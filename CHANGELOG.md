@@ -4,6 +4,18 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.16] - Unreleased
+
+### Added
+
+- Emoji button above the bytes left: the picked emoji goes in at the cursor and the focus returns to the message field.
+
+## [0.1.15] - Unreleased
+
+### Changed
+
+- The node dialog's header with the name stays in place while its content scrolls.
+
 ## [0.1.14] - Unreleased
 
 ### Changed

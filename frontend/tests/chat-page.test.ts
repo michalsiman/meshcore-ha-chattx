@@ -963,6 +963,49 @@ describe('reply', () => {
   });
 });
 
+describe('picking an emoji', () => {
+  async function pick(page: ChatPage, emoji: string) {
+    page.shadowRoot!.querySelector('chattx-emoji-picker')!.dispatchEvent(
+      new CustomEvent('emoji-selected', { detail: { emoji } }),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    await page.updateComplete;
+  }
+
+  async function typed(text: string) {
+    const page = await mountChatPage({ selectedId: '0' });
+    const area = page.shadowRoot!.querySelector('textarea')!;
+    area.value = text;
+    area.dispatchEvent(new Event('input'));
+    await page.updateComplete;
+    return { page, area };
+  }
+
+  it('inserts at the cursor and focuses the message field', async () => {
+    const { page, area } = await typed('ahoj svete');
+    area.setSelectionRange(4, 4);
+    await pick(page, '👍');
+    expect(area.value).toBe('ahoj👍 svete');
+    expect(page.shadowRoot!.activeElement).toBe(area);
+    expect(area.selectionStart).toBe(6);
+  });
+
+  it('replaces selected text', async () => {
+    const { page, area } = await typed('ahoj svete');
+    area.setSelectionRange(5, 10);
+    await pick(page, '👍');
+    expect(area.value).toBe('ahoj 👍');
+  });
+
+  it('counts the emoji in the bytes left', async () => {
+    const { page } = await typed('');
+    const counter = () => Number(page.shadowRoot!.querySelector('.byte-counter')!.textContent);
+    const before = counter();
+    await pick(page, '👍');
+    expect(counter()).toBe(before - 4);
+  });
+});
+
 describe('picking a conversation', () => {
   async function pick(page: ChatPage, id: string) {
     page.shadowRoot!.querySelector('chattx-conversation-list')!.dispatchEvent(

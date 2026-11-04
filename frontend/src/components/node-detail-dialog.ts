@@ -80,7 +80,9 @@ export class NodeDetailDialog extends LitElement {
       border-radius: 8px;
       max-width: 500px;
       max-height: 80vh;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
       animation: slideUp 0.3s;
     }
@@ -96,6 +98,7 @@ export class NodeDetailDialog extends LitElement {
       gap: 12px;
       padding: 16px;
       border-bottom: 1px solid var(--divider-color, #e0e0e0);
+      flex-shrink: 0;
     }
 
     .dialog-avatar {
@@ -151,7 +154,7 @@ export class NodeDetailDialog extends LitElement {
 
     .dialog-close:hover { color: var(--primary-text-color); }
 
-    .dialog-content { padding: 16px; }
+    .dialog-content { flex: 1; min-height: 0; overflow-y: auto; padding: 16px; }
 
     .section { margin-bottom: 16px; }
 

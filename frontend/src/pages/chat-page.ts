@@ -20,6 +20,7 @@ import '../components/message-bubble';
 import '../components/message-search';
 import '../components/node-detail-dialog';
 import '../components/quick-message-picker';
+import '../components/emoji-picker';
 
 @customElement('chattx-chat-page')
 export class ChatPage extends LitElement {
@@ -218,10 +219,18 @@ export class ChatPage extends LitElement {
       color: var(--text-primary-color, #fff);
     }
 
+    .composer-counter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
     .byte-counter {
       flex-shrink: 0;
       min-width: 28px;
-      padding-bottom: 12px;
+      padding-bottom: 4px;
       font-size: 12px;
       font-variant-numeric: tabular-nums;
       text-align: right;
@@ -957,9 +966,14 @@ export class ChatPage extends LitElement {
             }
           }}
           ?disabled=${this._sending || !this.selectedId}></textarea>
-        <span
-          class=${remaining <= 0 ? 'byte-counter at-limit' : 'byte-counter'}
-          title="Bytes left. Letters with diacritics take 2, emoji take 4. In channels your node name is part of the message.">${remaining}</span>
+        <div class="composer-counter">
+          <chattx-emoji-picker
+            ?disabled=${this._sending || !this.selectedId}
+            @emoji-selected=${this._onEmojiSelected}></chattx-emoji-picker>
+          <span
+            class=${remaining <= 0 ? 'byte-counter at-limit' : 'byte-counter'}
+            title="Bytes left. Letters with diacritics take 2, emoji take 4. In channels your node name is part of the message.">${remaining}</span>
+        </div>
         <button
           class="send-button"
           aria-label="Send message"
@@ -1213,6 +1227,19 @@ export class ChatPage extends LitElement {
     const current = this._inputText.trimEnd();
     this._inputText = current ? `${current} ${e.detail.message}` : e.detail.message;
     await this._focusInput();
+  }
+
+  /** Put an emoji where the cursor was and return the focus to the message field. */
+  private async _onEmojiSelected(e: CustomEvent<{ emoji: string }>) {
+    const textarea = this.shadowRoot?.querySelector<HTMLTextAreaElement>('.input-area textarea');
+    const start = textarea?.selectionStart ?? this._inputText.length;
+    const end = textarea?.selectionEnd ?? start;
+    this._inputText = this._inputText.slice(0, start) + e.detail.emoji + this._inputText.slice(end);
+    await this.updateComplete;
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const cursor = start + e.detail.emoji.length;
+    textarea?.focus();
+    textarea?.setSelectionRange(cursor, cursor);
   }
 
   private async _sendMessage() {
