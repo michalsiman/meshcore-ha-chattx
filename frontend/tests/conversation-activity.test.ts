@@ -79,8 +79,19 @@ describe('formatLastActivity', () => {
   const now = Date.parse('2026-11-04T12:00:00Z');
   const ago = (hours: number) => new Date(now - hours * 3_600_000).toISOString();
 
+  it('shows minutes under an hour', () => {
+    expect(formatLastActivity(ago(1 / 60), now, true)).toBe('před 1 min');
+    expect(formatLastActivity(ago(0.5), now, true)).toBe('před 30 min');
+    expect(formatLastActivity(ago(59.5 / 60), now, true)).toBe('před 59 min');
+    expect(formatLastActivity(ago(0.5), now, false)).toBe('30 min ago');
+  });
+
+  it('says just now under a minute', () => {
+    expect(formatLastActivity(ago(0.5 / 60), now, true)).toBe('právě teď');
+    expect(formatLastActivity(ago(0.5 / 60), now, false)).toBe('just now');
+  });
+
   it('shows hours up to and including 48', () => {
-    expect(formatLastActivity(ago(0.5), now, true)).toBe('před < 1 h');
     expect(formatLastActivity(ago(1), now, true)).toBe('před 1 h');
     expect(formatLastActivity(ago(47.9), now, true)).toBe('před 47 h');
     expect(formatLastActivity(ago(48), now, true)).toBe('před 48 h');
@@ -99,6 +110,6 @@ describe('formatLastActivity', () => {
   it('handles missing and future times', () => {
     expect(formatLastActivity(undefined, now, true)).toBe('');
     expect(formatLastActivity('nonsense', now, true)).toBe('');
-    expect(formatLastActivity(ago(-1), now, true)).toBe('před < 1 h');
+    expect(formatLastActivity(ago(-1), now, true)).toBe('právě teď');
   });
 });

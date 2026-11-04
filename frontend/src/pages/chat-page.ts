@@ -7,6 +7,7 @@ import { buildRenderItems } from '../chat/message-parser';
 import { remainingMessageBytes } from '../utils/message-limit';
 import { loadStripDiacritics, saveStripDiacritics, stripDiacritics } from '../utils/diacritics';
 import { isCzech } from '../utils/language';
+import { loadShowContactIds, saveShowContactIds } from '../utils/contact-ids';
 import { discoverChannelEntity, discoverContactEntity } from '../chat/entity-resolver';
 import { getRepeaterLoginState, sendDirectMessage, sendChannelMessage } from '../api';
 import {
@@ -70,6 +71,7 @@ export class ChatPage extends LitElement {
   @state() private _searchOpen = false;
   @state() private _repeaterDialogOpen = false;
   @state() private _stripDiacritics = loadStripDiacritics();
+  @state() private _showContactIds = loadShowContactIds();
   @state() private _repeaterLoggedIn = false;
   private _repeaterLoginPrefix: string | null = null;
   @state() private _currentEntityId: string | null = null;
@@ -747,6 +749,7 @@ export class ChatPage extends LitElement {
         return html`
           <div class="chat-layout narrow-list-only">
             <chattx-conversation-list
+              .showContactIds=${this._showContactIds}
               .conversations=${this.conversations}
               .activity=${this.activity}
               .activeId=${this.selectedId}
@@ -766,6 +769,8 @@ export class ChatPage extends LitElement {
               @manage-requested=${() => this._onManageRequested()}></chattx-conversation-list>
             ${this._manageOpen ? html`
               <chattx-manage-dialog
+                .showContactIds=${this._showContactIds}
+                @show-contact-ids-changed=${this._onShowContactIdsChanged}
                 .hass=${this.hass}
                 .entryId=${this.config?.entry_id}
                 .narrow=${this.narrow}
@@ -784,6 +789,7 @@ export class ChatPage extends LitElement {
     return html`
       <div class="chat-layout">
         <chattx-conversation-list
+          .showContactIds=${this._showContactIds}
           .conversations=${this.conversations}
           .activity=${this.activity}
           .activeId=${this.selectedId}
@@ -829,6 +835,8 @@ export class ChatPage extends LitElement {
         ` : ''}
         ${this._manageOpen ? html`
           <chattx-manage-dialog
+            .showContactIds=${this._showContactIds}
+            @show-contact-ids-changed=${this._onShowContactIdsChanged}
             .hass=${this.hass}
             .entryId=${this.config?.entry_id}
             .narrow=${this.narrow}
@@ -1174,6 +1182,11 @@ export class ChatPage extends LitElement {
   /** The composer's text as it would go out. */
   private _outgoingText(): string {
     return this._stripDiacritics ? stripDiacritics(this._inputText) : this._inputText;
+  }
+
+  private _onShowContactIdsChanged(e: CustomEvent<{ enabled: boolean }>) {
+    this._showContactIds = e.detail.enabled;
+    saveShowContactIds(e.detail.enabled);
   }
 
   private _toggleStripDiacritics() {

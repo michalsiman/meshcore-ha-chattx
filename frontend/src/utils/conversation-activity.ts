@@ -42,18 +42,21 @@ export function lastActivityOf(
   return bySuffix(activity).get(entitySuffix(conversation, nodePrefix));
 }
 
-const HOUR_MS = 3_600_000;
+const MINUTE_MS = 60_000;
+const HOUR_MS = 60 * MINUTE_MS;
 
 /**
- * Age of a message: in whole hours up to 48 hours, in whole days beyond that.
- * Empty when there is no valid time; a time in the future counts as just now.
+ * Age of a message: in whole minutes up to an hour, in whole hours up to 48
+ * hours, in whole days beyond that. Empty when there is no valid time; under a
+ * minute or a time in the future counts as just now.
  */
 export function formatLastActivity(timestamp: string | undefined, now: number, czech: boolean): string {
   const millis = toMillis(timestamp);
   if (millis === 0) return '';
   const age = now - millis;
+  if (age < MINUTE_MS) return czech ? 'právě teď' : 'just now';
   const amount = age < HOUR_MS
-    ? '< 1 h'
+    ? `${Math.floor(age / MINUTE_MS)} min`
     : age > 48 * HOUR_MS
       ? `${Math.floor(age / (24 * HOUR_MS))} d`
       : `${Math.floor(age / HOUR_MS)} h`;

@@ -4,6 +4,16 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.13] - Unreleased
+
+### Changed
+
+- The conversation list shows the newest message's age in minutes under an hour.
+
+### Added
+
+- Switch in the manage dialog to hide contact IDs and channel numbers in the chat list, remembered per browser.
+
 ## [0.1.12] - Unreleased
 
 ### Changed

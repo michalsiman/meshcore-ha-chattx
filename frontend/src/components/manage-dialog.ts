@@ -4,6 +4,7 @@ import type { HomeAssistant, Contact, Channel } from '../types';
 import { getContacts, getChannels, getDeviceConfig, addContact, removeContact, removeChannel } from '../api';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import './channel-dialog';
+import { isCzech } from '../utils/language';
 
 type ManageTab = 'contacts' | 'channels';
 
@@ -24,6 +25,7 @@ export class ManageDialog extends LitElement {
    * scope chip opens the dialog on 'channels' so the user lands on
    * the channel whose scope they tapped. */
   @property({ type: String }) initialTab?: ManageTab;
+  @property({ type: Boolean }) showContactIds = true;
 
   private _tabInitialized = false;
 
@@ -136,6 +138,16 @@ export class ManageDialog extends LitElement {
     }
 
     /* Tab bar */
+    .list-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--primary-text-color);
+      cursor: pointer;
+    }
+
     .tab-bar {
       display: flex;
       border-bottom: 1px solid var(--divider-color, #e0e0e0);
@@ -556,6 +568,18 @@ export class ManageDialog extends LitElement {
           <span class="dialog-title">Manage</span>
           <button class="close-btn" aria-label="Close" @click=${this._close}>✕</button>
         </div>
+
+        <label class="list-option">
+          <input
+            type="checkbox"
+            .checked=${this.showContactIds}
+            @change=${(e: Event) => this.dispatchEvent(
+              new CustomEvent('show-contact-ids-changed', {
+                detail: { enabled: (e.target as HTMLInputElement).checked },
+              }),
+            )} />
+          ${isCzech() ? 'Zobrazovat ID kontaktů a čísla kanálů v seznamu chatů' : 'Show contact IDs and channel numbers in the chat list'}
+        </label>
 
         <div class="tab-bar">
           <button

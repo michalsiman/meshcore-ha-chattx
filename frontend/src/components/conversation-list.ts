@@ -27,6 +27,8 @@ export class ConversationList extends LitElement {
   @property({ type: String }) nodePrefix: string | null = null;
   /** Time of the newest message per message entity_id. */
   @property({ type: Object }) activity: Record<string, string> = {};
+  /** Whether rows show the contact ID or channel number under the name. */
+  @property({ type: Boolean }) showContactIds = true;
   private _ageTimer: ReturnType<typeof setInterval> | null = null;
 
   @state() private _activeFilter: ChatFilter = 'all';
@@ -375,8 +377,9 @@ export class ConversationList extends LitElement {
     const id = isContact ? (conv as Contact).pubkey_prefix : String((conv as Channel).channel_idx);
     const name = isContact ? (conv as Contact).adv_name : (conv as Channel).name;
     const age = formatLastActivity(lastActivityOf(conv, this.activity, this.nodePrefix), Date.now(), isCzech());
-    const detail = (isContact ? (conv as Contact).pubkey_prefix : `Channel ${(conv as Channel).channel_idx}`)
-      + (age ? ` · ${age}` : '');
+    const idLabel = isContact ? (conv as Contact).pubkey_prefix : `Channel ${(conv as Channel).channel_idx}`;
+    const label = this.showContactIds ? idLabel : '';
+    const detail = [label, age].filter(Boolean).join(' · ');
     const avatar = isContact
       ? (conv as Contact).pubkey_prefix.substring(0, 2).toUpperCase()
       : `#${(conv as Channel).channel_idx}`;
@@ -384,9 +387,7 @@ export class ConversationList extends LitElement {
     const isActive = this.activeId === id;
 
     const unread = this._getUnreadCount(id);
-    const ariaLabel = unread > 0
-      ? `${name}, ${detail}, ${unread} unread`
-      : `${name}, ${detail}`;
+    const ariaLabel = [name, detail, unread > 0 ? `${unread} unread` : ''].filter(Boolean).join(', ');
 
     // Roving tabindex: exactly one item in the list is the Tab stop.
     // Prefer the active item; if nothing is active, the first row.
@@ -411,7 +412,7 @@ export class ConversationList extends LitElement {
         <div class="conversation-avatar ${isContact ? '' : 'channel'}">${avatar}</div>
         <div class="conversation-info">
           <div class="conversation-name">${name}</div>
-          <div class="conversation-detail">${detail}</div>
+          ${detail ? html`<div class="conversation-detail">${detail}</div>` : ''}
         </div>
         ${unread > 0
           ? html`<div class="unread-badge" aria-hidden="true">${unread}</div>`
