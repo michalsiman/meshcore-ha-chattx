@@ -46,7 +46,7 @@ export type StackedBarLegend = 'inline' | 'below' | 'none';
  * eye-fixation; use stat-bar when you need a single value coloured by
  * its band.
  */
-@customElement('meshcore-stacked-bar')
+@customElement('chattx-stacked-bar')
 export class StackedBar extends LitElement {
   @property({ type: Array }) segments: StackedBarSegment[] = [];
   @property({ type: Number }) total?: number;
@@ -171,6 +171,6 @@ export class StackedBar extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-stacked-bar': StackedBar;
+    'chattx-stacked-bar': StackedBar;
   }
 }

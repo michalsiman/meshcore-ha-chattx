@@ -1,8 +1,8 @@
-"""MeshCore Chat WebSocket API.
+"""MeshCore Chattx WebSocket API.
 
 Lifted from the upstream meshcore integration's ws_api.py for the
 companion integration. All type strings are namespaced under
-meshcore_chat/* to avoid collision with upstream meshcore/* commands.
+meshcore_chattx/* to avoid collision with upstream meshcore/* commands.
 Coordinator state lookups go via hass.data[MESHCORE_DOMAIN] because the
 chat panel acts as a consumer of the upstream meshcore integration's
 coordinator.
@@ -25,7 +25,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
 
-from . import MeshCoreChatRuntimeData, _sync_upstream_repair_issue
+from . import MeshCoreChattxRuntimeData, _sync_upstream_repair_issue
 from .const import (
     CONF_FLOOD_SCOPES_UPSTREAM,
     CONF_NAME_UPSTREAM,
@@ -136,7 +136,7 @@ def _resolve_coordinator(hass: HomeAssistant, entry_id: str | None = None):
     call ``_get_coordinator(...)`` / ``_resolve_coordinator(...)``. Handlers
     that accept ``entry_id`` in their schema but ignore it at the body
     level (SILENT-IGNORE — caught by
-    ``tests/components/meshcore_chat/test_ws_api_entry_id_audit.py``)
+    ``tests/components/meshcore_chattx/test_ws_api_entry_id_audit.py``)
     or route through a different resolver (e.g., ``_get_store`` — see
     its symmetric hardening for the chat-companion lookup) need their
     own coverage.
@@ -183,7 +183,7 @@ def _get_coordinator(hass: HomeAssistant, entry_id: str | None = None):
     integration's coordinator via ``hass.data[MESHCORE_DOMAIN][meshcore_entry_id]``.
     The ``entry_id`` argument here, when supplied by the frontend, is the
     *upstream* meshcore config-entry id (the chat panel discovers it via the
-    ``meshcore_chat/get_devices`` command, which in turn reads upstream's
+    ``meshcore_chattx/get_devices`` command, which in turn reads upstream's
     coordinator registry). When omitted, the first registered upstream
     coordinator is used.
 
@@ -376,7 +376,7 @@ def _get_store(
     if entry_id is not None:
         entry = hass.config_entries.async_get_entry(entry_id)
         if entry is None or not isinstance(
-            getattr(entry, "runtime_data", None), MeshCoreChatRuntimeData
+            getattr(entry, "runtime_data", None), MeshCoreChattxRuntimeData
         ):
             _LOGGER.warning(
                 "ws_api _get_store received entry_id %r that is not a chat companion entry",
@@ -388,7 +388,7 @@ def _get_store(
     # Fallback: first companion entry with a store.
     for entry in hass.config_entries.async_entries(DOMAIN):
         if isinstance(
-            getattr(entry, "runtime_data", None), MeshCoreChatRuntimeData
+            getattr(entry, "runtime_data", None), MeshCoreChattxRuntimeData
         ):
             return entry.runtime_data.store
     return None
@@ -405,7 +405,7 @@ def _get_channel_scopes(hass: HomeAssistant):
 
 
 def async_register_ws_commands(hass: HomeAssistant) -> None:
-    """Register all MeshCore Chat WebSocket commands."""
+    """Register all MeshCore Chattx WebSocket commands."""
     # Device / contact / channel read commands
     websocket_api.async_register_command(hass, ws_get_devices)
     websocket_api.async_register_command(hass, ws_get_contacts)
@@ -449,7 +449,7 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_search_stored_messages)
     websocket_api.async_register_command(hass, ws_get_messages_around)
 
-    _LOGGER.debug("Registered MeshCore Chat WebSocket API commands")
+    _LOGGER.debug("Registered MeshCore Chattx WebSocket API commands")
 
 
 # ─── meshcore/get_devices ────────────────────────────────────────────
@@ -459,7 +459,7 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_devices",
+        vol.Required("type"): "meshcore_chattx/get_devices",
     }
 )
 @callback
@@ -486,7 +486,7 @@ def ws_get_devices(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_contacts",
+        vol.Required("type"): "meshcore_chattx/get_contacts",
         vol.Optional("entry_id"): str,
     }
 )
@@ -536,7 +536,7 @@ def _compute_type_counts(contacts: list) -> dict:
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_contacts_paginated",
+        vol.Required("type"): "meshcore_chattx/get_contacts_paginated",
         vol.Optional("entry_id"): str,
         vol.Optional("category", default="all"): vol.In(
             ["all", "added", "discovered"]
@@ -627,7 +627,7 @@ async def ws_get_contacts_paginated(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_node_counts",
+        vol.Required("type"): "meshcore_chattx/get_node_counts",
         vol.Optional("entry_id"): str,
     }
 )
@@ -664,7 +664,7 @@ async def ws_get_node_counts(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/clear_discovered_contacts",
+        vol.Required("type"): "meshcore_chattx/clear_discovered_contacts",
         vol.Optional("days_threshold"): vol.All(int, vol.Range(min=1, max=365)),
         vol.Optional("entry_id"): str,
     }
@@ -726,7 +726,7 @@ async def ws_clear_discovered_contacts(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_channels",
+        vol.Required("type"): "meshcore_chattx/get_channels",
         vol.Optional("entry_id"): str,
     }
 )
@@ -782,7 +782,7 @@ def ws_get_channels(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_flood_scopes",
+        vol.Required("type"): "meshcore_chattx/get_flood_scopes",
         vol.Optional("entry_id"): str,
     }
 )
@@ -826,7 +826,7 @@ def ws_get_flood_scopes(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_managed_devices",
+        vol.Required("type"): "meshcore_chattx/get_managed_devices",
         vol.Optional("entry_id"): str,
     }
 )
@@ -932,7 +932,7 @@ def ws_get_managed_devices(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_device_config",
+        vol.Required("type"): "meshcore_chattx/get_device_config",
         vol.Optional("entry_id"): str,
     }
 )
@@ -1119,7 +1119,7 @@ def _send_device_config_failure(connection, msg_id, field, reason, changed):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/set_device_config",
+        vol.Required("type"): "meshcore_chattx/set_device_config",
         vol.Optional("entry_id"): str,
         vol.Required("settings"): dict,
     }
@@ -1406,7 +1406,7 @@ def _format_event_response(result) -> str:
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/execute_local",
+        vol.Required("type"): "meshcore_chattx/execute_local",
         vol.Optional("entry_id"): str,
         vol.Required("command"): str,
         vol.Optional("args"): dict,
@@ -1468,7 +1468,7 @@ async def ws_execute_local(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/execute_remote",
+        vol.Required("type"): "meshcore_chattx/execute_remote",
         vol.Optional("entry_id"): str,
         vol.Required("target_prefix"): str,
         vol.Required("command"): str,
@@ -1567,7 +1567,7 @@ async def ws_execute_remote(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/set_channel",
+        vol.Required("type"): "meshcore_chattx/set_channel",
         vol.Optional("entry_id"): str,
         vol.Required("channel_idx"): int,
         vol.Required("name"): str,
@@ -1648,7 +1648,7 @@ async def ws_set_channel(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/remove_channel",
+        vol.Required("type"): "meshcore_chattx/remove_channel",
         vol.Optional("entry_id"): str,
         vol.Required("channel_idx"): int,
     }
@@ -1706,7 +1706,7 @@ async def ws_remove_channel(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_neighbors",
+        vol.Required("type"): "meshcore_chattx/get_neighbors",
         vol.Optional("entry_id"): str,
         vol.Required("target_prefix"): str,
     }
@@ -1764,7 +1764,7 @@ def ws_get_neighbors(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/remove_neighbor",
+        vol.Required("type"): "meshcore_chattx/remove_neighbor",
         vol.Optional("entry_id"): str,
         vol.Required("target_prefix"): str,
         vol.Required("neighbor_pubkey"): str,
@@ -1842,7 +1842,7 @@ async def ws_remove_neighbor(hass, connection, msg):
         # removed from upstream main in an earlier change and is therefore
         # absent from the upstream coordinator this companion consumes. The
         # companion still exposes a remove-neighbor flow via
-        # meshcore_chat/remove_neighbor, so we duplicate the small
+        # meshcore_chattx/remove_neighbor, so we duplicate the small
         # entity-cleanup + persistence sequence here.
         # TODO: hoist into `coordinator_facade`.
         removed = 0
@@ -1907,7 +1907,7 @@ async def ws_remove_neighbor(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/cleanup_stale_neighbors",
+        vol.Required("type"): "meshcore_chattx/cleanup_stale_neighbors",
         vol.Optional("entry_id"): str,
         vol.Optional("days_threshold"): vol.All(
             vol.Coerce(int), vol.Range(min=1, max=90)
@@ -1951,7 +1951,7 @@ async def ws_cleanup_stale_neighbors(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_unread_counts",
+        vol.Required("type"): "meshcore_chattx/get_unread_counts",
         vol.Optional("entry_id"): str,
     }
 )
@@ -2027,7 +2027,7 @@ async def ws_get_unread_counts(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/mark_conversation_read",
+        vol.Required("type"): "meshcore_chattx/mark_conversation_read",
         vol.Optional("entry_id"): str,
         vol.Required("entity_id"): str,
     }
@@ -2284,7 +2284,7 @@ async def _do_identity_change(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/regenerate_identity",
+        vol.Required("type"): "meshcore_chattx/regenerate_identity",
         vol.Optional("entry_id"): str,
     }
 )
@@ -2334,7 +2334,7 @@ async def ws_regenerate_identity(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/import_identity",
+        vol.Required("type"): "meshcore_chattx/import_identity",
         vol.Optional("entry_id"): str,
         vol.Required("private_key"): str,
     }
@@ -2407,7 +2407,7 @@ async def ws_import_identity(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/set_location_source",
+        vol.Required("type"): "meshcore_chattx/set_location_source",
         vol.Optional("entry_id"): str,
         vol.Required("source"): str,
     }
@@ -2436,7 +2436,7 @@ async def ws_set_location_source(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/add_contact",
+        vol.Required("type"): "meshcore_chattx/add_contact",
         vol.Required("public_key"): str,
         vol.Optional("name"): str,
         vol.Optional("entry_id"): str,
@@ -2576,7 +2576,7 @@ async def ws_add_contact(hass, connection, msg):
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/remove_contact",
+        vol.Required("type"): "meshcore_chattx/remove_contact",
         vol.Required("public_key"): str,
         vol.Optional("entry_id"): str,
     }
@@ -2789,7 +2789,7 @@ def _trace_error_for(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/trace",
+        vol.Required("type"): "meshcore_chattx/trace",
         vol.Required("pubkey_prefix"): str,
         vol.Optional("entry_id"): str,
         # Optional comma-separated hex hops, e.g. "86,AE".  When provided,
@@ -3029,7 +3029,7 @@ async def _ws_trace_explicit(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_blocked_contacts",
+        vol.Required("type"): "meshcore_chattx/get_blocked_contacts",
         vol.Optional("entry_id"): str,
     }
 )
@@ -3064,7 +3064,7 @@ def ws_get_blocked_contacts(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/set_contact_blocked",
+        vol.Required("type"): "meshcore_chattx/set_contact_blocked",
         vol.Required("public_key"): str,
         vol.Required("blocked"): bool,
         vol.Optional("entry_id"): str,
@@ -3107,7 +3107,7 @@ def ws_set_contact_blocked(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_stored_messages",
+        vol.Required("type"): "meshcore_chattx/get_stored_messages",
         vol.Required("entity_id"): str,
         vol.Optional("limit", default=50): int,
         vol.Optional("before"): str,
@@ -3140,7 +3140,7 @@ async def ws_get_stored_messages(
     store = _get_store(hass, None)
     if store is None:
         connection.send_error(
-            msg["id"], "not_found", "No MeshCore Chat message store found"
+            msg["id"], "not_found", "No MeshCore Chattx message store found"
         )
         return
 
@@ -3159,7 +3159,7 @@ async def ws_get_stored_messages(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_stored_message_count",
+        vol.Required("type"): "meshcore_chattx/get_stored_message_count",
         vol.Required("entity_id"): str,
         vol.Optional("entry_id"): str,
     }
@@ -3187,7 +3187,7 @@ def ws_get_stored_message_count(
     store = _get_store(hass, None)
     if store is None:
         connection.send_error(
-            msg["id"], "not_found", "No MeshCore Chat message store found"
+            msg["id"], "not_found", "No MeshCore Chattx message store found"
         )
         return
 
@@ -3199,7 +3199,7 @@ def ws_get_stored_message_count(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/search_stored_messages",
+        vol.Required("type"): "meshcore_chattx/search_stored_messages",
         vol.Required("query"): str,
         vol.Optional("entity_id"): str,
         vol.Optional("from_date"): str,
@@ -3232,7 +3232,7 @@ async def ws_search_stored_messages(
     store = _get_store(hass, None)
     if store is None:
         connection.send_error(
-            msg["id"], "not_found", "No MeshCore Chat message store found"
+            msg["id"], "not_found", "No MeshCore Chattx message store found"
         )
         return
 
@@ -3278,7 +3278,7 @@ async def ws_search_stored_messages(
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "meshcore_chat/get_messages_around",
+        vol.Required("type"): "meshcore_chattx/get_messages_around",
         vol.Required("entity_id"): str,
         vol.Required("anchor_id"): str,
         vol.Optional("before_limit", default=25): int,
@@ -3321,7 +3321,7 @@ async def ws_get_messages_around(
     store = _get_store(hass, None)
     if store is None:
         connection.send_error(
-            msg["id"], "not_found", "No MeshCore Chat message store found"
+            msg["id"], "not_found", "No MeshCore Chattx message store found"
         )
         return
 

@@ -1,4 +1,4 @@
-"""Unit tests for ``custom_components.meshcore_chat.config_flow``.
+"""Unit tests for ``custom_components.meshcore_chattx.config_flow``.
 
 Phase 4A of the HA Quality + Best Practices Remediation. Covers the
 four behavioral guarantees of the config_flow module:
@@ -33,25 +33,25 @@ from homeassistant.loader import IntegrationNotFound
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.meshcore_chat import config_flow
-from custom_components.meshcore_chat.const import (
+from custom_components.meshcore_chattx import config_flow
+from custom_components.meshcore_chattx.const import (
     OPT_MAX_MESSAGES_PER_CONVERSATION,
     OPT_MESSAGE_RETENTION_DAYS,
 )
 
-DOMAIN = "meshcore_chat"
+DOMAIN = "meshcore_chattx"
 
 
 @pytest.fixture
-def user_flow() -> config_flow.MeshCoreChatConfigFlow:
+def user_flow() -> config_flow.MeshCoreChattxConfigFlow:
     """A bare user-source ConfigFlow handler ready for ``async_step_user``."""
-    flow = config_flow.MeshCoreChatConfigFlow()
+    flow = config_flow.MeshCoreChattxConfigFlow()
     flow.context = {"source": SOURCE_USER}
     return flow
 
 
 async def test_user_flow_aborts_when_meshcore_missing(
-    hass: HomeAssistant, user_flow: config_flow.MeshCoreChatConfigFlow
+    hass: HomeAssistant, user_flow: config_flow.MeshCoreChattxConfigFlow
 ) -> None:
     """Upstream meshcore not installed → abort with meshcore_not_installed."""
     user_flow.hass = hass
@@ -67,10 +67,10 @@ async def test_user_flow_aborts_when_meshcore_missing(
 
 
 async def test_user_flow_aborts_when_entry_already_exists(
-    hass: HomeAssistant, user_flow: config_flow.MeshCoreChatConfigFlow
+    hass: HomeAssistant, user_flow: config_flow.MeshCoreChattxConfigFlow
 ) -> None:
     """Singleton guard — second entry attempts abort with single_instance_allowed."""
-    existing = MockConfigEntry(domain=DOMAIN, title="MeshCore Chat", data={})
+    existing = MockConfigEntry(domain=DOMAIN, title="MeshCore Chattx", data={})
     existing.add_to_hass(hass)
     user_flow.hass = hass
 
@@ -85,7 +85,7 @@ async def test_user_flow_aborts_when_entry_already_exists(
 
 
 async def test_user_flow_happy_path_creates_entry(
-    hass: HomeAssistant, user_flow: config_flow.MeshCoreChatConfigFlow
+    hass: HomeAssistant, user_flow: config_flow.MeshCoreChattxConfigFlow
 ) -> None:
     """Meshcore present + no prior entry → flow creates the entry."""
     user_flow.hass = hass
@@ -97,7 +97,7 @@ async def test_user_flow_happy_path_creates_entry(
         result = await user_flow.async_step_user()
 
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["title"] == "MeshCore Chat"
+    assert result["title"] == "MeshCore Chattx"
     assert result["data"] == {}
 
 
@@ -109,11 +109,11 @@ async def test_options_flow_coerces_floats_to_ints(hass: HomeAssistant) -> None:
     and could corrupt comparisons or storage on round-trip.
     """
     config_entry = MockConfigEntry(
-        domain=DOMAIN, title="MeshCore Chat", data={}, options={}
+        domain=DOMAIN, title="MeshCore Chattx", data={}, options={}
     )
     config_entry.add_to_hass(hass)
 
-    flow = config_flow.MeshCoreChatOptionsFlow()
+    flow = config_flow.MeshCoreChattxOptionsFlow()
     flow.hass = hass
     # OptionsFlow's ``_config_entry_id`` property returns ``self.handler``;
     # that's how the framework links a fresh OptionsFlow back to its entry.
@@ -144,12 +144,12 @@ async def test_options_flow_coerces_floats_to_ints(hass: HomeAssistant) -> None:
 async def test_async_get_options_flow_returns_options_flow(
     hass: HomeAssistant,
 ) -> None:
-    """``async_get_options_flow`` returns a ``MeshCoreChatOptionsFlow`` instance."""
+    """``async_get_options_flow`` returns a ``MeshCoreChattxOptionsFlow`` instance."""
     config_entry = MockConfigEntry(
-        domain=DOMAIN, title="MeshCore Chat", data={}, options={}
+        domain=DOMAIN, title="MeshCore Chattx", data={}, options={}
     )
     config_entry.add_to_hass(hass)
-    options_flow = config_flow.MeshCoreChatConfigFlow.async_get_options_flow(
+    options_flow = config_flow.MeshCoreChattxConfigFlow.async_get_options_flow(
         config_entry
     )
-    assert isinstance(options_flow, config_flow.MeshCoreChatOptionsFlow)
+    assert isinstance(options_flow, config_flow.MeshCoreChattxOptionsFlow)

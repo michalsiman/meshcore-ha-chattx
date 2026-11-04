@@ -1,11 +1,11 @@
-"""Config flow for MeshCore Chat.
+"""Config flow for MeshCore Chattx.
 
 Two preconditions are enforced before an entry is created:
   1. The upstream `meshcore` integration must be installed (matches the
      hard-gate `dependencies: ["meshcore"]` in manifest.json — without
      this in-flow check, the flow would succeed and setup would then
      fail with a runtime ImportError surfaced as a generic error).
-  2. Only a single instance of `meshcore_chat` may exist.
+  2. Only a single instance of `meshcore_chattx` may exist.
 
 Options flow exposes two retention tunables (max messages per
 conversation, retention days) that are otherwise read from
@@ -35,11 +35,11 @@ from .const import (
     OPT_MESSAGE_RETENTION_DAYS,
 )
 
-DOMAIN = "meshcore_chat"
+DOMAIN = "meshcore_chattx"
 
 
-class MeshCoreChatConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a MeshCore Chat config flow."""
+class MeshCoreChattxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a MeshCore Chattx config flow."""
 
     VERSION = 1
 
@@ -59,17 +59,17 @@ class MeshCoreChatConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self._async_current_entries():
             return self.async_abort(reason="single_instance_allowed")
 
-        return self.async_create_entry(title="MeshCore Chat", data={})
+        return self.async_create_entry(title="MeshCore Chattx", data={})
 
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Return the options flow handler."""
-        return MeshCoreChatOptionsFlow()
+        return MeshCoreChattxOptionsFlow()
 
 
-class MeshCoreChatOptionsFlow(OptionsFlow):
-    """Handle MeshCore Chat options.
+class MeshCoreChattxOptionsFlow(OptionsFlow):
+    """Handle MeshCore Chattx options.
 
     Exposes the two message-store retention tunables that
     `message_store.py` already reads from `entry.options` (with the

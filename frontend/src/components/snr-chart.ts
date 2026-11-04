@@ -5,7 +5,7 @@ import { customElement, property } from 'lit/decorators.js';
  * Lightweight SVG-based SNR time-series chart.
  * Displays neighbor SNR values over time with minimal dependencies.
  */
-@customElement('meshcore-snr-chart')
+@customElement('chattx-snr-chart')
 export class SNRChart extends LitElement {
   @property({ type: Array }) data: Array<{ timestamp: number; values: Record<string, number> }> = [];
   @property({ type: Array }) neighbors: string[] = [];
@@ -251,6 +251,6 @@ export class SNRChart extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-snr-chart': SNRChart;
+    'chattx-snr-chart': SNRChart;
   }
 }

@@ -1,8 +1,8 @@
-# Using MeshCore Chat
+# Using MeshCore Chattx
 
-The MeshCore Chat interface should be intuitive for common tasks; this document mostly covers dialogs (accessed by clicking gear icons, etc.) and integration functions that might not be as easy to find or understand.
+The MeshCore Chattx interface should be intuitive for common tasks; this document mostly covers dialogs (accessed by clicking gear icons, etc.) and integration functions that might not be as easy to find or understand.
 
-These instructions are a walkthrough of the administrative tasks the panel is built for, plus the operational gotchas worth knowing in advance. Assumes you've already followed the install steps in [README.md](./README.md) and the **MeshCore Chat** entry is in your sidebar.
+These instructions are a walkthrough of the administrative tasks the panel is built for, plus the operational gotchas worth knowing in advance. Assumes you've already followed the install steps in [README.md](./README.md) and the **MeshCore Chattx** entry is in your sidebar.
 
 If you're brand new to MeshCore itself, [meshcore.io](https://meshcore.io) is the friendlier landing page; [docs.meshcore.io](https://docs.meshcore.io) is the protocol-and-firmware reference.
 
@@ -10,7 +10,7 @@ If you're brand new to MeshCore itself, [meshcore.io](https://meshcore.io) is th
 
 ## Quick start
 
-The panel lives in the HA sidebar under **MeshCore Chat**. It opens to the **Chat** tab; three more tabs sit along the top header: **Devices**, **Nodes**, **Settings**.
+The panel lives in the HA sidebar under **MeshCore Chattx**. It opens to the **Chat** tab; three more tabs sit along the top header: **Devices**, **Nodes**, **Settings**.
 
 - **Chat** — channels, DMs, message history, cross-conversation search, and per-message route popups (click any message bubble for Copy / Reply, plus the route metadata: hop sequence, SNR, RSSI, and exact receive timestamp).
 - **Devices** — per-device sensor cards for every managed repeater and client, plus action buttons (Flood Advert, Sync Clock, Req Telemetry, Req Status, Issue Command, Reboot).
@@ -154,7 +154,7 @@ The result view shows hops, total round-trip in ms, the per-hop path with SNR pe
 The chat archive has two retention knobs that the panel UI doesn't expose — they live on Home Assistant's standard config-entry options dialog instead.
 
 1. **Settings → Devices & Services**.
-2. Click the **MeshCore Chat** integration card.
+2. Click the **MeshCore Chattx** integration card.
 3. Click **Configure** gear icon.
 4. Two fields:
     - **Max messages per conversation** — default `500`, range `50`–`5000`. Per-conversation cap; older messages are dropped FIFO once the limit is hit. Bump this if you have chatty channels and want longer scrollback.
@@ -240,7 +240,7 @@ The firmware version shown in a managed repeater's header (e.g. `Firmware: v1.14
 To refresh:
 
 1. **Settings → Devices & Services**.
-2. Click the **MeshCore** integration card (the upstream one — *not* MeshCore Chat).
+2. Click the **MeshCore** integration card (the upstream one — *not* MeshCore Chattx).
 3. Click **Configure**.
 4. Click the repeater you flashed.
 5. Click **Save** — you don't need to change anything; the save action triggers a `ver` query against the repeater and updates Home Assistant's device registry.
@@ -279,7 +279,7 @@ Hidden-sensor preferences are per-device and stored in panel-local state — the
 
 - **Radio settings only take effect after a companion reboot.** Frequency, bandwidth, spreading factor, coding rate, TX power — change in Settings → Configure, save, then reboot the companion. The change is queued; the radio re-initialises on next boot.
 - **Renaming the companion changes its entity_ids.** See [Renaming the companion changes its entity_ids in HA](#renaming-the-companion-changes-its-entity_ids-in-ha) above. Plan automation references accordingly.
-- **No backend Python tests yet.** The integration is field-tested but not unit-tested. Issues are caught in production rather than CI. Track via the [GitHub issue tracker](https://github.com/mwolter805/meshcore-ha-chat/issues).
+- **No backend Python tests yet.** The integration is field-tested but not unit-tested. Issues are caught in production rather than CI. Track via the [GitHub issue tracker](https://github.com/michalsiman/meshcore-ha-chattx/issues).
 - **No reauthentication or device discovery.** The companion has no auth and no automatic discovery — meshcore (the upstream integration) handles all device pairing.
 
 ---

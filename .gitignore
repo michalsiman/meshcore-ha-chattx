@@ -6,7 +6,7 @@ __pycache__/
 .pytest_cache/
 pytest-cache-files-*/
 
-# Test venv (per CLAUDE.md "Python Tests (meshcore-ha-chat)" — uv-managed,
+# Test venv (per CLAUDE.md "Python Tests (meshcore-ha-chattx)" — uv-managed,
 # rebuildable via `uv venv --python 3.14 .venv && .venv/bin/pip install
 # pytest-homeassistant-custom-component`).
 .venv/
@@ -25,8 +25,8 @@ node_modules/
 # Ignore generic dist/ (Python builds, etc.) but DO track the panel
 # bundle — HACS users install the prebuilt artifact and never run npm.
 dist/
-!custom_components/meshcore_chat/frontend/dist/
-!custom_components/meshcore_chat/frontend/dist/**
+!custom_components/meshcore_chattx/frontend/dist/
+!custom_components/meshcore_chattx/frontend/dist/**
 
 # OS
 .DS_Store

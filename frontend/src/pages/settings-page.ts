@@ -82,7 +82,7 @@ const IDENTITY_FLOW_STEP_ORDER: ReadonlyArray<{
 /**
  * Full settings page with multiple collapsible sections and companion device card at top
  */
-@customElement('meshcore-settings-page')
+@customElement('chattx-settings-page')
 export class SettingsPage extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: Object }) config?: PanelConfig;
@@ -888,7 +888,7 @@ export class SettingsPage extends LitElement {
       ` : nothing}
 
       <!-- Dialogs -->
-      <meshcore-confirm-dialog
+      <chattx-confirm-dialog
         .open=${this._confirmDialogOpen}
         .title=${this._confirmAction?.title || ''}
         .message=${this._confirmAction?.message || ''}
@@ -896,16 +896,16 @@ export class SettingsPage extends LitElement {
         ?dangerous=${!!this._confirmAction?.requireTyped}
         @confirm=${this._onConfirmAction}
         @cancel=${this._onConfirmCancel}>
-      </meshcore-confirm-dialog>
+      </chattx-confirm-dialog>
 
-      <meshcore-command-dialog
+      <chattx-command-dialog
         .open=${this._commandDialogOpen}
         .hass=${this.hass}
         .entryId=${this.config?.entry_id}
         ?isLocal=${true}
         ?narrow=${this.narrow}
         @close=${this._onCommandDialogClose}>
-      </meshcore-command-dialog>
+      </chattx-command-dialog>
     `;
   }
 
@@ -961,12 +961,12 @@ export class SettingsPage extends LitElement {
 
         ${entities.length > 0
           ? html`
-              <meshcore-node-summary
+              <chattx-node-summary
                 .hass=${this.hass}
                 .device=${this._companionDescriptor(d)}
                 .entities=${entities}
                 .hiddenCount=${hiddenCount}>
-              </meshcore-node-summary>
+              </chattx-node-summary>
             `
           : nothing}
 
@@ -1541,7 +1541,7 @@ export class SettingsPage extends LitElement {
         // closes via _onConfirmAction).
         this._closeKeyManagementModal();
         this._startIdentityFlow('regenerate', {
-          type: 'meshcore_chat/regenerate_identity',
+          type: 'meshcore_chattx/regenerate_identity',
           payload: this.config?.entry_id
             ? { entry_id: this.config.entry_id }
             : {},
@@ -1581,7 +1581,7 @@ export class SettingsPage extends LitElement {
     const payload: Record<string, unknown> = { private_key: sanitized };
     if (this.config?.entry_id) payload.entry_id = this.config.entry_id;
     this._startIdentityFlow('import', {
-      type: 'meshcore_chat/import_identity',
+      type: 'meshcore_chattx/import_identity',
       payload,
     });
   }
@@ -1597,7 +1597,7 @@ export class SettingsPage extends LitElement {
    */
   private _startIdentityFlow(
     flow: IdentityFlowKind,
-    request: { type: 'meshcore_chat/regenerate_identity' | 'meshcore_chat/import_identity'; payload: Record<string, unknown> },
+    request: { type: 'meshcore_chattx/regenerate_identity' | 'meshcore_chattx/import_identity'; payload: Record<string, unknown> },
   ) {
     if (!this.hass) return;
     // Reset any leftover subscription from a previous flow.
@@ -1789,7 +1789,7 @@ export class SettingsPage extends LitElement {
     if (!r) return nothing;
 
     // Uses the canonical `.dialog-*` pattern (same as
-    // `meshcore-confirm-dialog`) rather than the `.modal-*` pattern
+    // `chattx-confirm-dialog`) rather than the `.modal-*` pattern
     // (which is for full-width left-aligned menu-list items, e.g.
     // the Companion Settings overflow menu). Visual consistency
     // with the rename CONFIRM dialog the user just clicked through.
@@ -1926,7 +1926,7 @@ export class SettingsPage extends LitElement {
 
   private _loadHiddenSensors() {
     try {
-      const stored = localStorage.getItem('meshcore-hidden-sensors');
+      const stored = localStorage.getItem('chattx-hidden-sensors');
       if (stored) {
         this._hiddenSensors = JSON.parse(stored);
       }
@@ -1937,7 +1937,7 @@ export class SettingsPage extends LitElement {
 
   private _saveHiddenSensors() {
     try {
-      localStorage.setItem('meshcore-hidden-sensors', JSON.stringify(this._hiddenSensors));
+      localStorage.setItem('chattx-hidden-sensors', JSON.stringify(this._hiddenSensors));
     } catch {
       // localStorage full or unavailable
     }
@@ -1989,7 +1989,7 @@ export class SettingsPage extends LitElement {
   }
 
   // Trace button on the Companion quick-actions row.  Rather
-  // than reach into the contact list (which lives on meshcore-chat-panel),
+  // than reach into the contact list (which lives on meshcore-chattx-panel),
   // the page dispatches an event upward.  The panel opens the target-
   // picker dialog, and on selection routes through the same trace-
   // dialog open code path that nodes-tab uses.
@@ -2057,6 +2057,6 @@ export class SettingsPage extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-settings-page': SettingsPage;
+    'chattx-settings-page': SettingsPage;
   }
 }

@@ -15,7 +15,7 @@ import '../components/manage-dialog';
 import '../components/message-bubble';
 import '../components/message-search';
 
-@customElement('meshcore-chat-page')
+@customElement('chattx-chat-page')
 export class ChatPage extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: Object }) config?: PanelConfig;
@@ -388,7 +388,7 @@ export class ChatPage extends LitElement {
       width: 100% !important;
     }
 
-    .narrow-list-only meshcore-conversation-list {
+    .narrow-list-only chattx-conversation-list {
       width: 100% !important;
       flex-shrink: 1;
     }
@@ -553,7 +553,7 @@ export class ChatPage extends LitElement {
       // conversation.
       //
       // We must clear `this.selectedId = null` from the child here.
-      // The parent (`meshcore-chat-panel.ts:_selectDevice`) clears
+      // The parent (`meshcore-chattx-panel.ts:_selectDevice`) clears
       // `_pendingChatTarget = null` simultaneously, but
       // `_pendingChatTarget` is normally already null — conversation-
       // list clicks set `chat-page.selectedId` directly without
@@ -685,7 +685,7 @@ export class ChatPage extends LitElement {
       } else {
         return html`
           <div class="chat-layout narrow-list-only">
-            <meshcore-conversation-list
+            <chattx-conversation-list
               .conversations=${this.conversations}
               .activeId=${this.selectedId}
               .unread=${this.unread}
@@ -701,9 +701,9 @@ export class ChatPage extends LitElement {
                 this.selectedId = newId;
                 this._narrowShowMessages = true;
               }}
-              @manage-requested=${() => this._onManageRequested()}></meshcore-conversation-list>
+              @manage-requested=${() => this._onManageRequested()}></chattx-conversation-list>
             ${this._manageOpen ? html`
-              <meshcore-manage-dialog
+              <chattx-manage-dialog
                 .hass=${this.hass}
                 .entryId=${this.config?.entry_id}
                 .narrow=${this.narrow}
@@ -711,7 +711,7 @@ export class ChatPage extends LitElement {
                 @manage-closed=${() => this._manageOpen = false}
                 @contacts-changed=${this._onContactsChanged}
                 @channels-changed=${this._onChannelsChanged}
-              ></meshcore-manage-dialog>
+              ></chattx-manage-dialog>
             ` : html``}
           </div>
         `;
@@ -721,7 +721,7 @@ export class ChatPage extends LitElement {
     // Wide mode: side-by-side
     return html`
       <div class="chat-layout">
-        <meshcore-conversation-list
+        <chattx-conversation-list
           .conversations=${this.conversations}
           .activeId=${this.selectedId}
           .unread=${this.unread}
@@ -736,7 +736,7 @@ export class ChatPage extends LitElement {
             }
             this.selectedId = newId;
           }}
-          @manage-requested=${() => this._onManageRequested()}></meshcore-conversation-list>
+          @manage-requested=${() => this._onManageRequested()}></chattx-conversation-list>
         <div class="chat-main">
           ${this.selectedId ? html`
             <div class="narrow-header" style="display: flex; align-items: center; padding: 8px 16px;">
@@ -752,18 +752,18 @@ export class ChatPage extends LitElement {
         </div>
         ${this._searchOpen ? html`
           <div class="search-panel">
-            <meshcore-message-search
+            <chattx-message-search
               .hass=${this.hass}
               .entryId=${this.config?.entry_id}
               .entityId=${this._currentEntityId || undefined}
               .meshNodeName=${this.config?.node_name}
               @result-selected=${this._onSearchResultSelected}
               @search-close=${() => { this._searchOpen = false; }}
-            ></meshcore-message-search>
+            ></chattx-message-search>
           </div>
         ` : ''}
         ${this._manageOpen ? html`
-          <meshcore-manage-dialog
+          <chattx-manage-dialog
             .hass=${this.hass}
             .entryId=${this.config?.entry_id}
             .narrow=${this.narrow}
@@ -771,7 +771,7 @@ export class ChatPage extends LitElement {
             @manage-closed=${() => this._manageOpen = false}
             @contacts-changed=${this._onContactsChanged}
             @channels-changed=${this._onChannelsChanged}
-          ></meshcore-manage-dialog>
+          ></chattx-manage-dialog>
         ` : html``}
       </div>
     `;
@@ -903,9 +903,9 @@ export class ChatPage extends LitElement {
       }
 
       results.push(html`
-        <meshcore-message-bubble
+        <chattx-message-bubble
           .group=${item.group}
-          .timestampFormat=${this.config?.timestamp_format ?? 'relative'}></meshcore-message-bubble>
+          .timestampFormat=${this.config?.timestamp_format ?? 'relative'}></chattx-message-bubble>
       `);
       messageIdx++;
     }
@@ -1047,7 +1047,7 @@ export class ChatPage extends LitElement {
       //
       // Anchor-driven open: when we have a persisted last-read cursor
       // for this entity, hand it to the MessageStore so it routes
-      // through `meshcore_chat/get_messages_around` instead of the
+      // through `meshcore_chattx/get_messages_around` instead of the
       // newest-50 path. The divider then renders AFTER the anchor in
       // `_renderItemsWithDivider`, and `_doScrollWithRetry`
       // scrolls the divider to viewport top — landing the user with
@@ -1430,7 +1430,7 @@ export class ChatPage extends LitElement {
    *
    * The intended mark-read semantics are "user has
    * the chronologically newest message visible." This helper checks
-   * exactly that by comparing the last `meshcore-message-bubble`'s
+   * exactly that by comparing the last `chattx-message-bubble`'s
    * bottom edge against the chat container's bottom edge. 5 px slack
    * absorbs sub-pixel rounding from getBoundingClientRect.
    *
@@ -1443,7 +1443,7 @@ export class ChatPage extends LitElement {
   private _isLastMessageVisible(): boolean {
     const container = this._getChatContainer();
     if (!container) return false;
-    const bubbles = container.querySelectorAll('meshcore-message-bubble');
+    const bubbles = container.querySelectorAll('chattx-message-bubble');
     const last = bubbles[bubbles.length - 1] as HTMLElement | undefined;
     if (!last) return false;
     const containerBottom = container.getBoundingClientRect().bottom;
@@ -1604,7 +1604,7 @@ export class ChatPage extends LitElement {
     const container = this.shadowRoot?.querySelector('.chat-container') as HTMLElement | null;
     if (!container) return false;
 
-    const bubbleElements = container.querySelectorAll('meshcore-message-bubble');
+    const bubbleElements = container.querySelectorAll('chattx-message-bubble');
     for (const bubbleEl of Array.from(bubbleElements)) {
       const target = bubbleEl.shadowRoot?.querySelector(`[data-msg-id="${messageId}"]`) as HTMLElement | null;
       if (target) {
@@ -1620,6 +1620,6 @@ export class ChatPage extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-chat-page': ChatPage;
+    'chattx-chat-page': ChatPage;
   }
 }

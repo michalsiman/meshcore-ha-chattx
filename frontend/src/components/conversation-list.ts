@@ -6,7 +6,7 @@ import type { UnreadController } from '../chat/unread-controller';
 
 type ChatFilter = 'all' | 'unread' | 'dms' | 'channels';
 
-@customElement('meshcore-conversation-list')
+@customElement('chattx-conversation-list')
 export class ConversationList extends LitElement {
   @property({ type: Array }) conversations: Array<Contact | Channel> = [];
   @property({ type: String }) activeId: string | null = null;
@@ -442,6 +442,6 @@ export class ConversationList extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-conversation-list': ConversationList;
+    'chattx-conversation-list': ConversationList;
   }
 }

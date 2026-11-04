@@ -30,7 +30,7 @@ import { attachDialogA11y } from '../utils/dialog-a11y';
  * would silently mis-categorize — but renumbering would break much
  * more than a UI filter, so no dynamic source-of-truth import is used.
  */
-@customElement('meshcore-target-picker')
+@customElement('chattx-target-picker')
 export class TargetPicker extends LitElement {
   @property({ type: Boolean }) open = false;
   @property({ type: Array }) contacts: Contact[] = [];
@@ -329,6 +329,6 @@ export class TargetPicker extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-target-picker': TargetPicker;
+    'chattx-target-picker': TargetPicker;
   }
 }

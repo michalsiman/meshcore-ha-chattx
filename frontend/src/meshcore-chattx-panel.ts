@@ -13,7 +13,7 @@ import './pages/settings-page';
 import './components/trace-dialog';
 import './components/target-picker';
 
-@customElement('meshcore-chat-panel')
+@customElement('meshcore-chattx-panel')
 export class MeshCorePanel extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: Boolean, reflect: true }) narrow = false;
@@ -720,7 +720,7 @@ export class MeshCorePanel extends LitElement {
                   <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
                 </button>`
               : html``}
-            <div class="panel-title">MeshCore Chat</div>
+            <div class="panel-title">MeshCore Chattx</div>
           </div>
           <div class="header-right">
             ${device && this._getNodeStatus(device) !== null
@@ -819,7 +819,7 @@ export class MeshCorePanel extends LitElement {
           ${this._renderActivePage()}
         </div>
 
-        <meshcore-trace-dialog
+        <chattx-trace-dialog
           ?open=${this._traceDialogOpen}
           .contactName=${this._traceDialogContactName}
           .result=${this._traceDialogResult}
@@ -828,14 +828,14 @@ export class MeshCorePanel extends LitElement {
           .targetContact=${this._traceDialogTargetContact}
           @trace-requested=${this._onTraceRequested}
           @trace-dialog-closed=${() => { this._traceDialogOpen = false; }}>
-        </meshcore-trace-dialog>
+        </chattx-trace-dialog>
 
-        <meshcore-target-picker
+        <chattx-target-picker
           ?open=${this._targetPickerOpen}
           .contacts=${this._contacts}
           @target-selected=${this._onTargetPicked}
           @target-picker-closed=${() => { this._targetPickerOpen = false; }}>
-        </meshcore-target-picker>
+        </chattx-target-picker>
       </div>
     `;
   }
@@ -844,7 +844,7 @@ export class MeshCorePanel extends LitElement {
     switch (this._activeTab) {
       case 'chat':
         return html`
-          <meshcore-chat-page
+          <chattx-chat-page
             .hass=${this.hass}
             .config=${this._config}
             .conversations=${[...this._channels, ...this._contacts.filter(c => c.added_to_node)]}
@@ -853,33 +853,33 @@ export class MeshCorePanel extends LitElement {
             .narrow=${this.narrow}
             @active-entity-changed=${this._onActiveEntityChanged}
             @contacts-changed=${() => this._loadDeviceData()}
-            @channels-changed=${() => this._loadDeviceData()}></meshcore-chat-page>`;
+            @channels-changed=${() => this._loadDeviceData()}></chattx-chat-page>`;
       case 'devices':
         return html`
-          <meshcore-devices-page
+          <chattx-devices-page
             .hass=${this.hass}
             .config=${this._config}
             .selectedDevice=${this._selectedDevice}
-            .narrow=${this.narrow}></meshcore-devices-page>`;
+            .narrow=${this.narrow}></chattx-devices-page>`;
       case 'nodes':
         return html`
-          <meshcore-nodes-page
+          <chattx-nodes-page
             .hass=${this.hass}
             .config=${this._config}
             .contacts=${this._contacts}
             .channels=${this._channels}
             .narrow=${this.narrow}
             @node-action=${this._handleNodeAction}
-            @contacts-changed=${() => this._loadDeviceData()}></meshcore-nodes-page>`;
+            @contacts-changed=${() => this._loadDeviceData()}></chattx-nodes-page>`;
       case 'settings':
         return html`
-          <meshcore-settings-page
+          <chattx-settings-page
             .hass=${this.hass}
             .config=${this._config}
             .selectedDevice=${this._selectedDevice}
             .narrow=${this.narrow}
             @companion-trace-requested=${this._onCompanionTraceRequested}
-            @device-renamed=${this._onDeviceRenamed}></meshcore-settings-page>`;
+            @device-renamed=${this._onDeviceRenamed}></chattx-settings-page>`;
     }
   }
 
@@ -1160,7 +1160,7 @@ export class MeshCorePanel extends LitElement {
   // the child component to trigger its own refetch + re-resolve.
 
   private async _refreshNodesPageAfterMutation(pubkey: string) {
-    const nodesPage = this.shadowRoot?.querySelector('meshcore-nodes-page') as
+    const nodesPage = this.shadowRoot?.querySelector('chattx-nodes-page') as
       | (HTMLElement & { refreshAfterMutation: (pubkey: string) => Promise<void> })
       | null;
     if (nodesPage && typeof nodesPage.refreshAfterMutation === 'function') {
@@ -1173,7 +1173,7 @@ export class MeshCorePanel extends LitElement {
   }
 
   private _clearNodesPagePending() {
-    const nodesPage = this.shadowRoot?.querySelector('meshcore-nodes-page') as
+    const nodesPage = this.shadowRoot?.querySelector('chattx-nodes-page') as
       | (HTMLElement & { clearPendingAction: () => void })
       | null;
     if (nodesPage && typeof nodesPage.clearPendingAction === 'function') {
@@ -1244,6 +1244,6 @@ export class MeshCorePanel extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-chat-panel': MeshCorePanel;
+    'meshcore-chattx-panel': MeshCorePanel;
   }
 }

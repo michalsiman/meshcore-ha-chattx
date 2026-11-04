@@ -65,7 +65,7 @@ type GroupName =
  * UX is preserved. Long-press fires `tile-context-menu` so the existing
  * sensor-hide flow is preserved.
  */
-@customElement('meshcore-node-summary')
+@customElement('chattx-node-summary')
 export class NodeSummary extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: Object }) device?: NodeSummaryDevice;
@@ -272,7 +272,7 @@ export class NodeSummary extends LitElement {
       white-space: nowrap;
     }
     .si-bar { min-width: 0; }
-    .si-bar meshcore-stat-bar { width: 100%; }
+    .si-bar chattx-stat-bar { width: 100%; }
 
     .unit {
       font-size: 11px;
@@ -483,7 +483,7 @@ export class NodeSummary extends LitElement {
     if (!this._rateHistory.length) return nothing;
     return html`
       <div class="subsection-label">Message activity (48h)</div>
-      <meshcore-message-rate-chart .data=${this._rateHistory}></meshcore-message-rate-chart>
+      <chattx-message-rate-chart .data=${this._rateHistory}></chattx-message-rate-chart>
     `;
   }
 
@@ -558,12 +558,12 @@ export class NodeSummary extends LitElement {
             ? html`<span class="secondary">· ${voltageVal.toFixed(3)} V</span>`
             : nothing}
         </div>
-        <meshcore-stat-bar
+        <chattx-stat-bar
           .value=${pct}
           .min=${0}
           .max=${100}
           .band=${ev.band}>
-        </meshcore-stat-bar>
+        </chattx-stat-bar>
       </div>
     `;
   }
@@ -590,12 +590,12 @@ export class NodeSummary extends LitElement {
             ? html`<span class="secondary">· SNR ${snrVal.toFixed(1)} dB</span>`
             : nothing}
         </div>
-        <meshcore-stat-bar
+        <chattx-stat-bar
           .value=${rssiVal}
           .min=${-130}
           .max=${-30}
           .band=${ev.band}>
-        </meshcore-stat-bar>
+        </chattx-stat-bar>
       </div>
     `;
   }
@@ -654,11 +654,11 @@ export class NodeSummary extends LitElement {
           <span class="primary">${totalUsed.toFixed(1)}<span class="unit">%</span></span>
         </div>
         <div class="ra-bar-wrap">
-          <meshcore-stacked-bar
+          <chattx-stacked-bar
             .segments=${segments}
             .total=${100}
             .legend=${'none'}>
-          </meshcore-stacked-bar>
+          </chattx-stacked-bar>
           <div class="ra-legend">
             ${tx
               ? html`<span class="ra-legend-item" @click=${onTxClick}>
@@ -716,10 +716,10 @@ export class NodeSummary extends LitElement {
         <div class="hero-tile-value">
           <span class="primary">${this._formatCount(totalSent)}</span>
         </div>
-        <meshcore-stacked-bar
+        <chattx-stacked-bar
           .segments=${segs}
           .legend=${'inline'}>
-        </meshcore-stacked-bar>
+        </chattx-stacked-bar>
       </div>
     `;
   }
@@ -795,10 +795,10 @@ export class NodeSummary extends LitElement {
         <div class="hero-tile-value">
           <span class="primary">${this._formatCount(totalRecv)}</span>
         </div>
-        <meshcore-stacked-bar
+        <chattx-stacked-bar
           .segments=${segs}
           .legend=${'none'}>
-        </meshcore-stacked-bar>
+        </chattx-stacked-bar>
         ${recvErrorsN > 0
           ? html`<div class="err-line"
                       title="Receive errors (CRC failures): ${recvErrorsN} — ${errRatio.toFixed(1)}% of reception attempts (received + errors)">
@@ -865,10 +865,10 @@ export class NodeSummary extends LitElement {
             ? html`<span class="secondary">· ${total} attempt${total === 1 ? '' : 's'}</span>`
             : nothing}
         </div>
-        <meshcore-stacked-bar
+        <chattx-stacked-bar
           .segments=${segs}
           .legend=${'inline'}>
-        </meshcore-stacked-bar>
+        </chattx-stacked-bar>
       </div>
     `;
   }
@@ -1035,11 +1035,11 @@ export class NodeSummary extends LitElement {
           <span class="primary">${totalUsed.toFixed(1)}<span class="unit">%</span></span>
         </div>
         <div class="ra-bar-wrap">
-          <meshcore-stacked-bar
+          <chattx-stacked-bar
             .segments=${segments}
             .total=${100}
             .legend=${'none'}>
-          </meshcore-stacked-bar>
+          </chattx-stacked-bar>
           <div class="ra-legend">
             ${txAir
               ? html`<span class="ra-legend-item" @click=${onTxClick}>
@@ -1244,12 +1244,12 @@ export class NodeSummary extends LitElement {
         </span>
         <span class="si-bar">
           ${ev && info.metricKey
-            ? html`<meshcore-stat-bar
+            ? html`<chattx-stat-bar
                 .value=${ev.fillPct}
                 .min=${0}
                 .max=${100}
                 .band=${band}>
-              </meshcore-stat-bar>`
+              </chattx-stat-bar>`
             : nothing}
         </span>
       </div>
@@ -1333,10 +1333,10 @@ export class NodeSummary extends LitElement {
 
   private _renderInfoTip(ev: SensorEval): TemplateResult | typeof nothing {
     if (!ev.tooltip) return nothing;
-    return html`<meshcore-info-tip
+    return html`<chattx-info-tip
       .content=${ev.tooltip}
       .source=${ev.source ?? ''}>
-    </meshcore-info-tip>`;
+    </chattx-info-tip>`;
   }
 
   private _worseBand(a: Band, b: Band): Band {
@@ -1365,6 +1365,6 @@ export class NodeSummary extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-node-summary': NodeSummary;
+    'chattx-node-summary': NodeSummary;
   }
 }

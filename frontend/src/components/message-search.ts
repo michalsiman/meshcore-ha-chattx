@@ -10,7 +10,7 @@ import { attachDialogA11y } from '../utils/dialog-a11y';
  * Fires 'result-selected' when a search result is clicked.
  * Fires 'search-close' when the user presses Escape inside the panel.
  */
-@customElement('meshcore-message-search')
+@customElement('chattx-message-search')
 export class MessageSearch extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: String }) entryId?: string;
@@ -362,7 +362,7 @@ export class MessageSearch extends LitElement {
 
     try {
       const msg: Record<string, unknown> = {
-        type: 'meshcore_chat/search_stored_messages',
+        type: 'meshcore_chattx/search_stored_messages',
         query: trimmedQuery,
         entity_id: this.entityId,
         limit: 100,
@@ -408,6 +408,6 @@ export class MessageSearch extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-message-search': MessageSearch;
+    'chattx-message-search': MessageSearch;
   }
 }

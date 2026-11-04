@@ -15,7 +15,7 @@ type ManageTab = 'contacts' | 'channels';
  * - 'contacts-changed' after a contact is added or removed
  * - 'channels-changed' after a channel is added, edited, or removed
  */
-@customElement('meshcore-manage-dialog')
+@customElement('chattx-manage-dialog')
 export class ManageDialog extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: String }) entryId?: string;
@@ -628,7 +628,7 @@ export class ManageDialog extends LitElement {
 
       ${this._channelDialogOpen
         ? html`
-            <meshcore-channel-dialog
+            <chattx-channel-dialog
               .open=${true}
               .hass=${this.hass}
               .entryId=${this.entryId}
@@ -641,7 +641,7 @@ export class ManageDialog extends LitElement {
               .availableIndices=${this._getAvailableIndices()}
               @channel-saved=${this._onChannelSaved}
               @close=${() => { this._channelDialogOpen = false; this._editingChannel = null; }}
-            ></meshcore-channel-dialog>
+            ></chattx-channel-dialog>
           `
         : ''}
     `;
@@ -970,6 +970,6 @@ export class ManageDialog extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-manage-dialog': ManageDialog;
+    'chattx-manage-dialog': ManageDialog;
   }
 }

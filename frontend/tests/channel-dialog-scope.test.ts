@@ -41,7 +41,7 @@ async function mountDialog(opts: {
 
   render(
     html`
-      <meshcore-channel-dialog
+      <chattx-channel-dialog
         .open=${true}
         .hass=${fakeHass}
         .entryId=${'test-entry'}
@@ -51,12 +51,12 @@ async function mountDialog(opts: {
         .initialScope=${opts.initialScope ?? ''}
         .initialKey=${opts.initialKey ?? ''}
         .availableIndices=${[0, 1, 2]}
-      ></meshcore-channel-dialog>
+      ></chattx-channel-dialog>
     `,
     container,
   );
 
-  const dialog = container.querySelector('meshcore-channel-dialog') as ChannelDialog;
+  const dialog = container.querySelector('chattx-channel-dialog') as ChannelDialog;
   await dialog.updateComplete;
   // Drain the async allowlist fetch kicked off by the dialog opening,
   // then the re-render it triggers.

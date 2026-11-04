@@ -36,7 +36,7 @@ interface Geom {
  * snaps to the nearest hourly bucket and shows a tooltip with its timestamp
  * and every series value.
  */
-@customElement('meshcore-message-rate-chart')
+@customElement('chattx-message-rate-chart')
 export class MessageRateChart extends LitElement {
   @property({ type: Array }) data: RatePoint[] = [];
   @property({ type: Number }) width = 700;
@@ -314,6 +314,6 @@ export class MessageRateChart extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-message-rate-chart': MessageRateChart;
+    'chattx-message-rate-chart': MessageRateChart;
   }
 }

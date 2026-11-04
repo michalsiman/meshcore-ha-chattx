@@ -8,7 +8,7 @@ import { longPress } from '../directives/long-press';
  * Left-click opens HA more-info dialog.
  * Right-click / long-press dispatches tile-context-menu event.
  */
-@customElement('meshcore-sensor-tile')
+@customElement('chattx-sensor-tile')
 export class SensorTile extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: String }) entityId = '';
@@ -185,6 +185,6 @@ export class SensorTile extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-sensor-tile': SensorTile;
+    'chattx-sensor-tile': SensorTile;
   }
 }

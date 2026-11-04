@@ -37,10 +37,10 @@ async function mountBubble(group: MessageGroup) {
   const container = document.createElement('div');
   document.body.appendChild(container);
   render(
-    html`<meshcore-message-bubble .group=${group}></meshcore-message-bubble>`,
+    html`<chattx-message-bubble .group=${group}></chattx-message-bubble>`,
     container,
   );
-  const bubble = container.querySelector('meshcore-message-bubble') as HTMLElement & {
+  const bubble = container.querySelector('chattx-message-bubble') as HTMLElement & {
     updateComplete: Promise<unknown>;
   };
   await bubble.updateComplete;

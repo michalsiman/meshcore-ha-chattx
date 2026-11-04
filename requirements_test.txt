@@ -1,4 +1,4 @@
-# Pinned test dependencies for meshcore-ha-chat (Phase 4 of HA Quality
+# Pinned test dependencies for meshcore-ha-chattx (Phase 4 of HA Quality
 # Remediation). Install into a Python 3.14 virtualenv (matching the
 # Python version in the deployed HA Docker image):
 #

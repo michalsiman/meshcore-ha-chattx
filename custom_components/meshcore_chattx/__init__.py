@@ -1,4 +1,4 @@
-"""MeshCore Chat companion integration for Home Assistant.
+"""MeshCore Chattx companion integration for Home Assistant.
 
 Two responsibilities at runtime:
 
@@ -6,7 +6,7 @@ Two responsibilities at runtime:
      upstream ``meshcore`` integration (``meshcore_message``,
      ``meshcore_delivery_update``, ``meshcore_connected``,
      ``meshcore_disconnected``) and persists each chat message to a
-     per-conversation store. Exposes the ``meshcore_chat/*`` WebSocket
+     per-conversation store. Exposes the ``meshcore_chattx/*`` WebSocket
      command namespace and an UnreadTracker singleton.
 
   2. Process-global sidebar panel registration. The Lit/TypeScript
@@ -54,8 +54,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
-class MeshCoreChatRuntimeData:
-    """Per-entry runtime state for the MeshCore Chat companion.
+class MeshCoreChattxRuntimeData:
+    """Per-entry runtime state for the MeshCore Chattx companion.
 
     Stored on ``entry.runtime_data`` (HA Bronze convention, post-2024.6).
     Process-global state (panel registration, WS commands, unread tracker)
@@ -69,7 +69,7 @@ class MeshCoreChatRuntimeData:
 
 # Type alias for ConfigEntry parameterized with our runtime data shape.
 # Lets typecheckers verify ``entry.runtime_data`` is the expected type.
-type MeshCoreChatConfigEntry = ConfigEntry[MeshCoreChatRuntimeData]
+type MeshCoreChattxConfigEntry = ConfigEntry[MeshCoreChattxRuntimeData]
 
 
 # ─── Upstream-presence helpers ───────────────────────────────────────────
@@ -121,7 +121,7 @@ def _sync_upstream_repair_issue(hass: HomeAssistant) -> None:
         )
 
 
-# NOTE: ws_api.py imports ``MeshCoreChatRuntimeData`` and
+# NOTE: ws_api.py imports ``MeshCoreChattxRuntimeData`` and
 # ``_sync_upstream_repair_issue`` from this module. Keep this import
 # below the dataclass + helper definitions so the symbols exist on the
 # partially-initialized package when ws_api.py executes its top-level
@@ -131,9 +131,9 @@ from .ws_api import async_register_ws_commands  # noqa: E402
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: MeshCoreChatConfigEntry
+    hass: HomeAssistant, entry: MeshCoreChattxConfigEntry
 ) -> bool:
-    """Set up MeshCore Chat from a config entry."""
+    """Set up MeshCore Chattx from a config entry."""
     # Test-before-setup: refuse setup until the upstream meshcore
     # integration has at least one coordinator. The chat companion is
     # useless without it, and HA will retry async_setup_entry
@@ -143,7 +143,7 @@ async def async_setup_entry(
     # surfaces it as a generic "Setup retry" badge with no remediation
     # text. Pair it with a Repairs issue so the user gets a clickable
     # explanation of what to do (install/configure meshcore, or remove
-    # meshcore_chat) on the Settings → System → Repairs page.
+    # meshcore_chattx) on the Settings → System → Repairs page.
     if not _upstream_meshcore_present(hass):
         _sync_upstream_repair_issue(hass)
         raise ConfigEntryNotReady(
@@ -162,7 +162,7 @@ async def async_setup_entry(
     # Per-entry runtime state lives on entry.runtime_data (Bronze pattern,
     # post-2024.6). Process-global singletons (panel registration, WS
     # commands, unread tracker) continue to live on hass.data[DOMAIN].
-    entry.runtime_data = MeshCoreChatRuntimeData(store=store)
+    entry.runtime_data = MeshCoreChattxRuntimeData(store=store)
 
     # Best-effort retention pass at startup. Failures here must not block
     # setup — they are logged and we continue.
@@ -183,7 +183,7 @@ async def async_setup_entry(
     if not bucket.get("_panel_registered"):
         await async_register_panel(hass)
         bucket["_panel_registered"] = True
-        _LOGGER.debug("MeshCore Chat panel registered")
+        _LOGGER.debug("MeshCore Chattx panel registered")
 
     # Unread tracker is a process-wide singleton (not per-entry) — the
     # frontend identifies conversations by entity_id, which is globally
@@ -224,7 +224,7 @@ async def async_setup_entry(
     if not bucket.get("_service_surface_logged"):
         bucket["_service_surface_logged"] = True
         _LOGGER.info(
-            "MeshCore Chat startup — companion-integration services available: "
+            "MeshCore Chattx startup — companion-integration services available: "
             "get_contacts=%s get_channels=%s trace=%s",
             hass.services.has_service(MESHCORE_DOMAIN, "get_contacts"),
             hass.services.has_service(MESHCORE_DOMAIN, "get_channels"),
@@ -257,7 +257,7 @@ async def async_setup_entry(
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
 
     _LOGGER.info(
-        "MeshCore Chat configured for entry %s (%d conversations indexed)",
+        "MeshCore Chattx configured for entry %s (%d conversations indexed)",
         entry.entry_id,
         len(store.get_message_index()),
     )
@@ -265,7 +265,7 @@ async def async_setup_entry(
 
 
 async def async_unload_entry(
-    hass: HomeAssistant, entry: MeshCoreChatConfigEntry
+    hass: HomeAssistant, entry: MeshCoreChattxConfigEntry
 ) -> bool:
     """Tear down a config entry.
 
@@ -275,7 +275,7 @@ async def async_unload_entry(
     so no manual listener loop is required here.
     """
     runtime = entry.runtime_data
-    if isinstance(runtime, MeshCoreChatRuntimeData):
+    if isinstance(runtime, MeshCoreChattxRuntimeData):
         await runtime.store.async_unload()
 
     # Flush any pending debounced last-read save before tearing down
@@ -301,7 +301,7 @@ async def async_unload_entry(
         if bucket.get("_panel_registered"):
             await async_remove_panel(hass)
             bucket.pop("_panel_registered", None)
-            _LOGGER.debug("MeshCore Chat panel removed (last entry unloaded)")
+            _LOGGER.debug("MeshCore Chattx panel removed (last entry unloaded)")
         # WS commands live for the lifetime of the HA process — there's
         # no public unregister API. _ws_registered stays so a subsequent
         # async_setup_entry doesn't try to re-register and trip HA's
@@ -505,7 +505,18 @@ def _make_delivery_update_handler(hass: HomeAssistant, entry_id: str):
         elif progressive:
             status = None  # don't touch
         else:
-            status = "sent" if data.get("ack_received") else "pending"
+            # meshcore 3.x sends follow-up delivery updates for channel
+            # messages without "progressive" or ack_received. Treating those
+            # as "pending" flipped sent messages back to "Waiting…", so these
+            # updates may only confirm the status, never downgrade it.
+            if (
+                data.get("ack_received")
+                or data.get("repeater_count")
+                or data.get("rx_log_data")
+            ):
+                status = "sent"
+            else:
+                status = None  # don't touch
 
         kwargs: dict[str, Any] = {}
         for k in ("rx_log_data", "repeater_count", "ack_received"):
@@ -576,13 +587,13 @@ def _make_connection_state_handler(
 def _resolve_store(hass: HomeAssistant, entry_id: str) -> MessageStore | None:
     """Look up the MessageStore for an entry, defensively."""
     entry = hass.config_entries.async_get_entry(entry_id)
-    if entry is None or not isinstance(entry.runtime_data, MeshCoreChatRuntimeData):
+    if entry is None or not isinstance(entry.runtime_data, MeshCoreChattxRuntimeData):
         return None
     return entry.runtime_data.store
 
 
 async def _async_options_updated(
-    hass: HomeAssistant, entry: MeshCoreChatConfigEntry
+    hass: HomeAssistant, entry: MeshCoreChattxConfigEntry
 ) -> None:
     """Handle options-flow updates without requiring an HA restart.
 

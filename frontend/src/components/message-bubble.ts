@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { ChatMessage, MessageGroup, DeliveryStatus } from '../types';
-import { formatTimestamp } from '../chat/message-parser';
+import { formatHopLabel, formatTimestamp } from '../chat/message-parser';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 
 /**
@@ -16,7 +16,7 @@ function senderColorFromPrefix(prefix: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
-@customElement('meshcore-message-bubble')
+@customElement('chattx-message-bubble')
 export class MessageBubble extends LitElement {
   @property({ type: Object }) group?: MessageGroup;
   @property({ type: Object }) message?: ChatMessage;
@@ -327,7 +327,8 @@ export class MessageBubble extends LitElement {
     };
 
     const statusLabel = msg.isOutgoing && msg.deliveryStatus ? this._getStatusLabel(msg.deliveryStatus) : '';
-    const ts = formatTimestamp(msg.timestamp, this.timestampFormat);
+    const hopLabel = !msg.isOutgoing && !msg.isSystem ? formatHopLabel(msg.rxLogData) : '';
+    const ts = formatTimestamp(msg.timestamp, this.timestampFormat) + (hopLabel ? ` · ${hopLabel}` : '');
     // Inbound region scope — incoming bubbles only. "*" → "🌐 all regions",
     // a region name renders verbatim, absent renders nothing. The outbound
     // scope is shown by the thread-header chip, so outgoing is unaffected.
@@ -518,6 +519,6 @@ export class MessageBubble extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-message-bubble': MessageBubble;
+    'chattx-message-bubble': MessageBubble;
   }
 }

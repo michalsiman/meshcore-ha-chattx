@@ -32,7 +32,7 @@ const TYPE_LABELS: Record<NodeType, string> = {
   sensors: 'Sensors',
 };
 
-@customElement('meshcore-nodes-page')
+@customElement('chattx-nodes-page')
 export class NodesPage extends LitElement {
   @property({ type: Array }) contacts: Contact[] = [];
   @property({ type: Array }) channels: Channel[] = [];
@@ -494,7 +494,7 @@ export class NodesPage extends LitElement {
       </div>
 
       <!-- Node detail dialog -->
-      <meshcore-node-detail-dialog
+      <chattx-node-detail-dialog
         .hass=${this.hass}
         .node=${this._selectedNode}
         .pendingAction=${this._pendingAction}
@@ -504,7 +504,7 @@ export class NodesPage extends LitElement {
         @node-trace=${() => this._dispatchNodeAction('trace')}
         @node-add-contact=${() => this._dispatchNodeAction('add-contact')}
         @node-remove-contact=${() => this._dispatchNodeAction('remove-contact')}>
-      </meshcore-node-detail-dialog>
+      </chattx-node-detail-dialog>
 
     `;
   }
@@ -667,7 +667,7 @@ export class NodesPage extends LitElement {
       <div class="nodes-grid">
         ${this._displayedContacts.map((c) => html`
           <div @click=${() => this._openNodeDetail(c)}>
-            <meshcore-contact-card .contact=${c as Contact}></meshcore-contact-card>
+            <chattx-contact-card .contact=${c as Contact}></chattx-contact-card>
           </div>
         `)}
       </div>
@@ -781,6 +781,6 @@ export class NodesPage extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-nodes-page': NodesPage;
+    'chattx-nodes-page': NodesPage;
   }
 }

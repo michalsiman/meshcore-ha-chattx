@@ -64,7 +64,7 @@ describe('devices-page._executeRemoteAction toast branch (Phase 2 Option A)', ()
 
   beforeEach(() => {
     vi.clearAllMocks();
-    page = document.createElement('meshcore-devices-page') as unknown as typeof page;
+    page = document.createElement('chattx-devices-page') as unknown as typeof page;
     page.hass = makeMockHass();
     page.config = { entry_id: 'test-entry' };
   });

@@ -10,7 +10,7 @@ import { attachDialogA11y } from '../utils/dialog-a11y';
  * - 'confirm' event when user confirms
  * - 'cancel' event when user cancels
  */
-@customElement('meshcore-confirm-dialog')
+@customElement('chattx-confirm-dialog')
 export class ConfirmDialog extends LitElement {
   @property({ type: Boolean }) open = false;
   @property({ type: String }) title = 'Confirm';
@@ -117,6 +117,6 @@ export class ConfirmDialog extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-confirm-dialog': ConfirmDialog;
+    'chattx-confirm-dialog': ConfirmDialog;
   }
 }

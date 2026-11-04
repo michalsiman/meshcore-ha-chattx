@@ -10,14 +10,14 @@ import type { Band } from '../utils/sensor-thresholds';
  * via CSS so updating values animates smoothly.
  *
  * Tick marks are deliberately not supported.
- * Tooltip text is owned by the parent label's `<meshcore-info-tip>`,
+ * Tooltip text is owned by the parent label's `<chattx-info-tip>`,
  * not by the bar itself.
  *
  * Colour variables (`--good`, `--warn`, `--bad`, `--info`) are declared
  * by the panel root once styles.ts (step 4) lands. Fallback hex values
  * keep the component renderable in isolation.
  */
-@customElement('meshcore-stat-bar')
+@customElement('chattx-stat-bar')
 export class StatBar extends LitElement {
   @property({ type: Number }) value = 0;
   @property({ type: Number }) min = 0;
@@ -70,6 +70,6 @@ export class StatBar extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-stat-bar': StatBar;
+    'chattx-stat-bar': StatBar;
   }
 }

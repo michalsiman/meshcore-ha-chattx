@@ -1,4 +1,4 @@
-"""Unit tests for ``custom_components.meshcore_chat.ws_api``.
+"""Unit tests for ``custom_components.meshcore_chattx.ws_api``.
 
 Phase 4C of the HA Quality + Best Practices Remediation. Covers
 happy-path and error-path branches across the 29 WebSocket handlers,
@@ -34,12 +34,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.meshcore_chat import (
-    MeshCoreChatRuntimeData,
+from custom_components.meshcore_chattx import (
+    MeshCoreChattxRuntimeData,
 )
-from custom_components.meshcore_chat.channel_scopes import ChannelScopeStore
-from custom_components.meshcore_chat.const import DOMAIN, MESHCORE_DOMAIN
-from custom_components.meshcore_chat import ws_api
+from custom_components.meshcore_chattx.channel_scopes import ChannelScopeStore
+from custom_components.meshcore_chattx.const import DOMAIN, MESHCORE_DOMAIN
+from custom_components.meshcore_chattx import ws_api
 from pytest_homeassistant_custom_component.common import async_mock_service
 
 # ─── Helpers ────────────────────────────────────────────────────────────
@@ -166,14 +166,14 @@ def scope_store(hass: HomeAssistant) -> ChannelScopeStore:
 def companion_entry(hass: HomeAssistant) -> MockConfigEntry:
     """A companion config entry with a MessageStore-shaped runtime_data."""
     entry = MockConfigEntry(
-        domain=DOMAIN, title="MeshCore Chat", entry_id="01CHAT", data={}, options={}
+        domain=DOMAIN, title="MeshCore Chattx", entry_id="01CHAT", data={}, options={}
     )
     entry.add_to_hass(hass)
     store = MagicMock()
     store.get_message_index = MagicMock(return_value={})
     store.get_messages = AsyncMock(return_value=[])
     store._load_for_search = AsyncMock(return_value=[])
-    entry.runtime_data = MeshCoreChatRuntimeData(store=store)
+    entry.runtime_data = MeshCoreChattxRuntimeData(store=store)
     return entry
 
 
@@ -2897,7 +2897,7 @@ async def test_ws_get_devices_runtime_removal_creates_repair_issue(
     """Upstream present → ws_get_devices clean; remove → next call surfaces issue.
 
     Mirrors the observable bug: the user removes the upstream meshcore
-    config entry while meshcore_chat is still loaded; the chat panel's
+    config entry while meshcore_chattx is still loaded; the chat panel's
     next backend hit should publish the repair issue rather than
     silently degrade.
     """
@@ -3024,11 +3024,11 @@ async def _seed_companion_with_messages(
     The ``hass_storage`` fixture in PHACC intercepts the per-conversation
     Store writes; tests don't need a temp directory.
     """
-    from custom_components.meshcore_chat.message_store import MessageStore
+    from custom_components.meshcore_chattx.message_store import MessageStore
 
     entry = MockConfigEntry(
         domain=DOMAIN,
-        title="MeshCore Chat",
+        title="MeshCore Chattx",
         entry_id="01CHAT_REAL",
         data={},
         options={},
@@ -3053,7 +3053,7 @@ async def _seed_companion_with_messages(
             },
         )
 
-    entry.runtime_data = MeshCoreChatRuntimeData(store=real_store)
+    entry.runtime_data = MeshCoreChattxRuntimeData(store=real_store)
     return entry, entity_id, message_ids
 
 

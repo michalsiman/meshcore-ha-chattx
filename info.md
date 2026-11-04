@@ -1,10 +1,10 @@
-# MeshCore Chat
+# MeshCore Chattx
 
 Sidebar chat panel and persistent message store for the MeshCore mesh radio network.
 
 A **companion** integration: works alongside the [core meshcore integration](https://github.com/meshcore-dev/meshcore-ha) without modifying it. Install both.
 
-![MeshCore Chat panel](https://raw.githubusercontent.com/mwolter805/meshcore-ha-chat/main/assets/screenshots/chat-tab.jpg)
+![MeshCore Chattx panel](https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chat-tab.jpg)
 
 **Features:**
 

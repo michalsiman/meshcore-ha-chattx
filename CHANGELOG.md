@@ -4,6 +4,23 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.0] - Unreleased
+
+First release of **MeshCore Chattx**, a fork of [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat) v0.3.1. Entries below this one are the upstream project's history; issue numbers in them refer to the upstream repository.
+
+### Changed
+
+- Renamed to domain `meshcore_chattx`, with its own panel URL, WebSocket commands, storage keys, HA events and custom element names, so it can run next to MeshCore Chat. Message history is not migrated.
+
+### Fixed
+
+- Follow-up delivery updates from meshcore 3.x no longer flip sent channel messages back to "Waiting…".
+- Browsers load the new panel bundle after an update instead of a cached copy.
+
+### Added
+
+- Hop count on incoming message bubbles, in Czech or English depending on the browser language.
+
 ## [0.3.1] - 2026-06-24
 
 ### Fixed

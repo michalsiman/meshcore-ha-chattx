@@ -17,7 +17,7 @@ type Chart = HTMLElement & {
 };
 
 async function mount(data: RatePoint[]): Promise<Chart> {
-  const el = document.createElement('meshcore-message-rate-chart') as unknown as Chart;
+  const el = document.createElement('chattx-message-rate-chart') as unknown as Chart;
   el.data = data;
   document.body.appendChild(el);
   await el.updateComplete;

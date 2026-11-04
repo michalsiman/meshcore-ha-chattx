@@ -21,7 +21,7 @@ import {
  * Dispatches:
  * - 'close' event when dialog is closed
  */
-@customElement('meshcore-command-dialog')
+@customElement('chattx-command-dialog')
 export class CommandDialog extends LitElement {
   @property({ type: Boolean }) open = false;
   @property({ type: Object }) hass?: HomeAssistant;
@@ -687,6 +687,6 @@ export class CommandDialog extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-command-dialog': CommandDialog;
+    'chattx-command-dialog': CommandDialog;
   }
 }

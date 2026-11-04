@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { Contact, ManagedDevice } from '../types';
 
-@customElement('meshcore-node-card')
+@customElement('chattx-node-card')
 export class NodeCard extends LitElement {
   @property({ type: Object }) node?: Contact | ManagedDevice;
   @property({ type: Boolean }) selected = false;
@@ -186,6 +186,6 @@ export class NodeCard extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-node-card': NodeCard;
+    'chattx-node-card': NodeCard;
   }
 }

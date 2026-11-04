@@ -120,7 +120,7 @@ type Card = HTMLElement & {
 };
 
 async function mount(specs: RawSpec[]): Promise<Card> {
-  const el = document.createElement('meshcore-node-summary') as Card;
+  const el = document.createElement('chattx-node-summary') as Card;
   el.hass = makeHass(specs);
   el.device = companionDevice();
   el.entities = classify(specs);
@@ -182,7 +182,7 @@ describe('node-summary companion hero — Self Diagnostics ENABLED', () => {
 
   it('no longer shows the per-tile msg/min rate text', () => {
     const bars = Array.from(
-      el.shadowRoot?.querySelectorAll('meshcore-stacked-bar') ?? [],
+      el.shadowRoot?.querySelectorAll('chattx-stacked-bar') ?? [],
     ) as Array<{ extraLegendText?: string }>;
     for (const b of bars) {
       expect(b.extraLegendText ?? '').not.toContain('msg/min');

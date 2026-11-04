@@ -46,11 +46,11 @@ describe('message-bubble XSS regression (F01)', () => {
       [],
     );
     render(
-      html`<meshcore-message-bubble .group=${group}></meshcore-message-bubble>`,
+      html`<chattx-message-bubble .group=${group}></chattx-message-bubble>`,
       container,
     );
 
-    const bubble = container.querySelector('meshcore-message-bubble') as
+    const bubble = container.querySelector('chattx-message-bubble') as
       | (HTMLElement & { updateComplete: Promise<unknown> })
       | null;
     await bubble?.updateComplete;
@@ -75,11 +75,11 @@ describe('message-bubble XSS regression (F01)', () => {
       [],
     );
     render(
-      html`<meshcore-message-bubble .group=${group}></meshcore-message-bubble>`,
+      html`<chattx-message-bubble .group=${group}></chattx-message-bubble>`,
       container,
     );
 
-    const bubble = container.querySelector('meshcore-message-bubble') as
+    const bubble = container.querySelector('chattx-message-bubble') as
       | (HTMLElement & { updateComplete: Promise<unknown> })
       | null;
     await bubble?.updateComplete;
@@ -102,11 +102,11 @@ describe('message-bubble XSS regression (F01)', () => {
       ['<img src=x onerror=alert(1)>'],
     );
     render(
-      html`<meshcore-message-bubble .group=${group}></meshcore-message-bubble>`,
+      html`<chattx-message-bubble .group=${group}></chattx-message-bubble>`,
       container,
     );
 
-    const bubble = container.querySelector('meshcore-message-bubble') as
+    const bubble = container.querySelector('chattx-message-bubble') as
       | (HTMLElement & { updateComplete: Promise<unknown> })
       | null;
     await bubble?.updateComplete;
@@ -126,11 +126,11 @@ describe('message-bubble XSS regression (F01)', () => {
 
     const group = makeGroup('Hi @Bob, how are you?', ['Bob']);
     render(
-      html`<meshcore-message-bubble .group=${group}></meshcore-message-bubble>`,
+      html`<chattx-message-bubble .group=${group}></chattx-message-bubble>`,
       container,
     );
 
-    const bubble = container.querySelector('meshcore-message-bubble') as
+    const bubble = container.querySelector('chattx-message-bubble') as
       | (HTMLElement & { updateComplete: Promise<unknown> })
       | null;
     await bubble?.updateComplete;

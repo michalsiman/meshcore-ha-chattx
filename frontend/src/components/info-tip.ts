@@ -23,7 +23,7 @@ import { customElement, property, state } from 'lit/decorators.js';
  * with a thin wrapper around that. For now, no such HA primitive exists
  * in this repo's environment, so we render our own.
  */
-@customElement('meshcore-info-tip')
+@customElement('chattx-info-tip')
 export class InfoTip extends LitElement {
   /** Band-statement prose. Plain text; no embedded HTML. */
   @property({ type: String }) content = '';
@@ -212,6 +212,6 @@ export class InfoTip extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-info-tip': InfoTip;
+    'chattx-info-tip': InfoTip;
   }
 }

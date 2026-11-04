@@ -12,7 +12,7 @@ import { longPress } from '../directives/long-press';
 import { loadMeshcoreEntityRegistry, type EntityInfo } from '../utils/classify-entity';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 
-@customElement('meshcore-devices-page')
+@customElement('chattx-devices-page')
 export class DevicesPage extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: Object }) config?: PanelConfig;
@@ -45,7 +45,7 @@ export class DevicesPage extends LitElement {
   @state() private _entityRegistryLoaded = false;
 
   // Hidden sensors: device identifier key → set of hidden entity_ids
-  // Persisted to localStorage under 'meshcore-hidden-sensors'
+  // Persisted to localStorage under 'chattx-hidden-sensors'
   @state() private _hiddenSensors: Record<string, string[]> = {};
 
   // Context menu modal state (right-click / long-press on tile)
@@ -715,16 +715,16 @@ export class DevicesPage extends LitElement {
       </div>
 
       <!-- Confirmation Dialog -->
-      <meshcore-confirm-dialog
+      <chattx-confirm-dialog
         .open=${this._confirmDialogOpen}
         .title=${this._confirmAction?.title || ''}
         .message=${this._confirmAction?.message || ''}
         @confirm=${this._onConfirmAction}
         @cancel=${this._onConfirmCancel}>
-      </meshcore-confirm-dialog>
+      </chattx-confirm-dialog>
 
       <!-- Command Dialog -->
-      <meshcore-command-dialog
+      <chattx-command-dialog
         .open=${this._commandDialogOpen}
         .hass=${this.hass}
         .entryId=${this.config?.entry_id}
@@ -733,7 +733,7 @@ export class DevicesPage extends LitElement {
         ?isLocal=${this._commandDialogIsLocal}
         ?narrow=${this.narrow}
         @close=${this._onCommandDialogClose}>
-      </meshcore-command-dialog>
+      </chattx-command-dialog>
 
       <!-- Tile Context Menu Modal -->
       ${this._contextMenu ? html`
@@ -929,7 +929,7 @@ export class DevicesPage extends LitElement {
 
         ${entities.length > 0
           ? html`
-              <meshcore-node-summary
+              <chattx-node-summary
                 .hass=${this.hass}
                 .device=${{ ...device, type }}
                 .entities=${entities}
@@ -937,7 +937,7 @@ export class DevicesPage extends LitElement {
                 .fallbackLatitude=${fallbackLat}
                 .fallbackLongitude=${fallbackLon}
                 .fallbackUpdated=${fallbackUpdated}>
-              </meshcore-node-summary>
+              </chattx-node-summary>
             `
           : nothing}
 
@@ -982,13 +982,13 @@ export class DevicesPage extends LitElement {
         ${state.chartData.length > 0
           ? html`
               <div class="chart-container">
-                <meshcore-snr-chart
+                <chattx-snr-chart
                   .data=${state.chartData}
                   .neighbors=${state.neighbors.map(n => n.pubkey_prefix)}
                   width="550"
                   height="200"
                   timeRange="24">
-                </meshcore-snr-chart>
+                </chattx-snr-chart>
               </div>
             `
           : nothing}
@@ -1309,7 +1309,7 @@ export class DevicesPage extends LitElement {
 
   private _loadHiddenSensors() {
     try {
-      const stored = localStorage.getItem('meshcore-hidden-sensors');
+      const stored = localStorage.getItem('chattx-hidden-sensors');
       if (stored) {
         this._hiddenSensors = JSON.parse(stored);
       }
@@ -1320,7 +1320,7 @@ export class DevicesPage extends LitElement {
 
   private _saveHiddenSensors() {
     try {
-      localStorage.setItem('meshcore-hidden-sensors', JSON.stringify(this._hiddenSensors));
+      localStorage.setItem('chattx-hidden-sensors', JSON.stringify(this._hiddenSensors));
     } catch {
       // localStorage full or unavailable — silent fail
     }
@@ -1455,7 +1455,7 @@ export class DevicesPage extends LitElement {
     if (!this.hass) return;
     try {
       const result: any = await this.hass.callWS({
-        type: 'meshcore_chat/remove_neighbor',
+        type: 'meshcore_chattx/remove_neighbor',
         entry_id: this.config?.entry_id,
         target_prefix: repeaterPubkey,
         neighbor_pubkey: neighborPubkey,
@@ -1597,6 +1597,6 @@ export class DevicesPage extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-devices-page': DevicesPage;
+    'chattx-devices-page': DevicesPage;
   }
 }

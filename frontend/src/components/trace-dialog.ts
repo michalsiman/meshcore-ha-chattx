@@ -24,7 +24,7 @@ import { attachDialogA11y } from '../utils/dialog-a11y';
  * Firmware auto-handles the return path (reverse of outbound), so the
  * user only supplies the outbound route.
  */
-@customElement('meshcore-trace-dialog')
+@customElement('chattx-trace-dialog')
 export class TraceDialog extends LitElement {
   @property({ type: Boolean }) open = false;
   @property({ type: String }) contactName = '';
@@ -852,6 +852,6 @@ export class TraceDialog extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-trace-dialog': TraceDialog;
+    'chattx-trace-dialog': TraceDialog;
   }
 }

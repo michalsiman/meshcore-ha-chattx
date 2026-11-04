@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, ManagedDevice, HomeAssistant } from '../types';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 
-@customElement('meshcore-node-detail-dialog')
+@customElement('chattx-node-detail-dialog')
 export class NodeDetailDialog extends LitElement {
   @property({ type: Object }) node?: Contact | ManagedDevice;
   @property({ type: Boolean }) open = false;
@@ -448,6 +448,6 @@ export class NodeDetailDialog extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-node-detail-dialog': NodeDetailDialog;
+    'chattx-node-detail-dialog': NodeDetailDialog;
   }
 }

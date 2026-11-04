@@ -13,7 +13,7 @@ import { attachDialogA11y } from '../utils/dialog-a11y';
  * - 'channel-saved' event when channel is successfully saved
  * - 'close' event when dialog is closed
  */
-@customElement('meshcore-channel-dialog')
+@customElement('chattx-channel-dialog')
 export class ChannelDialog extends LitElement {
   @property({ type: Boolean }) open = false;
   @property({ type: Object }) hass?: HomeAssistant;
@@ -403,6 +403,6 @@ export class ChannelDialog extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'meshcore-channel-dialog': ChannelDialog;
+    'chattx-channel-dialog': ChannelDialog;
   }
 }

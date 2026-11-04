@@ -1,13 +1,13 @@
-"""MeshCore Chat sidebar panel registration.
+"""MeshCore Chattx sidebar panel registration.
 
 Adapted from the upstream meshcore integration's panel registration.
 
 Differences vs. upstream:
-- All HTTP/sidebar URLs are scoped under `meshcore_chat` so the companion
+- All HTTP/sidebar URLs are scoped under `meshcore_chattx` so the companion
   panel co-exists with upstream's panel if both are installed.
-- Sidebar title is "MeshCore Chat" so users can tell the two apart.
+- Sidebar title is "MeshCore Chattx" so users can tell the two apart.
 - Module-URL filename matches the renamed entry point
-  (`meshcore-chat-panel.js`, produced by the rollup config).
+  (`meshcore-chattx-panel.js`, produced by the rollup config).
 """
 from __future__ import annotations
 
@@ -20,6 +20,9 @@ from homeassistant.components.frontend import (
 )
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import HomeAssistant
+from homeassistant.loader import async_get_integration
+
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,21 +40,21 @@ _LOGGER = logging.getLogger(__name__)
 _static_path_registered = False
 
 # HTTP URL the bundle is served at; module_url below points at this path.
-PANEL_URL = "/meshcore_chat_panel/meshcore-chat-panel.js"
+PANEL_URL = "/meshcore_chattx_panel/meshcore-chattx-panel.js"
 # Filesystem path to the bundle. Lives flat at the integration root since
 # the rollup output is a single file (no chunks, no source maps, no other
 # assets); a wrapper directory would add nothing.
-PANEL_FRONTEND_PATH = str(Path(__file__).parent / "meshcore-chat-panel.js")
+PANEL_FRONTEND_PATH = str(Path(__file__).parent / "meshcore-chattx-panel.js")
 
 PANEL_ICON = "mdi:radio-handheld"
-PANEL_TITLE = "MeshCore Chat"
+PANEL_TITLE = "MeshCore Chattx"
 
-# Sidebar URL slug — the panel will be reachable at /meshcore-chat in the HA UI.
-PANEL_URL_PATH = "meshcore-chat"
+# Sidebar URL slug — the panel will be reachable at /meshcore-chattx in the HA UI.
+PANEL_URL_PATH = "meshcore-chattx"
 
 
 async def async_register_panel(hass: HomeAssistant) -> None:
-    """Register the MeshCore Chat sidebar panel.
+    """Register the MeshCore Chattx sidebar panel.
 
     Static-path registration is gated on the module-level
     `_static_path_registered` flag — it runs exactly once per HA process
@@ -66,7 +69,8 @@ async def async_register_panel(hass: HomeAssistant) -> None:
             [StaticPathConfig(PANEL_URL, PANEL_FRONTEND_PATH, cache_headers=False)]
         )
         _static_path_registered = True
-        _LOGGER.debug("Registered MeshCore Chat panel static path %s", PANEL_URL)
+        _LOGGER.debug("Registered MeshCore Chattx panel static path %s", PANEL_URL)
+    integration = await async_get_integration(hass, DOMAIN)
     async_register_built_in_panel(
         hass,
         component_name="custom",
@@ -75,17 +79,19 @@ async def async_register_panel(hass: HomeAssistant) -> None:
         frontend_url_path=PANEL_URL_PATH,
         config={
             "_panel_custom": {
-                "name": "meshcore-chat-panel",
-                "module_url": PANEL_URL,
+                "name": "meshcore-chattx-panel",
+                # Version in the URL makes browsers fetch the new bundle
+                # after an update instead of reusing a cached copy.
+                "module_url": f"{PANEL_URL}?v={integration.version}",
             }
         },
         require_admin=False,
     )
-    _LOGGER.debug("Registered MeshCore Chat sidebar panel")
+    _LOGGER.debug("Registered MeshCore Chattx sidebar panel")
 
 
 async def async_remove_panel(hass: HomeAssistant) -> None:
-    """Remove the MeshCore Chat sidebar panel.
+    """Remove the MeshCore Chattx sidebar panel.
 
     The static path registered in `async_register_panel` is intentionally
     NOT torn down — `hass.http` has no public unregister API, and aiohttp
@@ -95,4 +101,4 @@ async def async_remove_panel(hass: HomeAssistant) -> None:
     static paths are process-lifetime, sidebar entries are entry-lifetime.
     """
     frontend_async_remove_panel(hass, PANEL_URL_PATH)
-    _LOGGER.debug("Removed MeshCore Chat sidebar panel")
+    _LOGGER.debug("Removed MeshCore Chattx sidebar panel")

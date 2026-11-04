@@ -9,7 +9,7 @@
  * ```ts
  * import { attachDialogA11y } from '../utils/dialog-a11y';
  *
- * @customElement('meshcore-some-dialog')
+ * @customElement('chattx-some-dialog')
  * export class SomeDialog extends LitElement {
  *   @property({ type: Boolean }) open = false;
  *
@@ -30,7 +30,7 @@
  * Usage (inline modal inside a page's render output):
  *
  * ```ts
- * @customElement('meshcore-some-page')
+ * @customElement('chattx-some-page')
  * export class SomePage extends LitElement {
  *   @state() private _settingsOpen = false;
  *
