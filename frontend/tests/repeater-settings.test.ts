@@ -219,7 +219,7 @@ describe('repeater settings', () => {
     const el = await mount(hass, false);
 
     expect(fieldValue(el, 'Latitude')).toBe('49.6');
-    expect(note(el, 'Location')!.textContent).toContain(new Date(READ_AT).toLocaleString());
+    expect(note(el, 'Location')!.getAttribute('title')).toContain(new Date(READ_AT).toLocaleString());
     expect(label(el, 'Location')).toBe('Reload');
     expect(commands(callWS)).toEqual([]);
   });
@@ -257,7 +257,7 @@ describe('repeater settings', () => {
     });
     const el = await mount(hass);
 
-    expect(note(el, 'Location')!.textContent).toContain(new Date(READ_AT).toLocaleString());
+    expect(note(el, 'Location')!.getAttribute('title')).toContain(new Date(READ_AT).toLocaleString());
   });
 
   it('keeps the old value and time when a reload gets no answer', async () => {
@@ -272,7 +272,7 @@ describe('repeater settings', () => {
 
     expect(fieldValue(el, 'Latitude')).toBe('49.6');
     expect(fieldValue(el, 'Longitude')).toBe('value of get lon');
-    expect(note(el, 'Location')!.textContent).toContain(new Date(READ_AT).toLocaleString());
+    expect(note(el, 'Location')!.getAttribute('title')).toContain(new Date(READ_AT).toLocaleString());
   });
 
   it('updates the time after a successful reload', async () => {
@@ -285,7 +285,7 @@ describe('repeater settings', () => {
     groupButton(el, 'Location').click();
     await flush(el);
 
-    expect(note(el, 'Location')!.textContent).not.toContain(new Date(READ_AT).toLocaleString());
+    expect(note(el, 'Location')!.getAttribute('title')).not.toContain(new Date(READ_AT).toLocaleString());
   });
 
   it('never reads secrets', () => {

@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.12] - Unreleased
+
+### Changed
+
+- Saved repeater data shows how long ago it was read instead of the date and time, which moved to the tooltip.
+
 ## [0.1.11] - Unreleased
 
 ### Added

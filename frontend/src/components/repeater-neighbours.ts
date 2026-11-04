@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterNeighbours, type RepeaterNeighbour } from '../api';
 import { isCzech } from '../utils/language';
-import { readAtClass } from '../utils/read-age';
+import './read-age-note';
 
 export function formatHeardAgo(seconds: number, cs: boolean): string {
   if (seconds < 60) return cs ? `před ${seconds} s` : `${seconds} s ago`;
@@ -155,7 +155,7 @@ export class RepeaterNeighbours extends LitElement {
         ${this._waitSeconds
           ? html`<span class="hint" role="status">${cs ? `Limit provozu sítě, pokračuji za ${this._waitSeconds} s.` : `Mesh traffic limit, continuing in ${this._waitSeconds} s.`}</span>`
           : this._readAt
-            ? html`<span class=${readAtClass(this._readAt)}>${cs ? 'Načteno' : 'Loaded'} ${new Date(this._readAt).toLocaleString()}</span>`
+            ? html`<chattx-read-age-note .readAt=${this._readAt}></chattx-read-age-note>`
             : ''}
         <button class="reload" ?disabled=${!this.canLoad || this._loading} @click=${() => this._load(0)}>
           ${this._loading

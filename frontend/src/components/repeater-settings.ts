@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterSetting } from '../api';
 import { isCzech } from '../utils/language';
-import { readAtClass } from '../utils/read-age';
+import './read-age-note';
 
 interface SettingField {
   /** Read-only CLI command that returns this field's value. */
@@ -126,7 +126,7 @@ export class RepeaterSettings extends LitElement {
     .error { margin-bottom: 12px; font-size: 13px; color: var(--error-color, #db4437); }
     section { margin-bottom: 16px; }
     .group-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-    .read-at { margin: -4px 0 8px; font-size: 12px; color: var(--secondary-text-color); }
+    .read-at { display: block; margin: -4px 0 8px; font-size: 12px; color: var(--secondary-text-color); }
     .read-at.old { color: var(--warning-color, #ff9800); }
     .read-at.very-old { color: var(--error-color, #db4437); }
     h4 { margin: 0; font-size: 14px; font-weight: 600; color: var(--primary-text-color); }
@@ -323,7 +323,7 @@ export class RepeaterSettings extends LitElement {
             </button>
           </div>
           ${readAt
-            ? html`<div class=${readAtClass(readAt)}>${cs ? 'Načteno' : 'Loaded'} ${new Date(readAt).toLocaleString()}</div>`
+            ? html`<chattx-read-age-note .readAt=${readAt}></chattx-read-age-note>`
             : ''}
           <div class="fields">${group.fields.map((field) => this._renderField(field))}</div>
         </section>

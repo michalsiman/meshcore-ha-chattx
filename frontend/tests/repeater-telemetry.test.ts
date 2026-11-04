@@ -94,7 +94,7 @@ describe('telemetry block', () => {
     const el = await mount(hass, false);
 
     expect(value(el, 'MCU temperature (°C)')).toBe('6.2');
-    expect(el.shadowRoot!.querySelector('.read-at')!.textContent).toContain(new Date('2026-11-01T10:00:00+00:00').toLocaleString());
+    expect(el.shadowRoot!.querySelector('.read-at')!.getAttribute('title')).toContain(new Date('2026-11-01T10:00:00+00:00').toLocaleString());
     expect(reads(callWS)).toHaveLength(0);
   });
 
@@ -122,7 +122,7 @@ describe('telemetry block', () => {
 
     expect(value(el, 'MCU temperature (°C)')).toBe('6.2');
     expect(el.shadowRoot!.querySelector('.error')!.textContent).toContain('did not answer');
-    expect(el.shadowRoot!.querySelector('.read-at')!.textContent).toContain(new Date('2026-11-01T10:00:00+00:00').toLocaleString());
+    expect(el.shadowRoot!.querySelector('.read-at')!.getAttribute('title')).toContain(new Date('2026-11-01T10:00:00+00:00').toLocaleString());
   });
 
   it('says so when there are no sensors', async () => {

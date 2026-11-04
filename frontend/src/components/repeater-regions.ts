@@ -4,7 +4,7 @@ import { live } from 'lit/directives/live.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterSetting, sendRepeaterCommand } from '../api';
 import { isCzech } from '../utils/language';
-import { readAtClass } from '../utils/read-age';
+import './read-age-note';
 
 export interface RegionRow {
   name: string;
@@ -316,7 +316,7 @@ export class RepeaterRegions extends LitElement {
       ${this._notice ? html`<div class="notice" role="status">${this._notice}</div>` : ''}
       <div class="header">
         ${this._readAt
-          ? html`<span class=${readAtClass(this._readAt)}>${cs ? 'Načteno' : 'Loaded'} ${new Date(this._readAt).toLocaleString()}</span>`
+          ? html`<chattx-read-age-note .readAt=${this._readAt}></chattx-read-age-note>`
           : ''}
         <button class="load" ?disabled=${disabled} @click=${this._load}>
           ${this._busy

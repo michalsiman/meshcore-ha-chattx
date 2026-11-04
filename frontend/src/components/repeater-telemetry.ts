@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterTelemetry, type TelemetrySensor } from '../api';
 import { isCzech } from '../utils/language';
-import { readAtClass } from '../utils/read-age';
+import './read-age-note';
 
 // Units of the Cayenne LPP types, as the core meshcore integration shows them.
 const UNITS: Record<string, string> = {
@@ -179,7 +179,7 @@ export class RepeaterTelemetry extends LitElement {
         ${this._waitSeconds
           ? html`<span class="hint" role="status">${cs ? `Limit provozu sítě, pokračuji za ${this._waitSeconds} s.` : `Mesh traffic limit, continuing in ${this._waitSeconds} s.`}</span>`
           : this._readAt
-            ? html`<span class=${readAtClass(this._readAt)}>${cs ? 'Načteno' : 'Loaded'} ${new Date(this._readAt).toLocaleString()}</span>`
+            ? html`<chattx-read-age-note .readAt=${this._readAt}></chattx-read-age-note>`
             : ''}
         <button ?disabled=${!this.canLoad || this._loading} @click=${this._load}>
           ${this._loading
