@@ -963,6 +963,33 @@ describe('reply', () => {
   });
 });
 
+describe('picking a conversation', () => {
+  async function pick(page: ChatPage, id: string) {
+    page.shadowRoot!.querySelector('chattx-conversation-list')!.dispatchEvent(
+      new CustomEvent('conversation-selected', { detail: { id, isContact: false } }),
+    );
+    await page.updateComplete;
+    await page.updateComplete;
+  }
+
+  it('focuses the message field', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    page.shadowRoot!.querySelector<HTMLButtonElement>('.send-button')!.focus();
+    await pick(page, '0');
+    expect(page.shadowRoot!.activeElement).toBe(page.shadowRoot!.querySelector('textarea'));
+  });
+
+  it('leaves the cursor after text already written', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    const area = page.shadowRoot!.querySelector('textarea')!;
+    area.value = 'ahoj';
+    area.dispatchEvent(new Event('input'));
+    await page.updateComplete;
+    await pick(page, '0');
+    expect(area.selectionStart).toBe(4);
+  });
+});
+
 describe('diacritics switch', () => {
   afterEach(() => { localStorage.clear(); });
 

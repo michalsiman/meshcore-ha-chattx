@@ -5,6 +5,7 @@ import { getContacts, getChannels, getDeviceConfig, addContact, removeContact, r
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import './channel-dialog';
 import { isCzech } from '../utils/language';
+import { avatarLabel } from '../utils/avatar-label';
 
 type ManageTab = 'contacts' | 'channels';
 
@@ -701,7 +702,7 @@ export class ManageDialog extends LitElement {
   }
 
   private _renderContactItem(contact: Contact) {
-    const avatar = contact.pubkey_prefix.substring(0, 2).toUpperCase();
+    const avatar = avatarLabel(contact.adv_name, contact.pubkey_prefix.substring(0, 2).toUpperCase());
     const isAdded = contact.added_to_node;
     const isConfirming = this._confirmingRemoveContact === contact.public_key;
     const isActing = this._actionInProgress === contact.public_key;

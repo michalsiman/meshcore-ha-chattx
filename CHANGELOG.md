@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.14] - Unreleased
+
+### Changed
+
+- Picking a conversation puts the cursor in the message field.
+- Conversation circles show letters from the name instead of the ID or channel number: "Kamenny vrch" KV, "MBX-BASE" MB, "Public" PU, "Lx01 📟" L📟.
+
 ## [0.1.13] - Unreleased
 
 ### Changed

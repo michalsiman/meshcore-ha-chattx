@@ -72,6 +72,8 @@ export class ChatPage extends LitElement {
   @state() private _repeaterDialogOpen = false;
   @state() private _stripDiacritics = loadStripDiacritics();
   @state() private _showContactIds = loadShowContactIds();
+  /** Focus the composer once it is ready after picking a conversation. */
+  private _focusAfterSelect = false;
   @state() private _repeaterLoggedIn = false;
   private _repeaterLoginPrefix: string | null = null;
   @state() private _currentEntityId: string | null = null;
@@ -602,6 +604,14 @@ export class ChatPage extends LitElement {
 
   updated(changedProperties: Map<string, unknown>) {
     this._syncRepeaterLoginState();
+    if (this._focusAfterSelect) {
+      const textarea = this.shadowRoot?.querySelector<HTMLTextAreaElement>('.input-area textarea');
+      if (textarea && !textarea.disabled) {
+        this._focusAfterSelect = false;
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      }
+    }
     if (changedProperties.has('hass') && this.hass && this._messageStore) {
       this._messageStore.setHass(this.hass);
     }
@@ -765,6 +775,8 @@ export class ChatPage extends LitElement {
                 }
                 this.selectedId = newId;
                 this._narrowShowMessages = true;
+                this._focusAfterSelect = true;
+                this.requestUpdate();
               }}
               @manage-requested=${() => this._onManageRequested()}></chattx-conversation-list>
             ${this._manageOpen ? html`
@@ -804,6 +816,8 @@ export class ChatPage extends LitElement {
               this._pendingScroll = 'bottom';
             }
             this.selectedId = newId;
+            this._focusAfterSelect = true;
+            this.requestUpdate();
           }}
           @manage-requested=${() => this._onManageRequested()}></chattx-conversation-list>
         <div class="chat-main">

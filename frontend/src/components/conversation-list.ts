@@ -4,6 +4,7 @@ import type { Contact, Channel } from '../types';
 import type { UnreadController } from '../chat/unread-controller';
 import { formatLastActivity, lastActivityOf } from '../utils/conversation-activity';
 import { isCzech } from '../utils/language';
+import { avatarLabel } from '../utils/avatar-label';
 // manage-dialog is loaded by chat-page
 
 type ChatFilter = 'all' | 'unread' | 'dms' | 'channels';
@@ -380,9 +381,10 @@ export class ConversationList extends LitElement {
     const idLabel = isContact ? (conv as Contact).pubkey_prefix : `Channel ${(conv as Channel).channel_idx}`;
     const label = this.showContactIds ? idLabel : '';
     const detail = [label, age].filter(Boolean).join(' · ');
-    const avatar = isContact
-      ? (conv as Contact).pubkey_prefix.substring(0, 2).toUpperCase()
-      : `#${(conv as Channel).channel_idx}`;
+    const avatar = avatarLabel(
+      name,
+      isContact ? (conv as Contact).pubkey_prefix.substring(0, 2).toUpperCase() : `#${(conv as Channel).channel_idx}`,
+    );
 
     const isActive = this.activeId === id;
 
