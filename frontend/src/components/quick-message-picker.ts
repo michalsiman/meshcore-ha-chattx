@@ -19,8 +19,8 @@ export class QuickMessagePicker extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      width: var(--quick-message-toggle-size, 40px);
+      height: var(--quick-message-toggle-size, 40px);
       border: none;
       border-radius: 50%;
       background: none;

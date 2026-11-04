@@ -2,6 +2,8 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, Channel } from '../types';
 import type { UnreadController } from '../chat/unread-controller';
+import { formatLastActivity, lastActivityOf } from '../utils/conversation-activity';
+import { isCzech } from '../utils/language';
 // manage-dialog is loaded by chat-page
 
 type ChatFilter = 'all' | 'unread' | 'dms' | 'channels';
@@ -23,6 +25,9 @@ export class ConversationList extends LitElement {
    */
   @property({ type: Object }) unreadCounts: Record<string, number> = {};
   @property({ type: String }) nodePrefix: string | null = null;
+  /** Time of the newest message per message entity_id. */
+  @property({ type: Object }) activity: Record<string, string> = {};
+  private _ageTimer: ReturnType<typeof setInterval> | null = null;
 
   @state() private _activeFilter: ChatFilter = 'all';
   @state() private _filteredConversations: Array<Contact | Channel> = [];
@@ -234,6 +239,18 @@ export class ConversationList extends LitElement {
     }
   `;
 
+  connectedCallback() {
+    super.connectedCallback();
+    // The shown ages grow on their own, without any new message.
+    this._ageTimer = setInterval(() => this.requestUpdate(), 60_000);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this._ageTimer) clearInterval(this._ageTimer);
+    this._ageTimer = null;
+  }
+
   updated(changedProperties: Map<string, unknown>) {
     if (
       changedProperties.has('conversations') ||
@@ -357,7 +374,9 @@ export class ConversationList extends LitElement {
     const isContact = 'pubkey_prefix' in conv;
     const id = isContact ? (conv as Contact).pubkey_prefix : String((conv as Channel).channel_idx);
     const name = isContact ? (conv as Contact).adv_name : (conv as Channel).name;
-    const detail = isContact ? (conv as Contact).pubkey_prefix : `Channel ${(conv as Channel).channel_idx}`;
+    const age = formatLastActivity(lastActivityOf(conv, this.activity, this.nodePrefix), Date.now(), isCzech());
+    const detail = (isContact ? (conv as Contact).pubkey_prefix : `Channel ${(conv as Channel).channel_idx}`)
+      + (age ? ` · ${age}` : '');
     const avatar = isContact
       ? (conv as Contact).pubkey_prefix.substring(0, 2).toUpperCase()
       : `#${(conv as Channel).channel_idx}`;

@@ -25,6 +25,8 @@ export class ChatPage extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: Object }) config?: PanelConfig;
   @property({ type: Array }) conversations: Array<Contact | Channel> = [];
+  /** Time of the newest message per message entity_id. */
+  @property({ type: Object }) activity: Record<string, string> = {};
   @property({ type: String }) selectedId: string | null = null;
   @property({ type: Boolean }) narrow = false;
   /**
@@ -184,16 +186,24 @@ export class ChatPage extends LitElement {
       cursor: not-allowed;
     }
 
+    .composer-tools {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+      --quick-message-toggle-size: 28px;
+    }
+
     .diacritics-toggle {
       flex-shrink: 0;
-      height: 32px;
-      margin-bottom: 4px;
-      padding: 0 6px;
+      height: 24px;
+      padding: 0 4px;
       border: 1px solid var(--divider-color, #e0e0e0);
       border-radius: 6px;
       background: none;
       color: var(--secondary-text-color, #727272);
-      font-size: 12px;
+      font-size: 11px;
       white-space: nowrap;
       cursor: pointer;
     }
@@ -738,6 +748,7 @@ export class ChatPage extends LitElement {
           <div class="chat-layout narrow-list-only">
             <chattx-conversation-list
               .conversations=${this.conversations}
+              .activity=${this.activity}
               .activeId=${this.selectedId}
               .unread=${this.unread}
               .unreadCounts=${this.unread.counts}
@@ -774,6 +785,7 @@ export class ChatPage extends LitElement {
       <div class="chat-layout">
         <chattx-conversation-list
           .conversations=${this.conversations}
+          .activity=${this.activity}
           .activeId=${this.selectedId}
           .unread=${this.unread}
           .unreadCounts=${this.unread.counts}
@@ -896,16 +908,18 @@ export class ChatPage extends LitElement {
         ${this._renderNewMessagesIndicator()}
       </div>
       <div class="input-area">
-        <chattx-quick-message-picker
-          .hass=${this.hass}
-          ?disabled=${this._sending || !this.selectedId}
-          @quick-message-selected=${this._onQuickMessageSelected}></chattx-quick-message-picker>
-        <button
-          class=${this._stripDiacritics ? 'diacritics-toggle on' : 'diacritics-toggle'}
-          title=${diacriticsLabel}
-          aria-label=${diacriticsLabel}
-          aria-pressed=${this._stripDiacritics ? 'true' : 'false'}
-          @click=${this._toggleStripDiacritics}>á→a</button>
+        <div class="composer-tools">
+          <chattx-quick-message-picker
+            .hass=${this.hass}
+            ?disabled=${this._sending || !this.selectedId}
+            @quick-message-selected=${this._onQuickMessageSelected}></chattx-quick-message-picker>
+          <button
+            class=${this._stripDiacritics ? 'diacritics-toggle on' : 'diacritics-toggle'}
+            title=${diacriticsLabel}
+            aria-label=${diacriticsLabel}
+            aria-pressed=${this._stripDiacritics ? 'true' : 'false'}
+            @click=${this._toggleStripDiacritics}>á→a</button>
+        </div>
         <textarea
           placeholder="Type a message..."
           aria-label="Message text. Press Enter to send, Shift+Enter for newline."

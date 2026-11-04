@@ -311,9 +311,19 @@ export function fewestHops(rxLogData: Array<Record<string, unknown>> | undefined
   return counts.length > 0 ? Math.min(...counts) : null;
 }
 
+/** Bytes per hop in the path of a copy that took the fewest hops, or null when unknown. */
+export function pathHashSize(rxLogData: Array<Record<string, unknown>> | undefined): number | null {
+  const hops = fewestHops(rxLogData);
+  const size = (rxLogData ?? []).find(
+    (entry) => entry?.hop_count === hops && typeof entry?.path_hash_size === 'number',
+  )?.path_hash_size;
+  return typeof size === 'number' ? size : null;
+}
+
 /**
- * Label for the fewest hops any received copy of a message took, or '' when
- * no copy reports a hop count. Czech for cs browsers, English otherwise.
+ * Label for the fewest hops any received copy of a message took, with the
+ * path's bytes per hop when known, or '' when no copy reports a hop count.
+ * Czech for cs browsers, English otherwise.
  */
 export function formatHopLabel(
   rxLogData: Array<Record<string, unknown>> | undefined,
@@ -321,12 +331,14 @@ export function formatHopLabel(
 ): string {
   const hops = fewestHops(rxLogData);
   if (hops === null) return '';
+  const bytes = pathHashSize(rxLogData);
+  const size = bytes === null ? '' : ` (${bytes}B)`;
   if (language.toLowerCase().startsWith('cs')) {
     if (hops === 0) return 'přímo';
-    return `${hops} ${hops === 1 ? 'hop' : hops < 5 ? 'hopy' : 'hopů'}`;
+    return `${hops} ${hops === 1 ? 'hop' : hops < 5 ? 'hopy' : 'hopů'}${size}`;
   }
   if (hops === 0) return 'direct';
-  return `${hops} ${hops === 1 ? 'hop' : 'hops'}`;
+  return `${hops} ${hops === 1 ? 'hop' : 'hops'}${size}`;
 }
 
 export function formatTimestamp(date: Date, format: 'relative' | 'time' | 'datetime'): string {

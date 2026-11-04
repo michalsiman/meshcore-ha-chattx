@@ -872,6 +872,7 @@ export class MeshCorePanel extends LitElement {
             .hass=${this.hass}
             .config=${this._config}
             .conversations=${sortByActivity([...this._channels, ...this._contacts.filter(c => c.added_to_node)], this._conversationActivity, this._config?.node_prefix)}
+            .activity=${this._conversationActivity}
             .unread=${this._unread}
             .selectedId=${this._pendingChatTarget}
             .narrow=${this.narrow}

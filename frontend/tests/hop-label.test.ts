@@ -27,6 +27,28 @@ describe('formatHopLabel', () => {
   });
 });
 
+describe('formatHopLabel path size', () => {
+  it('adds the bytes per hop when known', () => {
+    expect(formatHopLabel([{ hop_count: 1, path_hash_size: 1 }], 'en')).toBe('1 hop (1B)');
+    expect(formatHopLabel([{ hop_count: 3, path_hash_size: 2 }], 'cs')).toBe('3 hopy (2B)');
+    expect(formatHopLabel([{ hop_count: 5, path_hash_size: 3 }], 'cs')).toBe('5 hopů (3B)');
+  });
+
+  it('takes the size from the copy with the fewest hops', () => {
+    expect(formatHopLabel([
+      { hop_count: 4, path_hash_size: 1 },
+      { hop_count: 2, path_hash_size: 3 },
+    ], 'en')).toBe('2 hops (3B)');
+  });
+
+  it('leaves the size out when unknown or when there is no path', () => {
+    expect(formatHopLabel([{ hop_count: 2, synthesized: true }], 'en')).toBe('2 hops');
+    expect(formatHopLabel([{ hop_count: 4, path_hash_size: 2 }, { hop_count: 2 }], 'en')).toBe('2 hops');
+    expect(formatHopLabel([{ hop_count: 0, path_hash_size: 2 }], 'cs')).toBe('přímo');
+    expect(formatHopLabel([{ hop_count: 0, path_hash_size: 2 }], 'en')).toBe('direct');
+  });
+});
+
 describe('fewestHops', () => {
   it('returns null when no copy reports a count', () => {
     expect(fewestHops(undefined)).toBeNull();

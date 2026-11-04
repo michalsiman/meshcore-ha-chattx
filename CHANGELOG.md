@@ -4,6 +4,17 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.11] - Unreleased
+
+### Added
+
+- The hop count on received messages also shows the path's bytes per hop, for example "3 hops (2B)".
+- The conversation list shows how long ago each conversation's newest message came, in hours and above 48 hours in days.
+
+### Changed
+
+- The quick messages and diacritics buttons are stacked to leave more width for the message text.
+
 ## [0.1.10] - Unreleased
 
 ### Added

@@ -1,7 +1,7 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
-import { mergeActivity, sortByActivity } from '../src/utils/conversation-activity';
+import { formatLastActivity, lastActivityOf, mergeActivity, sortByActivity } from '../src/utils/conversation-activity';
 import type { Channel, Contact } from '../src/types';
 
 const channel = (idx: number) => ({ channel_idx: idx, name: `c${idx}` }) as unknown as Channel;
@@ -56,5 +56,49 @@ describe('mergeActivity', () => {
       { a: '2026-11-04T12:00:00+00:00' },
       { a: '2026-11-04T11:00:00+00:00', b: '2026-11-04T09:00:00+00:00' },
     )).toEqual({ a: '2026-11-04T12:00:00+00:00', b: '2026-11-04T09:00:00+00:00' });
+  });
+});
+
+describe('lastActivityOf', () => {
+  const activity = {
+    'binary_sensor.meshcore_abc_ch_1_messages': '2026-11-04T10:00:00+00:00',
+    'binary_sensor.meshcore_abc_a1b2c3_messages': '2026-11-03T10:00:00+00:00',
+  };
+
+  it('finds channels and contacts by their entity', () => {
+    expect(lastActivityOf(channel(1), activity, 'abc')).toBe('2026-11-04T10:00:00+00:00');
+    expect(lastActivityOf(contact('a1b2c3aabbcc'), activity, 'abc')).toBe('2026-11-03T10:00:00+00:00');
+  });
+
+  it('is undefined without a stored message', () => {
+    expect(lastActivityOf(channel(2), activity, 'abc')).toBeUndefined();
+  });
+});
+
+describe('formatLastActivity', () => {
+  const now = Date.parse('2026-11-04T12:00:00Z');
+  const ago = (hours: number) => new Date(now - hours * 3_600_000).toISOString();
+
+  it('shows hours up to and including 48', () => {
+    expect(formatLastActivity(ago(0.5), now, true)).toBe('před < 1 h');
+    expect(formatLastActivity(ago(1), now, true)).toBe('před 1 h');
+    expect(formatLastActivity(ago(47.9), now, true)).toBe('před 47 h');
+    expect(formatLastActivity(ago(48), now, true)).toBe('před 48 h');
+  });
+
+  it('shows days above 48 hours', () => {
+    expect(formatLastActivity(ago(48.5), now, true)).toBe('před 2 d');
+    expect(formatLastActivity(ago(72), now, true)).toBe('před 3 d');
+  });
+
+  it('uses English otherwise', () => {
+    expect(formatLastActivity(ago(3), now, false)).toBe('3 h ago');
+    expect(formatLastActivity(ago(72), now, false)).toBe('3 d ago');
+  });
+
+  it('handles missing and future times', () => {
+    expect(formatLastActivity(undefined, now, true)).toBe('');
+    expect(formatLastActivity('nonsense', now, true)).toBe('');
+    expect(formatLastActivity(ago(-1), now, true)).toBe('před < 1 h');
   });
 });
