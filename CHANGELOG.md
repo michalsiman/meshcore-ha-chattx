@@ -4,6 +4,16 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.10] - Unreleased
+
+### Added
+
+- Message dialog option that puts "@[sender] Slyším, N hops!" in the composer, with the message's hop count.
+
+### Changed
+
+- The message dialog's copy and reply buttons are in Czech for Czech browsers.
+
 ## [0.1.9] - Unreleased
 
 ### Changed

@@ -303,6 +303,14 @@ export function formatRelativeTime(date: Date): string {
 /**
  * Format a timestamp according to the configured format.
  */
+/** The fewest hops any received copy of a message took, or null when no copy reports it. */
+export function fewestHops(rxLogData: Array<Record<string, unknown>> | undefined): number | null {
+  const counts = (rxLogData ?? [])
+    .map((entry) => entry?.hop_count)
+    .filter((hops): hops is number => typeof hops === 'number');
+  return counts.length > 0 ? Math.min(...counts) : null;
+}
+
 /**
  * Label for the fewest hops any received copy of a message took, or '' when
  * no copy reports a hop count. Czech for cs browsers, English otherwise.
@@ -311,11 +319,8 @@ export function formatHopLabel(
   rxLogData: Array<Record<string, unknown>> | undefined,
   language: string = typeof navigator !== 'undefined' ? navigator.language : 'en',
 ): string {
-  const counts = (rxLogData ?? [])
-    .map((entry) => entry?.hop_count)
-    .filter((hops): hops is number => typeof hops === 'number');
-  if (counts.length === 0) return '';
-  const hops = Math.min(...counts);
+  const hops = fewestHops(rxLogData);
+  if (hops === null) return '';
   if (language.toLowerCase().startsWith('cs')) {
     if (hops === 0) return 'přímo';
     return `${hops} ${hops === 1 ? 'hop' : hops < 5 ? 'hopy' : 'hopů'}`;

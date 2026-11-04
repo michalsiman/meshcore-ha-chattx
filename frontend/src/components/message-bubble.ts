@@ -1,8 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { ChatMessage, MessageGroup, DeliveryStatus } from '../types';
-import { formatHopLabel, formatTimestamp } from '../chat/message-parser';
+import { fewestHops, formatHopLabel, formatTimestamp } from '../chat/message-parser';
 import { attachDialogA11y } from '../utils/dialog-a11y';
+import { isCzech } from '../utils/language';
 
 /**
  * Generate a deterministic color from a string (e.g., pubkey prefix).
@@ -439,6 +440,8 @@ export class MessageBubble extends LitElement {
       minute: '2-digit',
       second: '2-digit',
     });
+    const hops = fewestHops(msg.rxLogData);
+    const heardText = hops === null ? '' : `Slyším, ${hops} ${hops === 1 ? 'hop' : 'hops'}!`;
     const footerStyle = 'padding: 8px 16px; font-size: 12px; color: var(--secondary-text-color); border-top: 1px solid var(--divider-color, #e0e0e0);';
 
     return html`
@@ -448,13 +451,20 @@ export class MessageBubble extends LitElement {
              @click=${(e: Event) => e.stopPropagation()}>
           <div class="message-dialog-preview">${msg.text}</div>
           <button class="message-dialog-action" @click=${() => this._copyText(msg.text)}>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>Copy Text
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>${isCzech() ? 'Kopírovat text' : 'Copy Text'}
           </button>
           ${!msg.isOutgoing && !msg.isSystem
             ? html`
                 <button class="message-dialog-action" @click=${() => this._replyToSender(msg.sender)}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>Reply
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>${isCzech() ? 'Odpovědět' : 'Reply'}
                 </button>
+                ${heardText
+                  ? html`
+                      <button class="message-dialog-action" @click=${() => this._replyToSender(msg.sender, heardText)}>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>${heardText}
+                      </button>
+                    `
+                  : html``}
               `
             : html``}
           ${hasRoute
@@ -498,10 +508,11 @@ export class MessageBubble extends LitElement {
     this._selectedMessage = null;
   }
 
-  private _replyToSender(sender: string) {
+  /** Hand the composer a reply to the sender; sending stays a separate step. */
+  private _replyToSender(sender: string, text = '') {
     this.dispatchEvent(
       new CustomEvent('reply-to-sender', {
-        detail: { mention: `@[${sender}] ` },
+        detail: { mention: text ? `@[${sender}] ${text} ` : `@[${sender}] ` },
         bubbles: true,
         composed: true,
       }),
