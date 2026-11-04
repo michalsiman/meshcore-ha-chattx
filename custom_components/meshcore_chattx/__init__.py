@@ -43,6 +43,12 @@ from .const import (
 from .channel_scopes import ChannelScopeStore
 from .message_store import MessageStore
 from .panel import async_register_panel, async_remove_panel
+from .quick_messages import QuickMessageStore
+from .repeater_credentials import (
+    RepeaterCredentialStore,
+    RepeaterLoginStore,
+    RepeaterSettingsStore,
+)
 from .unread_tracking import EVENT_UNREAD_UPDATED, UnreadTracker
 from .utils import (
     enrich_rx_log_entries,
@@ -127,7 +133,7 @@ def _sync_upstream_repair_issue(hass: HomeAssistant) -> None:
 # partially-initialized package when ws_api.py executes its top-level
 # imports during package load. The deliberate-ordering noqa silences the
 # E402 module-level-import-not-at-top warning.
-from .ws_api import async_register_ws_commands  # noqa: E402
+from .ws_api import async_register_ws_commands, is_repeater_read_reply  # noqa: E402
 
 
 async def async_setup_entry(
@@ -210,6 +216,26 @@ async def async_setup_entry(
         await scopes.async_load()
         bucket["channel_scopes"] = scopes
 
+    if "repeater_credentials" not in bucket:
+        credentials = RepeaterCredentialStore(hass)
+        await credentials.async_load()
+        bucket["repeater_credentials"] = credentials
+
+    if "quick_messages" not in bucket:
+        quick_messages = QuickMessageStore(hass)
+        await quick_messages.async_load()
+        bucket["quick_messages"] = quick_messages
+
+    if "repeater_settings" not in bucket:
+        repeater_settings = RepeaterSettingsStore(hass)
+        await repeater_settings.async_load()
+        bucket["repeater_settings"] = repeater_settings
+
+    if "repeater_logins" not in bucket:
+        logins = RepeaterLoginStore(hass)
+        await logins.async_load()
+        bucket["repeater_logins"] = logins
+
     # Register WS commands once (idempotent registration would be ideal but
     # HA's websocket_api raises on duplicate types — guard with a flag on the
     # domain bucket so multiple config entries don't collide).
@@ -262,6 +288,24 @@ async def async_setup_entry(
         len(store.get_message_index()),
     )
     return True
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Delete remembered repeater logins when the integration is removed."""
+    remaining = [
+        other
+        for other in hass.config_entries.async_entries(DOMAIN)
+        if other.entry_id != entry.entry_id
+    ]
+    if remaining:
+        return
+    bucket = hass.data.get(DOMAIN, {})
+    credentials = bucket.pop("repeater_credentials", None)
+    await (credentials or RepeaterCredentialStore(hass)).async_remove()
+    logins = bucket.pop("repeater_logins", None)
+    await (logins or RepeaterLoginStore(hass)).async_remove()
+    settings = bucket.pop("repeater_settings", None)
+    await (settings or RepeaterSettingsStore(hass)).async_remove()
 
 
 async def async_unload_entry(
@@ -346,6 +390,14 @@ def _make_message_handler(hass: HomeAssistant, entry_id: str):
             return
 
         data = event.data or {}
+        # Core reports these as ordinary direct messages, but they are not chat.
+        if (
+            data.get("message_type") == "direct"
+            and not data.get("outgoing")
+            and is_repeater_read_reply(data.get("pubkey_prefix"))
+        ):
+            return
+
         entity_id = data.get("entity_id")
         if not entity_id:
             # Without an entity_id we don't know which conversation to write

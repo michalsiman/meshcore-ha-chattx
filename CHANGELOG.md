@@ -4,6 +4,92 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.9] - Unreleased
+
+### Changed
+
+- Repeater neighbours load ten at a time, with a button for the next ten.
+
+## [0.1.8] - Unreleased
+
+### Added
+
+- Neighbours block after repeater login: heard nodes with SNR and when they were last heard.
+- Regions block after repeater login: read the region tree, add and remove regions, set flood permission, home and default scope, and save to the repeater.
+
+## [0.1.7] - Unreleased
+
+### Changed
+
+- The time values were read from a repeater turns orange after an hour and red after a day.
+
+### Added
+
+- Terminal block after repeater login: send any command and read the reply.
+
+## [0.1.6] - Unreleased
+
+### Fixed
+
+- Reply moves the cursor to the message input, so typing continues there.
+
+### Added
+
+- Telemetry block after repeater login: battery voltage, MCU temperature and any other sensors the repeater reports. Values are remembered with the time they were read.
+
+## [0.1.5] - Unreleased
+
+### Added
+
+- Bytes-left counter next to the chat input, red at the limit. Messages over the limit can't be sent.
+- Switch next to the chat input to send without diacritics. The browser remembers it.
+
+## [0.1.4] - Unreleased
+
+### Added
+
+- Quick messages: managed in Settings, offered by a button next to the chat input. Each can have up to 160 bytes.
+- Values read from a repeater are remembered and shown with the time they were read. The button then offers a reload.
+- The login icon turns green for a repeater with a remembered admin login.
+
+### Changed
+
+- Channels and contacts in the chat list are sorted by latest message.
+
+## [0.1.3] - Unreleased
+
+### Added
+
+- Repeater login and settings can be opened from a repeater's chat conversation.
+- A confirmed admin login is remembered, so settings can be loaded without logging in again. Repeaters keep admin logins indefinitely.
+
+### Fixed
+
+- Replies to commands typed in a repeater's chat conversation are stored again. Only replies to settings reads are left out of the chat.
+
+## [0.1.2] - Unreleased
+
+### Changed
+
+- Repeater settings load one group at a time. Loading again fills only the fields still missing, or refreshes a fully loaded group.
+- Commands to a zero-hop repeater no longer use core's mesh traffic budget.
+- When the budget runs out, loading waits and continues instead of stopping.
+
+### Fixed
+
+- Frequency no longer shows floating-point noise.
+
+## [0.1.1] - Unreleased
+
+### Added
+
+- Log in to a repeater contact, optionally remembering the password in Home Assistant.
+- Read repeater settings group by group. Guest password and private key are not read, because core publishes every reply as a `meshcore_message` event.
+
+### Changed
+
+- Replies to repeater settings reads are not stored as chat messages.
+
 ## [0.1.0] - Unreleased
 
 First release of **MeshCore Chattx**, a fork of [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat) v0.3.1. Entries below this one are the upstream project's history; issue numbers in them refer to the upstream repository.

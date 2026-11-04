@@ -4,8 +4,11 @@ import type { HomeAssistant, PanelConfig, Contact, Channel } from '../types';
 import { MessageStore } from '../chat/message-store';
 import { UnreadController, pillLabel } from '../chat/unread-controller';
 import { buildRenderItems } from '../chat/message-parser';
+import { remainingMessageBytes } from '../utils/message-limit';
+import { loadStripDiacritics, saveStripDiacritics, stripDiacritics } from '../utils/diacritics';
+import { isCzech } from '../utils/language';
 import { discoverChannelEntity, discoverContactEntity } from '../chat/entity-resolver';
-import { sendDirectMessage, sendChannelMessage } from '../api';
+import { getRepeaterLoginState, sendDirectMessage, sendChannelMessage } from '../api';
 import {
   AT_BOTTOM_THRESHOLD_PX,
   LAZY_LOAD_TRIGGER_PX,
@@ -14,6 +17,8 @@ import '../components/conversation-list';
 import '../components/manage-dialog';
 import '../components/message-bubble';
 import '../components/message-search';
+import '../components/node-detail-dialog';
+import '../components/quick-message-picker';
 
 @customElement('chattx-chat-page')
 export class ChatPage extends LitElement {
@@ -61,6 +66,10 @@ export class ChatPage extends LitElement {
   // button, 'channels' from the header scope chip.
   @state() private _manageInitialTab: 'contacts' | 'channels' = 'contacts';
   @state() private _searchOpen = false;
+  @state() private _repeaterDialogOpen = false;
+  @state() private _stripDiacritics = loadStripDiacritics();
+  @state() private _repeaterLoggedIn = false;
+  private _repeaterLoginPrefix: string | null = null;
   @state() private _currentEntityId: string | null = null;
   @state() private _conversationResolved = false;
   @state() private _pendingScroll: 'bottom' | 'last-read' | null = null;
@@ -173,6 +182,41 @@ export class ChatPage extends LitElement {
     .input-area textarea:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .diacritics-toggle {
+      flex-shrink: 0;
+      height: 32px;
+      margin-bottom: 4px;
+      padding: 0 6px;
+      border: 1px solid var(--divider-color, #e0e0e0);
+      border-radius: 6px;
+      background: none;
+      color: var(--secondary-text-color, #727272);
+      font-size: 12px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .diacritics-toggle.on {
+      border-color: var(--primary-color, #03a9f4);
+      background: var(--primary-color, #03a9f4);
+      color: var(--text-primary-color, #fff);
+    }
+
+    .byte-counter {
+      flex-shrink: 0;
+      min-width: 28px;
+      padding-bottom: 12px;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      color: var(--secondary-text-color, #727272);
+    }
+
+    .byte-counter.at-limit {
+      color: var(--error-color, #db4437);
+      font-weight: 600;
     }
 
     .send-button {
@@ -400,6 +444,10 @@ export class ChatPage extends LitElement {
       margin-left: auto;
     }
 
+    .header-action-btn.logged-in {
+      color: var(--success-color, #43a047);
+    }
+
     .header-action-btn {
       display: flex;
       align-items: center;
@@ -541,6 +589,7 @@ export class ChatPage extends LitElement {
   }
 
   updated(changedProperties: Map<string, unknown>) {
+    this._syncRepeaterLoginState();
     if (changedProperties.has('hass') && this.hass && this._messageStore) {
       this._messageStore.setHass(this.hass);
     }
@@ -675,11 +724,13 @@ export class ChatPage extends LitElement {
                 <button class="back-button" @click=${() => (this._narrowShowMessages = false)}>← Back</button>
                 <span class="narrow-conv-name">${this._getConversationName()}${this._renderScopeChip()}</span>
                 <div class="chat-header-actions">
+                  ${this._renderRepeaterButton()}
                   <button class="header-action-btn" title="Search messages" aria-label="Search messages" @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
                 </div>
               </div>
               ${this._renderChatArea()}
             </div>
+            ${this._renderRepeaterDialog()}
           </div>
         `;
       } else {
@@ -744,12 +795,14 @@ export class ChatPage extends LitElement {
                 ${this._getConversationName()}${this._renderScopeChip()}
               </div>
               <div class="chat-header-actions">
+                ${this._renderRepeaterButton()}
                 <button class="header-action-btn" title="Search messages" aria-label="Search messages" @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
               </div>
             </div>
           ` : ''}
           ${this._renderChatArea()}
         </div>
+        ${this._renderRepeaterDialog()}
         ${this._searchOpen ? html`
           <div class="search-panel">
             <chattx-message-search
@@ -805,6 +858,10 @@ export class ChatPage extends LitElement {
       show_date_separators: this.config?.show_date_separators ?? true,
     });
 
+    const remaining = this._remainingBytes();
+    const diacriticsLabel = isCzech()
+      ? 'Odesílat bez diakritiky. Text se upraví až při odeslání.'
+      : 'Send without diacritics. The text changes when it is sent.';
     return html`
       <div class="chat-container" @reply-to-sender=${this._onReplyToSender} @scroll=${this._onChatScroll}>
         ${this._messageStore.loadingOlder
@@ -839,6 +896,16 @@ export class ChatPage extends LitElement {
         ${this._renderNewMessagesIndicator()}
       </div>
       <div class="input-area">
+        <chattx-quick-message-picker
+          .hass=${this.hass}
+          ?disabled=${this._sending || !this.selectedId}
+          @quick-message-selected=${this._onQuickMessageSelected}></chattx-quick-message-picker>
+        <button
+          class=${this._stripDiacritics ? 'diacritics-toggle on' : 'diacritics-toggle'}
+          title=${diacriticsLabel}
+          aria-label=${diacriticsLabel}
+          aria-pressed=${this._stripDiacritics ? 'true' : 'false'}
+          @click=${this._toggleStripDiacritics}>á→a</button>
         <textarea
           placeholder="Type a message..."
           aria-label="Message text. Press Enter to send, Shift+Enter for newline."
@@ -854,11 +921,14 @@ export class ChatPage extends LitElement {
             }
           }}
           ?disabled=${this._sending || !this.selectedId}></textarea>
+        <span
+          class=${remaining <= 0 ? 'byte-counter at-limit' : 'byte-counter'}
+          title="Bytes left. Letters with diacritics take 2, emoji take 4. In channels your node name is part of the message.">${remaining}</span>
         <button
           class="send-button"
           aria-label="Send message"
           @click=${() => this._sendMessage()}
-          ?disabled=${this._sending || !this.selectedId || !this._inputText.trim()}>
+          ?disabled=${this._sending || !this.selectedId || !this._inputText.trim() || remaining < 0}>
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 L4.13399899,1.16151496 C3.34915502,0.9 2.40734225,0.9 1.77946707,1.4429026 C0.994623095,2.0752101 0.837654326,3.00778453 1.15159189,3.98029867 L3.03521743,10.4212916 C3.03521743,10.5783889 3.19218622,10.7354863 3.50612381,10.7354863 L16.6915026,11.5209733 C16.6915026,11.5209733 17.1624089,11.5209733 17.1624089,12.0492776 C17.1624089,12.5775818 16.6915026,12.4744748 16.6915026,12.4744748 Z"/>
           </svg>
@@ -1083,17 +1153,40 @@ export class ChatPage extends LitElement {
     }
   }
 
+  private _remainingBytes(): number {
+    return remainingMessageBytes(this._outgoingText(), this._isContact() ? null : this.config?.node_name ?? '');
+  }
+
+  /** The composer's text as it would go out. */
+  private _outgoingText(): string {
+    return this._stripDiacritics ? stripDiacritics(this._inputText) : this._inputText;
+  }
+
+  private _toggleStripDiacritics() {
+    this._stripDiacritics = !this._stripDiacritics;
+    saveStripDiacritics(this._stripDiacritics);
+  }
+
+  /** Put a quick message in the composer for review; sending stays a separate step. */
+  private async _onQuickMessageSelected(e: CustomEvent<{ message: string }>) {
+    const current = this._inputText.trimEnd();
+    this._inputText = current ? `${current} ${e.detail.message}` : e.detail.message;
+    await this._focusInput();
+  }
+
   private async _sendMessage() {
     if (this._sending || !this._inputText.trim() || !this.selectedId || !this.hass || !this.config) {
       return;
     }
+    // Too long: firmware cuts a channel message short and refuses a direct one.
+    if (this._remainingBytes() < 0) return;
     if (!this._conversationResolved) {
       console.warn('Cannot send — conversation not resolved');
       return;
     }
 
     this._sending = true;
-    const text = this._inputText.trim();
+    const text = this._outgoingText().trim();
     this._inputText = '';
 
     try {
@@ -1189,7 +1282,18 @@ export class ChatPage extends LitElement {
     if (mention) {
       this._inputText = mention + this._inputText;
       this.requestUpdate();
+      void this._focusInput();
     }
+  }
+
+  /** Put the cursor at the end of the composer's text. */
+  private async _focusInput() {
+    await this.updateComplete;
+    // A closing dialog hands focus back during its own update, so wait for that.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const textarea = this.shadowRoot?.querySelector<HTMLTextAreaElement>('.input-area textarea');
+    textarea?.focus();
+    textarea?.setSelectionRange(textarea.value.length, textarea.value.length);
   }
 
   private _getConversationName(): string {
@@ -1224,6 +1328,54 @@ export class ChatPage extends LitElement {
    * Clicking opens Manage → Channels, where Edit reaches the scope
    * field.
    */
+  /** The open conversation's contact, if it is a repeater the user may log in to. */
+  private _selectedRepeater(): Contact | null {
+    if (!this.hass?.user?.is_admin) return null;
+    const contact = this.conversations.find(
+      (c) => 'pubkey_prefix' in c && (c as Contact).pubkey_prefix === this.selectedId,
+    ) as Contact | undefined;
+    return contact?.type === 2 && contact.added_to_node ? contact : null;
+  }
+
+  /** Refresh the header icon's state when another repeater is selected. */
+  private _syncRepeaterLoginState() {
+    const prefix = this._selectedRepeater()?.pubkey_prefix ?? null;
+    if (prefix === this._repeaterLoginPrefix) return;
+    this._repeaterLoginPrefix = prefix;
+    this._repeaterLoggedIn = false;
+    if (prefix) void this._loadRepeaterLoginState(prefix);
+  }
+
+  private async _loadRepeaterLoginState(prefix: string) {
+    if (!this.hass) return;
+    const state = await getRepeaterLoginState(this.hass, prefix, this.config?.entry_id);
+    if (prefix === this._repeaterLoginPrefix) this._repeaterLoggedIn = !!state.logged_in_at;
+  }
+
+  private _renderRepeaterButton() {
+    if (!this._selectedRepeater()) return '';
+    const label = this._repeaterLoggedIn ? 'Logged in. Repeater settings' : 'Repeater login and settings';
+    return html`<button class=${this._repeaterLoggedIn ? 'header-action-btn repeater-login-btn logged-in' : 'header-action-btn repeater-login-btn'} title=${label} aria-label=${label} @click=${() => { this._repeaterDialogOpen = true; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></button>`;
+  }
+
+  private _renderRepeaterDialog() {
+    const repeater = this._repeaterDialogOpen ? this._selectedRepeater() : null;
+    if (!repeater) return '';
+    return html`
+      <chattx-node-detail-dialog
+        .hass=${this.hass}
+        .node=${repeater}
+        .entryId=${this.config?.entry_id}
+        .loginOnly=${true}
+        .open=${true}
+        @node-detail-closed=${() => {
+          this._repeaterDialogOpen = false;
+          void this._loadRepeaterLoginState(repeater.pubkey_prefix);
+        }}>
+      </chattx-node-detail-dialog>
+    `;
+  }
+
   private _renderScopeChip() {
     const scope = this._getActiveChannelScope();
     if (!scope) return '';

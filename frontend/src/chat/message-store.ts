@@ -7,7 +7,7 @@ import type {
   StoredMessage,
 } from '../types';
 import { generateId, extractMentions, toClientMessage, deriveFloodScope } from './message-parser';
-import { getMessagesAround } from '../api';
+import { getMessagesAround, isRepeaterSettingsReply } from '../api';
 import {
   CHANNEL_PREFIX_REGEX,
   FETCH_MAX_RETRIES,
@@ -661,6 +661,14 @@ export class MessageStore {
    * display, then triggers a debounced store fetch for confirmation.
    */
   private _handleRealtimeMessage(eventData: Record<string, unknown>): void {
+    // Replies to the settings dialog are not chat; the backend doesn't store them.
+    if (
+      eventData.message_type === 'direct'
+      && !eventData.outgoing
+      && isRepeaterSettingsReply(eventData.pubkey_prefix as string | undefined)
+    ) {
+      return;
+    }
     const sender = (eventData.sender_name ?? eventData.sender) as string;
     const text = (eventData.message ?? eventData.text) as string;
     const isOutgoing = sender === this._config.node_name;

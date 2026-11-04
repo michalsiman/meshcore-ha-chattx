@@ -12,6 +12,7 @@ export interface HomeAssistant {
   callApi: <T>(method: string, path: string) => Promise<T>;
   callService: (domain: string, service: string, data?: Record<string, unknown>) => Promise<void>;
   callWS: <T>(msg: Record<string, unknown>) => Promise<T>;
+  user?: { is_admin: boolean };
   connection: {
     subscribeEvents: (
       callback: (event: HassEvent) => void,

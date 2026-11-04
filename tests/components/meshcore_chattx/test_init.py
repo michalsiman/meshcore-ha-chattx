@@ -136,6 +136,39 @@ def test_resolve_store_returns_none_when_runtime_data_wrong_shape(
 # ─── _make_message_handler ─────────────────────────────────────────────
 
 
+@pytest.mark.parametrize(
+    ("message_type", "reading", "stored"),
+    [
+        ("direct", False, True),
+        ("direct", True, False),
+        ("channel", True, True),
+    ],
+)
+async def test_message_handler_skips_only_settings_read_replies(
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    mock_store: MagicMock,
+    monkeypatch: pytest.MonkeyPatch,
+    message_type: str,
+    reading: bool,
+    stored: bool,
+) -> None:
+    """A repeater's chat replies are kept; settings read replies are not."""
+    monkeypatch.setattr(
+        "custom_components.meshcore_chattx.is_repeater_read_reply",
+        lambda prefix: reading,
+    )
+    handler = _make_message_handler(hass, config_entry.entry_id)
+    await handler(_make_event({
+        "id": "m1",
+        "entity_id": "binary_sensor.x",
+        "message_type": message_type,
+        "pubkey_prefix": "abcdef123456",
+        "message": "> 22",
+    }))
+    assert mock_store.store_message.await_count == (1 if stored else 0)
+
+
 async def test_message_handler_persists_event(
     hass: HomeAssistant,
     config_entry: MockConfigEntry,

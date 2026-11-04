@@ -497,6 +497,7 @@ export class NodesPage extends LitElement {
       <chattx-node-detail-dialog
         .hass=${this.hass}
         .node=${this._selectedNode}
+        .entryId=${this.config?.entry_id}
         .pendingAction=${this._pendingAction}
         ?open=${this._nodeDetailDialogOpen}
         @node-detail-closed=${() => { this._nodeDetailDialogOpen = false; }}

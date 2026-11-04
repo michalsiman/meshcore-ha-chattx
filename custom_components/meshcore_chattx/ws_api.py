@@ -14,6 +14,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import time
 from datetime import datetime
 from pathlib import Path
@@ -24,6 +25,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.util import dt as dt_util
 
 from . import MeshCoreChattxRuntimeData, _sync_upstream_repair_issue
 from .const import (
@@ -418,6 +420,14 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_set_device_config)
     websocket_api.async_register_command(hass, ws_execute_local)
     websocket_api.async_register_command(hass, ws_execute_remote)
+    websocket_api.async_register_command(hass, ws_repeater_login_state)
+    websocket_api.async_register_command(hass, ws_repeater_login)
+    websocket_api.async_register_command(hass, ws_repeater_forget_password)
+    websocket_api.async_register_command(hass, ws_repeater_read)
+    websocket_api.async_register_command(hass, ws_repeater_read_telemetry)
+    websocket_api.async_register_command(hass, ws_repeater_command)
+    websocket_api.async_register_command(hass, ws_repeater_read_neighbours)
+    websocket_api.async_register_command(hass, ws_repeater_remembered_settings)
     websocket_api.async_register_command(hass, ws_set_channel)
     websocket_api.async_register_command(hass, ws_remove_channel)
 
@@ -428,6 +438,9 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
 
     # Unread, identity, location, and contact commands
     websocket_api.async_register_command(hass, ws_get_unread_counts)
+    websocket_api.async_register_command(hass, ws_get_conversation_activity)
+    websocket_api.async_register_command(hass, ws_get_quick_messages)
+    websocket_api.async_register_command(hass, ws_set_quick_messages)
     websocket_api.async_register_command(hass, ws_mark_read)
     websocket_api.async_register_command(hass, ws_regenerate_identity)
     websocket_api.async_register_command(hass, ws_import_identity)
@@ -1558,6 +1571,722 @@ async def ws_execute_remote(hass, connection, msg):
             msg["id"],
             ex,
             handler=f"ws_execute_remote({target_prefix!r})",
+        )
+
+
+# ─── meshcore/get_conversation_activity ─────────────────────────────────
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "meshcore_chattx/get_conversation_activity"}
+)
+@websocket_api.async_response
+async def ws_get_conversation_activity(hass, connection, msg):
+    """Return the newest message time per conversation, for sorting the list."""
+    store = _get_store(hass, None)
+    index = store.get_message_index() if store is not None else {}
+    activity = {
+        entity_id: entry["last_message_ts"]
+        for entity_id, entry in index.items()
+        if entry.get("last_message_ts")
+    }
+    connection.send_result(msg["id"], {"activity": activity})
+
+
+# ─── meshcore/quick_messages ────────────────────────────────────────────
+
+_MAX_QUICK_MESSAGES = 50
+# Firmware MAX_TEXT_LEN, in UTF-8 bytes. A longer message could never be sent.
+_MAX_QUICK_MESSAGE_BYTES = 160
+
+
+def _quick_message(value: str) -> str:
+    """Validate one quick message."""
+    if not value or len(value.encode()) > _MAX_QUICK_MESSAGE_BYTES:
+        raise vol.Invalid(f"must be 1 to {_MAX_QUICK_MESSAGE_BYTES} bytes")
+    return value
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "meshcore_chattx/get_quick_messages"}
+)
+@websocket_api.async_response
+async def ws_get_quick_messages(hass, connection, msg):
+    """Return the quick messages."""
+    store = hass.data.get(DOMAIN, {}).get("quick_messages")
+    connection.send_result(msg["id"], {"messages": store.get() if store else []})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/set_quick_messages",
+        vol.Required("messages"): vol.All(
+            [vol.All(str, _quick_message)],
+            vol.Length(max=_MAX_QUICK_MESSAGES),
+        ),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_set_quick_messages(hass, connection, msg):
+    """Replace the quick messages."""
+    store = hass.data.get(DOMAIN, {}).get("quick_messages")
+    if not store:
+        connection.send_error(msg["id"], "not_found", "Integration is not set up yet")
+        return
+    try:
+        await store.async_set(msg["messages"])
+        connection.send_result(msg["id"], {"messages": store.get()})
+    except Exception as ex:
+        _ws_send_error_safe(connection, msg["id"], ex, handler="ws_set_quick_messages")
+
+
+# ─── meshcore/repeater_login ────────────────────────────────────────────
+# Log in to any repeater contact with a typed or remembered password.
+# Passwords are accepted here but never returned to the frontend.
+
+
+def _get_credentials(hass: HomeAssistant):
+    """Return the remembered-password store, or None if setup hasn't run."""
+    return hass.data.get(DOMAIN, {}).get("repeater_credentials")
+
+
+def _get_logins(hass: HomeAssistant):
+    """Return the remembered-login store, or None if setup hasn't run."""
+    return hass.data.get(DOMAIN, {}).get("repeater_logins")
+
+
+def _find_contact(coordinator, prefix: str):
+    """Resolve a contact on the radio, on core meshcore 3.x or 2.x."""
+    api = coordinator.api
+    if hasattr(api, "contact_by_prefix"):
+        return api.contact_by_prefix(prefix)
+    return api.mesh_core.get_contact_by_key_prefix(prefix)
+
+
+def _mesh_wait_seconds(coordinator, contact) -> float:
+    """Charge core's mesh traffic budget; seconds to wait if it refuses."""
+    check_budget = getattr(coordinator, "check_interactive_budget", None)
+    if check_budget is None:  # core meshcore 2.x has no traffic budget
+        return 0.0
+    out_path_len = contact.get("out_path_len")
+    # Zero hops: only that repeater hears it and nothing forwards it.
+    if out_path_len == 0:
+        return 0.0
+    # Same rule as core's traffic.classify_lane for a login.
+    routed = out_path_len is not None and out_path_len >= 0
+    return check_budget("direct" if routed else "flood")
+
+
+async def _send_login(coordinator, contact, password: str):
+    """Send a login and wait for the answer; None when not confirmed."""
+    api = coordinator.api
+    if hasattr(api, "login"):
+        return await api.login(contact, password)
+    return await api.mesh_core.commands.send_login_sync(contact, password)
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_login_state",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_login_state(hass, connection, msg):
+    """Report what is remembered about logging in to a repeater."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    credentials = _get_credentials(hass)
+    logins = _get_logins(hass)
+    if not coordinator or not credentials or not logins:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+    entry_id = coordinator.config_entry.entry_id
+    saved = credentials.get(entry_id, msg["target_prefix"])
+    connection.send_result(
+        msg["id"],
+        {
+            "has_saved_password": saved is not None,
+            "logged_in_at": logins.get(entry_id, msg["target_prefix"]),
+        },
+    )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_login",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+        # Omitted: use the remembered password, or a blank one if there is none.
+        vol.Optional("password"): str,
+        vol.Optional("remember", default=False): bool,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_login(hass, connection, msg):
+    """Log in to a repeater, remembering or forgetting the password on success."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    credentials = _get_credentials(hass)
+    logins = _get_logins(hass)
+    if not coordinator or not credentials or not logins:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+
+    prefix = msg["target_prefix"]
+    entry_id = coordinator.config_entry.entry_id
+    try:
+        if not coordinator.api.connected:
+            connection.send_error(
+                msg["id"], "not_connected", _t("device_not_connected")
+            )
+            return
+        contact = _find_contact(coordinator, prefix)
+        if not contact:
+            connection.send_error(
+                msg["id"],
+                "not_found",
+                f"Contact not found on the radio: {prefix}. Add it as a contact first.",
+            )
+            return
+
+        saved = credentials.get(entry_id, prefix)
+        password = msg.get("password")
+        if password is None:
+            password = saved or ""
+
+        wait = _mesh_wait_seconds(coordinator, contact)
+        if wait:
+            connection.send_result(
+                msg["id"],
+                {
+                    "success": False,
+                    "reason": "rate_limited",
+                    "retry_after": max(1, int(wait)),
+                    "has_saved_password": saved is not None,
+                },
+            )
+            return
+
+        answer = await _send_login(coordinator, contact, password)
+        if answer is None:
+            connection.send_result(
+                msg["id"],
+                {
+                    "success": False,
+                    "reason": "no_response",
+                    "has_saved_password": saved is not None,
+                },
+            )
+            return
+
+        if msg["remember"] and password:
+            await credentials.async_set(entry_id, prefix, password)
+        elif not msg["remember"]:
+            await credentials.async_forget(entry_id, prefix)
+
+        payload = answer.payload if isinstance(answer.payload, dict) else {}
+        if payload.get("is_admin") is True:
+            await logins.async_set(entry_id, prefix, dt_util.utcnow().isoformat())
+        elif payload.get("is_admin") is False:
+            await logins.async_forget(entry_id, prefix)
+        connection.send_result(
+            msg["id"],
+            {
+                "success": True,
+                "is_admin": payload.get("is_admin"),
+                "has_saved_password": credentials.get(entry_id, prefix) is not None,
+            },
+        )
+    except Exception as ex:
+        _ws_send_error_safe(
+            connection, msg["id"], ex, handler=f"ws_repeater_login({prefix!r})"
+        )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_forget_password",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_forget_password(hass, connection, msg):
+    """Forget the remembered password for a repeater."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    credentials = _get_credentials(hass)
+    if not coordinator or not credentials:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+    await credentials.async_forget(
+        coordinator.config_entry.entry_id, msg["target_prefix"]
+    )
+    connection.send_result(msg["id"], {"has_saved_password": False})
+
+
+# ─── meshcore/repeater_read ─────────────────────────────────────────────
+# Read one setting from a repeater. Replies carry no command echo, so requests
+# run one at a time and a reply is matched by its sender.
+
+# Read-only commands only: this path must never be able to change a repeater.
+_REPEATER_READ_COMMAND = re.compile(
+    r"^(get [a-z0-9_.]+|ver|board|region( home| default| list (allowed|denied))?)\Z"
+)
+# Core publishes every reply as a meshcore_message event, which lands in the
+# logbook and the recorder and reaches any automation, so secrets stay out.
+_REPEATER_READ_BLOCKED = frozenset({"get guest.password", "get prv.key"})
+_REPEATER_READ_ATTEMPTS = 2
+_REPEATER_READ_MIN_TIMEOUT = 10.0
+_REPEATER_READ_MAX_TIMEOUT = 30.0
+_SUGGESTED_TIMEOUT_SCALE = 800.0
+_REPEATER_ERROR_PREFIXES = ("error", "err:", "err -", "failed", "unknown", "??")
+
+# A reply can reach the message listeners just after the read has finished.
+_REPEATER_READ_REPLY_GRACE = 3.0
+
+_repeater_read_lock = asyncio.Lock()
+_last_repeater_read_timestamp = 0
+_repeater_read_replies_until: dict[str, float] = {}
+
+
+def is_repeater_read_reply(prefix: str | None) -> bool:
+    """Return whether a message from this contact answers a settings read."""
+    until = _repeater_read_replies_until.get(prefix or "")
+    return until is not None and time.monotonic() < until
+
+
+def _next_repeater_read_timestamp() -> int:
+    """Return a strictly increasing send time.
+
+    Firmware treats a command with the same timestamp as the last one as a
+    retry of it and does not run it again.
+    """
+    global _last_repeater_read_timestamp
+    _last_repeater_read_timestamp = max(
+        int(time.time()), _last_repeater_read_timestamp + 1
+    )
+    return _last_repeater_read_timestamp
+
+
+async def _send_repeater_read(
+    api, contact, command: str, min_timeout: float | None = None
+) -> str | None:
+    """Send one CLI command and wait for its reply; None when unanswered."""
+    from meshcore.events import EventType
+
+    prefix = contact["public_key"][:12]
+    reply: asyncio.Future[str] = asyncio.get_running_loop().create_future()
+
+    def on_reply(event) -> None:
+        if not reply.done():
+            reply.set_result(str((event.payload or {}).get("text") or ""))
+
+    unsubscribe = api.subscribe(
+        EventType.CONTACT_MSG_RECV,
+        on_reply,
+        attribute_filters={"pubkey_prefix": prefix},
+    )
+    _repeater_read_replies_until[prefix] = float("inf")
+    try:
+        sent = await api.exchange(
+            "send_cmd", contact, command, timestamp=_next_repeater_read_timestamp()
+        )
+        if sent is None or getattr(sent, "type", None) == EventType.ERROR:
+            return None
+        payload = getattr(sent, "payload", None)
+        suggested = payload.get("suggested_timeout") if isinstance(payload, dict) else 0
+        timeout = min(
+            max(
+                (suggested or 0) / _SUGGESTED_TIMEOUT_SCALE,
+                _REPEATER_READ_MIN_TIMEOUT if min_timeout is None else min_timeout,
+            ),
+            _REPEATER_READ_MAX_TIMEOUT,
+        )
+        try:
+            return await asyncio.wait_for(reply, timeout)
+        except TimeoutError:
+            return None
+    finally:
+        unsubscribe()
+        _repeater_read_replies_until[prefix] = (
+            time.monotonic() + _REPEATER_READ_REPLY_GRACE
+        )
+
+
+def _parse_repeater_reply(text: str) -> dict[str, Any]:
+    """Turn a CLI reply into a websocket result."""
+    text = text.strip()
+    if text.casefold().startswith(_REPEATER_ERROR_PREFIXES):
+        return {"success": False, "reason": "unsupported", "message": text}
+    if text.startswith(">"):
+        text = text[1:].strip()
+    return {"success": True, "value": text}
+
+
+# A terminal command is sent once, so it gets longer to answer than a read.
+_REPEATER_COMMAND_MIN_TIMEOUT = 20.0
+# Firmware MAX_TEXT_LEN, in UTF-8 bytes.
+_REPEATER_COMMAND_MAX_BYTES = 160
+
+
+def _repeater_command(value: str) -> str:
+    """Validate one terminal command."""
+    if not value or len(value.encode()) > _REPEATER_COMMAND_MAX_BYTES:
+        raise vol.Invalid(f"must be 1 to {_REPEATER_COMMAND_MAX_BYTES} bytes")
+    return value
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_command",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+        vol.Required("command"): vol.All(str, _repeater_command),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_command(hass, connection, msg):
+    """Send any CLI command to a repeater once and return its raw reply.
+
+    Unlike a read it is never retried: the command may not be safe to repeat,
+    and a missing reply doesn't mean it didn't run.
+    """
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+
+    prefix = msg["target_prefix"]
+    api = coordinator.api
+    try:
+        if not api.connected:
+            connection.send_error(
+                msg["id"], "not_connected", _t("device_not_connected")
+            )
+            return
+        if not hasattr(api, "exchange"):
+            connection.send_error(
+                msg["id"], "not_supported", "This requires core meshcore 3.0 or newer."
+            )
+            return
+        contact = _find_contact(coordinator, prefix)
+        if not contact:
+            connection.send_error(
+                msg["id"], "not_found", f"Contact not found on the radio: {prefix}."
+            )
+            return
+
+        # Shares the lock with reads, so replies can't reach the wrong request.
+        async with _repeater_read_lock:
+            wait = _mesh_wait_seconds(coordinator, contact)
+            if wait:
+                connection.send_result(
+                    msg["id"],
+                    {
+                        "success": False,
+                        "reason": "rate_limited",
+                        "retry_after": max(1, int(wait)),
+                    },
+                )
+                return
+            text = await _send_repeater_read(
+                api, contact, msg["command"], _REPEATER_COMMAND_MIN_TIMEOUT
+            )
+        if text is None:
+            connection.send_result(
+                msg["id"], {"success": False, "reason": "no_response"}
+            )
+        else:
+            connection.send_result(msg["id"], {"success": True, "reply": text.strip()})
+    except Exception as ex:
+        # The command can contain a password, so it stays out of the log.
+        _ws_send_error_safe(
+            connection, msg["id"], ex, handler=f"ws_repeater_command({prefix!r})"
+        )
+
+
+_REPEATER_NEIGHBOUR_PAGE = 10
+
+
+def _merge_neighbours(store, entry_id, prefix, offset, page, total) -> dict:
+    """Add a page to the remembered list; offset 0 starts a new list."""
+    now = dt_util.utcnow().isoformat()
+    previous = store.get(entry_id, prefix).get("neighbours") if store else None
+    if offset == 0 or not previous:
+        merged = {"neighbours": [], "read_at": now}
+    else:
+        merged = {
+            "neighbours": list(previous["neighbours"]),
+            "read_at": previous["read_at"],
+        }
+    # The repeater lists newest first, so entries can shift between pages.
+    known = {item["pubkey"] for item in merged["neighbours"]}
+    merged["neighbours"] += [item for item in page if item["pubkey"] not in known]
+    merged["total"] = total
+    if store:
+        store.record(entry_id, prefix, "neighbours", merged)
+    return merged
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_read_neighbours",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+        vol.Optional("offset", default=0): vol.All(int, vol.Range(min=0, max=65535)),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_read_neighbours(hass, connection, msg):
+    """Read the next few nodes a repeater has heard, and return the list so far."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+
+    prefix = msg["target_prefix"]
+    api = coordinator.api
+    try:
+        if not api.connected:
+            connection.send_error(
+                msg["id"], "not_connected", _t("device_not_connected")
+            )
+            return
+        if not hasattr(api, "req_neighbours"):
+            connection.send_error(
+                msg["id"], "not_supported", "This requires core meshcore 3.0 or newer."
+            )
+            return
+        contact = _find_contact(coordinator, prefix)
+        if not contact:
+            connection.send_error(
+                msg["id"], "not_found", f"Contact not found on the radio: {prefix}."
+            )
+            return
+
+        for _attempt in range(_REPEATER_READ_ATTEMPTS):
+            wait = _mesh_wait_seconds(coordinator, contact)
+            if wait:
+                connection.send_result(
+                    msg["id"],
+                    {
+                        "success": False,
+                        "reason": "rate_limited",
+                        "retry_after": max(1, int(wait)),
+                    },
+                )
+                return
+            answer = await api.req_neighbours(
+                contact, msg["offset"], _REPEATER_NEIGHBOUR_PAGE
+            )
+            if answer is not None:
+                read_at = dt_util.utcnow().isoformat()
+                page = [
+                    {
+                        "pubkey": item.get("pubkey", ""),
+                        "name": coordinator.resolve_neighbor_name(item.get("pubkey", "")),
+                        "secs_ago": item.get("secs_ago", 0),
+                        "snr": item.get("snr", 0),
+                        "read_at": read_at,
+                    }
+                    for item in answer.payload.get("neighbours") or []
+                ]
+                merged = _merge_neighbours(
+                    hass.data.get(DOMAIN, {}).get("repeater_settings"),
+                    coordinator.config_entry.entry_id,
+                    prefix,
+                    msg["offset"],
+                    page,
+                    answer.payload.get("neighbours_count", len(page)),
+                )
+                connection.send_result(msg["id"], {"success": True, **merged})
+                return
+        connection.send_result(msg["id"], {"success": False, "reason": "no_response"})
+    except Exception as ex:
+        _ws_send_error_safe(
+            connection, msg["id"], ex, handler=f"ws_repeater_read_neighbours({prefix!r})"
+        )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_read_telemetry",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_read_telemetry(hass, connection, msg):
+    """Read a repeater's sensors. Core also turns them into HA sensors."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+
+    prefix = msg["target_prefix"]
+    api = coordinator.api
+    try:
+        if not api.connected:
+            connection.send_error(
+                msg["id"], "not_connected", _t("device_not_connected")
+            )
+            return
+        if not hasattr(api, "req_telemetry"):
+            connection.send_error(
+                msg["id"], "not_supported", "This requires core meshcore 3.0 or newer."
+            )
+            return
+        contact = _find_contact(coordinator, prefix)
+        if not contact:
+            connection.send_error(
+                msg["id"], "not_found", f"Contact not found on the radio: {prefix}."
+            )
+            return
+
+        for _attempt in range(_REPEATER_READ_ATTEMPTS):
+            wait = _mesh_wait_seconds(coordinator, contact)
+            if wait:
+                connection.send_result(
+                    msg["id"],
+                    {
+                        "success": False,
+                        "reason": "rate_limited",
+                        "retry_after": max(1, int(wait)),
+                    },
+                )
+                return
+            answer = await api.req_telemetry(contact)
+            if answer is not None:
+                sensors = (answer.payload or {}).get("lpp") or []
+                store = hass.data.get(DOMAIN, {}).get("repeater_settings")
+                if store:
+                    store.record(
+                        coordinator.config_entry.entry_id,
+                        prefix,
+                        "telemetry",
+                        {"sensors": sensors, "read_at": dt_util.utcnow().isoformat()},
+                    )
+                connection.send_result(msg["id"], {"success": True, "sensors": sensors})
+                return
+        connection.send_result(msg["id"], {"success": False, "reason": "no_response"})
+    except Exception as ex:
+        _ws_send_error_safe(
+            connection, msg["id"], ex, handler=f"ws_repeater_read_telemetry({prefix!r})"
+        )
+
+
+def _remember_repeater_answer(hass, coordinator, msg, result) -> None:
+    """Keep a repeater's answer so the panel can show it next time."""
+    store = hass.data.get(DOMAIN, {}).get("repeater_settings")
+    if not store:
+        return
+    answer = {"read_at": dt_util.utcnow().isoformat()}
+    if result["success"]:
+        answer["value"] = result["value"]
+    else:
+        answer["unsupported"] = result["message"]
+    store.record(
+        coordinator.config_entry.entry_id, msg["target_prefix"], msg["command"], answer
+    )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_remembered_settings",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_remembered_settings(hass, connection, msg):
+    """Return the last answers read from a repeater, without any mesh traffic."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    store = hass.data.get(DOMAIN, {}).get("repeater_settings")
+    if not coordinator or not store:
+        connection.send_result(msg["id"], {"settings": {}})
+        return
+    connection.send_result(
+        msg["id"],
+        {
+            "settings": store.get(
+                coordinator.config_entry.entry_id, msg["target_prefix"]
+            )
+        },
+    )
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/repeater_read",
+        vol.Optional("entry_id"): str,
+        vol.Required("target_prefix"): str,
+        vol.Required("command"): vol.All(
+            str,
+            vol.Match(_REPEATER_READ_COMMAND),
+            vol.NotIn(_REPEATER_READ_BLOCKED),
+        ),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_repeater_read(hass, connection, msg):
+    """Read one setting from a repeater the radio is logged in to."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+
+    prefix = msg["target_prefix"]
+    api = coordinator.api
+    try:
+        if not api.connected:
+            connection.send_error(
+                msg["id"], "not_connected", _t("device_not_connected")
+            )
+            return
+        if not hasattr(api, "exchange"):
+            connection.send_error(
+                msg["id"], "not_supported", "This requires core meshcore 3.0 or newer."
+            )
+            return
+        contact = _find_contact(coordinator, prefix)
+        if not contact:
+            connection.send_error(
+                msg["id"], "not_found", f"Contact not found on the radio: {prefix}."
+            )
+            return
+
+        async with _repeater_read_lock:
+            for _attempt in range(_REPEATER_READ_ATTEMPTS):
+                wait = _mesh_wait_seconds(coordinator, contact)
+                if wait:
+                    connection.send_result(
+                        msg["id"],
+                        {
+                            "success": False,
+                            "reason": "rate_limited",
+                            "retry_after": max(1, int(wait)),
+                        },
+                    )
+                    return
+                text = await _send_repeater_read(api, contact, msg["command"])
+                if text is not None:
+                    result = _parse_repeater_reply(text)
+                    _remember_repeater_answer(hass, coordinator, msg, result)
+                    connection.send_result(msg["id"], result)
+                    return
+        connection.send_result(msg["id"], {"success": False, "reason": "no_response"})
+    except Exception as ex:
+        _ws_send_error_safe(
+            connection, msg["id"], ex, handler=f"ws_repeater_read({prefix!r})"
         )
 
 

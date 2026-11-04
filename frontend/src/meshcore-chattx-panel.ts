@@ -4,7 +4,8 @@ import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice } fro
 import type { TraceResult } from './api';
 import { panelStyles } from './styles';
 import { MESHCORE_PRESET, DEFAULT_PANEL_CONFIG } from './constants';
-import { getDevices, getContacts, getChannels, getUnreadAndLastRead, markConversationRead, removeContact, addContact, traceContact, type TracePathMode } from './api';
+import { mergeActivity, sortByActivity, type ConversationActivity } from './utils/conversation-activity';
+import { getConversationActivity, isRepeaterSettingsReply, getDevices, getContacts, getChannels, getUnreadAndLastRead, markConversationRead, removeContact, addContact, traceContact, type TracePathMode } from './api';
 import { UnreadController } from './chat/unread-controller';
 import './pages/chat-page';
 import './pages/devices-page';
@@ -24,6 +25,7 @@ export class MeshCorePanel extends LitElement {
   // managedDevices removed — devices-page.ts fetches its own data
   @state() private _devices: MeshCoreDevice[] = [];
   @state() private _contacts: Contact[] = [];
+  @state() private _conversationActivity: ConversationActivity = {};
   @state() private _channels: Channel[] = [];
   @state() private _selectedEntryId: string | null = null;
   @state() private _loading = true;
@@ -635,6 +637,28 @@ export class MeshCorePanel extends LitElement {
     });
 
     this.hass.connection.subscribeEvents(
+      (event: { data?: Record<string, unknown> }) => {
+        const data = event.data ?? {};
+        const entityId = data.entity_id as string | undefined;
+        if (!entityId) return;
+        // Replies to the repeater settings dialog are not conversation activity.
+        if (
+          data.message_type === 'direct'
+          && !data.outgoing
+          && isRepeaterSettingsReply(data.pubkey_prefix as string | undefined)
+        ) {
+          return;
+        }
+        this._conversationActivity = mergeActivity(this._conversationActivity, {
+          [entityId]: new Date().toISOString(),
+        });
+      },
+      'meshcore_message'
+    ).then(unsubscribe => {
+      this._unsubscribeList.push(unsubscribe);
+    });
+
+    this.hass.connection.subscribeEvents(
       (event: { data?: { entity_id?: string } }) => {
         // Suppress unread updates for the conversation the user is currently viewing
         if (this._activeChatEntityId && event.data?.entity_id === this._activeChatEntityId) {
@@ -847,7 +871,7 @@ export class MeshCorePanel extends LitElement {
           <chattx-chat-page
             .hass=${this.hass}
             .config=${this._config}
-            .conversations=${[...this._channels, ...this._contacts.filter(c => c.added_to_node)]}
+            .conversations=${sortByActivity([...this._channels, ...this._contacts.filter(c => c.added_to_node)], this._conversationActivity, this._config?.node_prefix)}
             .unread=${this._unread}
             .selectedId=${this._pendingChatTarget}
             .narrow=${this.narrow}
@@ -1039,6 +1063,10 @@ export class MeshCorePanel extends LitElement {
       // zeroing that used to be inline here, and notifies the
       // controller's subscribers (i.e. `<chat-page>`).
       this._unread.ingestBackendData(result, this._activeChatEntityId);
+      this._conversationActivity = mergeActivity(
+        this._conversationActivity,
+        await getConversationActivity(this.hass),
+      );
     } catch {
       // Silently fail
     }

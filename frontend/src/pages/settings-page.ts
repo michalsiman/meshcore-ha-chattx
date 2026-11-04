@@ -13,6 +13,7 @@ import '../components/confirm-dialog';
 import '../components/command-dialog';
 import '../components/sensor-tile';
 import '../components/node-summary';
+import '../components/quick-messages-editor';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import type { CompanionDeviceDescriptor } from '../components/node-summary';
 import { panelStyles } from '../styles';
@@ -783,6 +784,12 @@ export class SettingsPage extends LitElement {
             <div class="device-section">
               <div class="card-title">Location</div>
               ${this._renderLocation()}
+            </div>
+
+            <!-- Quick messages for the chat composer -->
+            <div class="device-section">
+              <div class="card-title">Quick messages</div>
+              <chattx-quick-messages-editor .hass=${this.hass}></chattx-quick-messages-editor>
             </div>
 
 

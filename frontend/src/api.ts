@@ -281,6 +281,256 @@ export async function executeRemote(
   }
 }
 
+export interface RepeaterLoginResult {
+  success: boolean;
+  is_admin?: boolean | null;
+  has_saved_password?: boolean;
+  reason?: 'no_response' | 'rate_limited';
+  retry_after?: number;
+  message?: string;
+}
+
+function wsErrorMessage(error: unknown): string {
+  const e = error as { code?: string; message?: string };
+  if (e && e.message) return e.message;
+  return String(error);
+}
+
+export interface RepeaterLoginState {
+  has_saved_password: boolean;
+  /** When an admin login was confirmed; repeaters keep those indefinitely. */
+  logged_in_at: string | null;
+}
+
+/** What is remembered about logging in to this repeater. */
+export async function getRepeaterLoginState(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  entryId?: string,
+): Promise<RepeaterLoginState> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_login_state',
+    target_prefix: targetPrefix,
+  };
+  if (entryId) msg.entry_id = entryId;
+  try {
+    return await hass.callWS<RepeaterLoginState>(msg);
+  } catch {
+    return { has_saved_password: false, logged_in_at: null };
+  }
+}
+
+/** Log in to a repeater. Without a password the remembered one is used. */
+export async function loginToRepeater(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  options: { password?: string; remember: boolean; entryId?: string },
+): Promise<RepeaterLoginResult> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_login',
+    target_prefix: targetPrefix,
+    remember: options.remember,
+  };
+  if (options.password !== undefined) msg.password = options.password;
+  if (options.entryId) msg.entry_id = options.entryId;
+  try {
+    return await hass.callWS<RepeaterLoginResult>(msg);
+  } catch (error) {
+    return { success: false, message: wsErrorMessage(error) };
+  }
+}
+
+export interface RepeaterReadResult {
+  success: boolean;
+  value?: string;
+  reason?: 'no_response' | 'rate_limited' | 'unsupported';
+  retry_after?: number;
+  message?: string;
+}
+
+// A reply can arrive just after the read has finished.
+const SETTINGS_REPLY_GRACE_MS = 3000;
+const settingsRepliesUntil = new Map<string, number>();
+
+/** Whether a direct message from this contact answers a settings read. */
+export function isRepeaterSettingsReply(prefix: string | undefined): boolean {
+  return Date.now() < (settingsRepliesUntil.get(prefix ?? '') ?? 0);
+}
+
+/** Read one setting from a repeater the radio is logged in to. */
+export async function readRepeaterSetting(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  command: string,
+  entryId?: string,
+): Promise<RepeaterReadResult> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_read',
+    target_prefix: targetPrefix,
+    command,
+  };
+  if (entryId) msg.entry_id = entryId;
+  settingsRepliesUntil.set(targetPrefix, Infinity);
+  try {
+    return await hass.callWS<RepeaterReadResult>(msg);
+  } catch (error) {
+    return { success: false, message: wsErrorMessage(error) };
+  } finally {
+    settingsRepliesUntil.set(targetPrefix, Date.now() + SETTINGS_REPLY_GRACE_MS);
+  }
+}
+
+export interface TelemetrySensor {
+  channel: number;
+  type: string;
+  value: unknown;
+}
+
+export interface RepeaterNeighbour {
+  pubkey: string;
+  name: string;
+  secs_ago: number;
+  snr: number;
+  /** When this entry was read; `secs_ago` counts from then. */
+  read_at?: string;
+}
+
+export interface RepeaterNeighboursResult {
+  success: boolean;
+  neighbours?: RepeaterNeighbour[];
+  total?: number;
+  read_at?: string;
+  reason?: 'no_response' | 'rate_limited';
+  retry_after?: number;
+  message?: string;
+}
+
+/** Ask a repeater for its next few neighbours; returns the whole list so far. */
+export async function readRepeaterNeighbours(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  offset: number,
+  entryId?: string,
+): Promise<RepeaterNeighboursResult> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_read_neighbours',
+    target_prefix: targetPrefix,
+    offset,
+  };
+  if (entryId) msg.entry_id = entryId;
+  try {
+    return await hass.callWS<RepeaterNeighboursResult>(msg);
+  } catch (error) {
+    return { success: false, message: wsErrorMessage(error) };
+  }
+}
+
+export interface RepeaterCommandResult {
+  success: boolean;
+  reply?: string;
+  reason?: 'no_response' | 'rate_limited';
+  retry_after?: number;
+  message?: string;
+}
+
+/** Send any CLI command to a repeater once and wait for its reply. */
+export async function sendRepeaterCommand(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  command: string,
+  entryId?: string,
+): Promise<RepeaterCommandResult> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_command',
+    target_prefix: targetPrefix,
+    command,
+  };
+  if (entryId) msg.entry_id = entryId;
+  settingsRepliesUntil.set(targetPrefix, Infinity);
+  try {
+    return await hass.callWS<RepeaterCommandResult>(msg);
+  } catch (error) {
+    return { success: false, message: wsErrorMessage(error) };
+  } finally {
+    settingsRepliesUntil.set(targetPrefix, Date.now() + SETTINGS_REPLY_GRACE_MS);
+  }
+}
+
+export interface RememberedRepeaterSetting {
+  value?: string;
+  unsupported?: string;
+  /** Only on the entry named `telemetry`. */
+  sensors?: TelemetrySensor[];
+  /** Only on the entry named `neighbours`. */
+  neighbours?: RepeaterNeighbour[];
+  total?: number;
+  read_at: string;
+}
+
+export interface RepeaterTelemetryResult {
+  success: boolean;
+  sensors?: TelemetrySensor[];
+  reason?: 'no_response' | 'rate_limited';
+  retry_after?: number;
+  message?: string;
+}
+
+/** Ask a repeater for its sensors. */
+export async function readRepeaterTelemetry(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  entryId?: string,
+): Promise<RepeaterTelemetryResult> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_read_telemetry',
+    target_prefix: targetPrefix,
+  };
+  if (entryId) msg.entry_id = entryId;
+  try {
+    return await hass.callWS<RepeaterTelemetryResult>(msg);
+  } catch (error) {
+    return { success: false, message: wsErrorMessage(error) };
+  }
+}
+
+/** Last answers read from a repeater; asks HA only, no mesh traffic. */
+export async function getRememberedRepeaterSettings(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  entryId?: string,
+): Promise<Record<string, RememberedRepeaterSetting>> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_remembered_settings',
+    target_prefix: targetPrefix,
+  };
+  if (entryId) msg.entry_id = entryId;
+  try {
+    const result = await hass.callWS<{ settings: Record<string, RememberedRepeaterSetting> }>(msg);
+    return result.settings ?? {};
+  } catch {
+    return {};
+  }
+}
+
+/** Forget a remembered password; returns an error message on failure. */
+export async function forgetRepeaterPassword(
+  hass: HomeAssistant,
+  targetPrefix: string,
+  entryId?: string,
+): Promise<string | null> {
+  const msg: Record<string, unknown> = {
+    type: 'meshcore_chattx/repeater_forget_password',
+    target_prefix: targetPrefix,
+  };
+  if (entryId) msg.entry_id = entryId;
+  try {
+    await hass.callWS(msg);
+    return null;
+  } catch (error) {
+    return wsErrorMessage(error);
+  }
+}
+
 /**
  * Set channel configuration.
  *
@@ -605,6 +855,43 @@ export async function getUnreadAndLastRead(
       last_read: result.last_read || {},
     };
   } catch { return { unread: {}, last_read: {} }; }
+}
+
+/** Newest message time per conversation; empty if it can't be fetched. */
+export async function getConversationActivity(
+  hass: HomeAssistant,
+): Promise<Record<string, string>> {
+  try {
+    const result = await hass.callWS<{ activity: Record<string, string> }>({
+      type: 'meshcore_chattx/get_conversation_activity',
+    });
+    return result.activity;
+  } catch {
+    return {};
+  }
+}
+
+export const MAX_QUICK_MESSAGES = 50;
+/** Firmware limit for a whole message, in UTF-8 bytes. */
+export const MAX_QUICK_MESSAGE_BYTES = 160;
+
+export async function getQuickMessages(hass: HomeAssistant): Promise<string[]> {
+  try {
+    const result = await hass.callWS<{ messages: string[] }>({ type: 'meshcore_chattx/get_quick_messages' });
+    return result.messages;
+  } catch {
+    return [];
+  }
+}
+
+/** Replace the quick messages; returns an error message on failure. */
+export async function saveQuickMessages(hass: HomeAssistant, messages: string[]): Promise<string | null> {
+  try {
+    await hass.callWS({ type: 'meshcore_chattx/set_quick_messages', messages });
+    return null;
+  } catch (error) {
+    return wsErrorMessage(error);
+  }
 }
 
 export async function getUnreadCounts(

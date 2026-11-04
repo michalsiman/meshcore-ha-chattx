@@ -2,12 +2,22 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, ManagedDevice, HomeAssistant } from '../types';
 import { attachDialogA11y } from '../utils/dialog-a11y';
+import { getRepeaterLoginState } from '../api';
+import './repeater-login';
+import './repeater-settings';
+import './repeater-telemetry';
+import './repeater-terminal';
+import './repeater-neighbours';
+import './repeater-regions';
 
 @customElement('chattx-node-detail-dialog')
 export class NodeDetailDialog extends LitElement {
   @property({ type: Object }) node?: Contact | ManagedDevice;
   @property({ type: Boolean }) open = false;
   @property({ type: Object }) hass?: HomeAssistant;
+  @property({ type: String }) entryId?: string;
+  /** Show only repeater login and settings, for opening from outside Nodes. */
+  @property({ type: Boolean }) loginOnly = false;
   // Parent-owned pending state; when set, the matching action button is
   // disabled and its label swaps to "Adding…" / "Removing…" so the user
   // gets feedback during the WS round-trip + coordinator refresh.
@@ -15,6 +25,10 @@ export class NodeDetailDialog extends LitElement {
 
   @state() private _confirming = false;
   @state() private _confirmAction: 'remove-contact' | null = null;
+  @state() private _showLogin = false;
+  @state() private _canLoadSettings = false;
+  @state() private _loggedIn = false;
+  private _loginStatePrefix: string | null = null;
 
   constructor() {
     super();
@@ -27,6 +41,9 @@ export class NodeDetailDialog extends LitElement {
         if (this._confirming) {
           this._confirming = false;
           this._confirmAction = null;
+        } else if (this._showLogin) {
+          this._showLogin = false;
+          this._canLoadSettings = false;
         } else {
           this._close();
         }
@@ -267,7 +284,29 @@ export class NodeDetailDialog extends LitElement {
     .confirm-btn.yes { background: var(--error-color, #db4437); color: #fff; }
     .confirm-btn.no { background: var(--divider-color, #e0e0e0); color: var(--primary-text-color); }
 
+    .action-btn.logged-in svg { color: var(--success-color, #43a047); }
+
+    .back-btn {
+      padding: 6px 0;
+      border: none;
+      background: none;
+      color: var(--secondary-text-color);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
   `;
+
+  protected updated() {
+    const prefix = this.open && !this.loginOnly && this.node ? this.node.pubkey_prefix ?? null : null;
+    if (prefix === this._loginStatePrefix) return;
+    this._loginStatePrefix = prefix;
+    this._loggedIn = false;
+    if (!prefix || !this.hass?.user?.is_admin) return;
+    void getRepeaterLoginState(this.hass, prefix, this.entryId).then((state) => {
+      if (prefix === this._loginStatePrefix) this._loggedIn = !!state.logged_in_at;
+    });
+  }
 
   render() {
     if (!this.open || !this.node) return html``;
@@ -280,6 +319,10 @@ export class NodeDetailDialog extends LitElement {
 
     const name = isContact ? (this.node as Contact).adv_name : (this.node as ManagedDevice).name;
     const prefix = isContact ? (this.node as Contact).pubkey_prefix : (this.node as ManagedDevice).pubkey_prefix;
+    // Only contacts stored on the radio can be logged in to, and the backend
+    // command is admin-only.
+    const canLogin = isRepeater && !!prefix && !!this.hass?.user?.is_admin
+      && (!isContact || (this.node as Contact).added_to_node);
 
     let avatarSvg = html`<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>`;
     let typeLabel = 'Contact';
@@ -308,7 +351,64 @@ export class NodeDetailDialog extends LitElement {
           </div>
 
           <div class="dialog-content">
-            ${this._confirming
+            ${this._showLogin || this.loginOnly
+              ? html`
+                  <div class="section">
+                    <div class="section-header">Log in to repeater</div>
+                    <chattx-repeater-login
+                      .hass=${this.hass}
+                      .prefix=${prefix}
+                      .entryId=${this.entryId}
+                      @repeater-logged-in=${(e: CustomEvent<{ role: string }>) => {
+                        // A login without a known role is an older firmware; let
+                        // the repeater itself refuse if it isn't an admin session.
+                        this._canLoadSettings = e.detail.role !== 'guest';
+                        this._loggedIn = e.detail.role === 'admin';
+                      }}></chattx-repeater-login>
+                  </div>
+                  <div class="section">
+                    <div class="section-header">Telemetry</div>
+                    <chattx-repeater-telemetry
+                      .hass=${this.hass}
+                      .prefix=${prefix}
+                      .entryId=${this.entryId}
+                      .canLoad=${this._canLoadSettings}></chattx-repeater-telemetry>
+                  </div>
+                  <div class="section">
+                    <div class="section-header">Neighbours</div>
+                    <chattx-repeater-neighbours
+                      .hass=${this.hass}
+                      .prefix=${prefix}
+                      .entryId=${this.entryId}
+                      .canLoad=${this._canLoadSettings}></chattx-repeater-neighbours>
+                  </div>
+                  <div class="section">
+                    <div class="section-header">Regions</div>
+                    <chattx-repeater-regions
+                      .hass=${this.hass}
+                      .prefix=${prefix}
+                      .entryId=${this.entryId}
+                      .canEdit=${this._canLoadSettings}></chattx-repeater-regions>
+                  </div>
+                  <div class="section">
+                    <div class="section-header">Settings</div>
+                    <chattx-repeater-settings
+                      .hass=${this.hass}
+                      .prefix=${prefix}
+                      .entryId=${this.entryId}
+                      .canLoad=${this._canLoadSettings}></chattx-repeater-settings>
+                  </div>
+                  <div class="section">
+                    <div class="section-header">Terminal</div>
+                    <chattx-repeater-terminal
+                      .hass=${this.hass}
+                      .prefix=${prefix}
+                      .entryId=${this.entryId}
+                      .canSend=${this._canLoadSettings}></chattx-repeater-terminal>
+                  </div>
+                  ${this.loginOnly ? '' : html`<button class="back-btn" @click=${() => { this._showLogin = false; this._canLoadSettings = false; }}>‹ Back</button>`}
+                `
+              : this._confirming
               ? html`
                   <div class="confirm-section">
                     <div class="confirm-text">
@@ -327,6 +427,9 @@ export class NodeDetailDialog extends LitElement {
                   <div class="section">
                     <div class="section-header">Quick Actions</div>
                     <div class="quick-actions ${isContact ? '' : 'full'}">
+                      ${canLogin ? html`
+                        <button class=${this._loggedIn ? 'action-btn logged-in' : 'action-btn'} @click=${() => { this._showLogin = true; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>${this._loggedIn ? 'Logged in' : 'Log in'}</button>
+                      ` : html``}
                       ${isContact && (this.node as Contact).added_to_node && (isClient || isRoomServer) ? html`
                         <button class="action-btn" @click=${() => this._dispatchEvent('message')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>Message</button>
                       ` : html``}
@@ -418,6 +521,8 @@ export class NodeDetailDialog extends LitElement {
 
   private _close() {
     this.open = false;
+    this._showLogin = false;
+    this._canLoadSettings = false;
     this._confirming = false;
     this._confirmAction = null;
     this.dispatchEvent(

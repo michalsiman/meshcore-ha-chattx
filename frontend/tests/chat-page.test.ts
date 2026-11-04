@@ -32,6 +32,9 @@ vi.mock('../src/api', () => ({
   removeContact: vi.fn(async () => ({ success: true })),
   removeChannel: vi.fn(async () => ({ success: true })),
   setChannel: vi.fn(async () => ({ success: true })),
+  isRepeaterSettingsReply: vi.fn(() => false),
+  getRememberedRepeaterSettings: vi.fn(async () => ({})),
+  getRepeaterLoginState: vi.fn(async () => ({ has_saved_password: false, logged_in_at: null })),
 }));
 
 // Mock entity-resolver — chat-page calls discoverChannelEntity /
@@ -870,6 +873,197 @@ describe('Phase 4 — indicator visibility', () => {
 // `meshcore.send_channel_message`'s `scope` argument, and surface in
 // the thread header as an always-visible chip while the scoped
 // channel is active.
+describe('repeater login button', () => {
+  const contact = (type: number, added = true) => ({
+    public_key: 'ab'.repeat(32),
+    pubkey_prefix: 'abababababab',
+    added_to_node: added,
+    adv_name: 'node',
+    type,
+    flags: 0,
+    adv_lat: 0,
+    adv_lon: 0,
+    lastmod: 0,
+    last_advert: 0,
+    out_path: '',
+    out_path_len: 0,
+    out_path_hash_mode: 0,
+  });
+
+  async function pageWith(conversation: ReturnType<typeof contact>, isAdmin = true) {
+    const page = await mountChatPage({
+      selectedId: conversation.pubkey_prefix,
+      conversations: [conversation as unknown as Channel],
+    });
+    page.hass = { ...page.hass!, user: { is_admin: isAdmin } };
+    await page.updateComplete;
+    return page;
+  }
+
+  const button = (page: ChatPage) => page.shadowRoot!.querySelector<HTMLButtonElement>('.repeater-login-btn');
+
+  it('shows for an added repeater and opens the dialog on login and settings', async () => {
+    const page = await pageWith(contact(2));
+
+    button(page)!.click();
+    await page.updateComplete;
+
+    const dialog = page.shadowRoot!.querySelector('chattx-node-detail-dialog') as HTMLElement & { updateComplete: Promise<boolean> };
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot!.querySelector('chattx-repeater-login')).not.toBeNull();
+    expect(dialog.shadowRoot!.querySelector('chattx-repeater-settings')).not.toBeNull();
+    expect(dialog.shadowRoot!.querySelector('.back-btn')).toBeNull();
+  });
+
+  it('turns green with a remembered login', async () => {
+    const api = await import('../src/api');
+    vi.mocked(api.getRepeaterLoginState).mockResolvedValueOnce({ has_saved_password: true, logged_in_at: '2026-11-04T10:00:00+00:00' });
+    const page = await pageWith(contact(2));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await page.updateComplete;
+
+    expect(button(page)!.classList.contains('logged-in')).toBe(true);
+  });
+
+  it('stays neutral without a remembered login', async () => {
+    const page = await pageWith(contact(2));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await page.updateComplete;
+
+    expect(button(page)!.classList.contains('logged-in')).toBe(false);
+  });
+
+  it('is hidden for other contacts and non-admins', async () => {
+    expect(button(await pageWith(contact(1)))).toBeNull();
+    expect(button(await pageWith(contact(2), false))).toBeNull();
+    expect(button(await pageWith(contact(2, false)))).toBeNull();
+  });
+});
+
+describe('reply', () => {
+  it('moves focus to the input, even if a closing dialog takes it back first', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    const area = page.shadowRoot!.querySelector('textarea')!;
+    const other = page.shadowRoot!.querySelector<HTMLButtonElement>('.send-button')!;
+    area.value = 'text';
+    area.dispatchEvent(new Event('input'));
+    await page.updateComplete;
+
+    page.shadowRoot!.querySelector('.chat-container')!.dispatchEvent(
+      new CustomEvent('reply-to-sender', { detail: { mention: '@[Čáp] ' } }),
+    );
+    await page.updateComplete;
+    other.removeAttribute('disabled');
+    other.focus();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(area.value).toBe('@[Čáp] text');
+    expect(page.shadowRoot!.activeElement).toBe(area);
+    expect(area.selectionStart).toBe(area.value.length);
+  });
+});
+
+describe('diacritics switch', () => {
+  afterEach(() => { localStorage.clear(); });
+
+  const toggle = (page: ChatPage) => page.shadowRoot!.querySelector<HTMLButtonElement>('.diacritics-toggle')!;
+  const area = (page: ChatPage) => page.shadowRoot!.querySelector('textarea')!;
+
+  async function type(page: ChatPage, text: string) {
+    area(page).value = text;
+    area(page).dispatchEvent(new Event('input'));
+    await page.updateComplete;
+  }
+
+  it('leaves the text alone while off', async () => {
+    const api = await import('../src/api');
+    const page = await mountChatPage({ selectedId: '0' });
+    expect(toggle(page).getAttribute('aria-pressed')).toBe('false');
+
+    await type(page, 'čau');
+    page.shadowRoot!.querySelector<HTMLButtonElement>('.send-button')!.click();
+    await page.updateComplete;
+
+    expect(vi.mocked(api.sendChannelMessage).mock.calls[0]).toContain('čau');
+  });
+
+  it('sends stripped text, keeps the typed text until then, and counts what goes out', async () => {
+    const api = await import('../src/api');
+    const page = await mountChatPage({ selectedId: '0' });
+    const counter = () => Number(page.shadowRoot!.querySelector('.byte-counter')!.textContent);
+
+    await type(page, 'čau');
+    const withDiacritics = counter();
+    toggle(page).click();
+    await page.updateComplete;
+
+    expect(counter()).toBe(withDiacritics + 1);
+    expect(area(page).value).toBe('čau');
+
+    page.shadowRoot!.querySelector<HTMLButtonElement>('.send-button')!.click();
+    await page.updateComplete;
+
+    expect(vi.mocked(api.sendChannelMessage).mock.calls[0]).toContain('cau');
+  });
+
+  it('remembers the state for the next page load', async () => {
+    const first = await mountChatPage({ selectedId: '0' });
+    toggle(first).click();
+    await first.updateComplete;
+
+    const second = await mountChatPage({ selectedId: '0' });
+    expect(toggle(second).getAttribute('aria-pressed')).toBe('true');
+  });
+});
+
+describe('byte counter', () => {
+  const counter = (page: ChatPage) => page.shadowRoot!.querySelector('.byte-counter')!;
+  const send = (page: ChatPage) => page.shadowRoot!.querySelector<HTMLButtonElement>('.send-button')!;
+
+  async function type(page: ChatPage, text: string) {
+    const area = page.shadowRoot!.querySelector('textarea')!;
+    area.value = text;
+    area.dispatchEvent(new Event('input'));
+    await page.updateComplete;
+  }
+
+  it('counts down from the channel limit without the sender name', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    const start = 160 - new TextEncoder().encode(`${page.config!.node_name}: `).length;
+
+    expect(counter(page).textContent).toBe(String(start));
+    await type(page, 'ahoj');
+    expect(counter(page).textContent).toBe(String(start - 4));
+    expect(counter(page).classList.contains('at-limit')).toBe(false);
+  });
+
+  it('turns red at the limit, still allowing a message that fits exactly', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    const start = Number(counter(page).textContent);
+
+    await type(page, 'x'.repeat(start));
+
+    expect(counter(page).textContent).toBe('0');
+    expect(counter(page).classList.contains('at-limit')).toBe(true);
+    expect(send(page).disabled).toBe(false);
+  });
+
+  it('blocks sending past the limit, by button and by Enter', async () => {
+    const api = await import('../src/api');
+    const page = await mountChatPage({ selectedId: '0' });
+    const start = Number(counter(page).textContent);
+
+    await type(page, 'x'.repeat(start + 1));
+
+    expect(counter(page).textContent).toBe('-1');
+    expect(send(page).disabled).toBe(true);
+    page.shadowRoot!.querySelector('textarea')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    await page.updateComplete;
+    expect(api.sendChannelMessage).not.toHaveBeenCalled();
+    expect(page.shadowRoot!.querySelector('textarea')!.value).toHaveLength(start + 1);
+  });
+});
+
 describe('region scope', () => {
   function scopedChannel(idx: number, scope?: string): Channel {
     return {
