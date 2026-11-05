@@ -37,7 +37,7 @@ It works as a **companion** to the [core meshcore integration](https://github.co
 
 Everything below is new or reworked compared with the original MeshCore Chat.
 
-These features were built by [Michal Šiman](https://github.com/michalsiman) together with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant. Michal chose the features and tested them on his own MeshCore network, and Claude wrote most of the code.
+These features were built by [Michal Šiman](https://github.com/michalsiman) ([OK1SIM](https://ok1sim.cz/)) together with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant. Michal ([OK1SIM](https://ok1sim.cz/)) chose the features and tested them on his own MeshCore network, and Claude wrote most of the code.
 
 **Repeaters**, from the lock icon in a repeater's conversation:
 
