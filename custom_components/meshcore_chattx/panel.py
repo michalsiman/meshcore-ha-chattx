@@ -15,6 +15,7 @@ import logging
 from pathlib import Path
 
 from homeassistant.components.frontend import (
+    add_extra_js_url,
     async_register_built_in_panel,
     async_remove_panel as frontend_async_remove_panel,
 )
@@ -46,7 +47,12 @@ PANEL_URL = "/meshcore_chattx_panel/meshcore-chattx-panel.js"
 # assets); a wrapper directory would add nothing.
 PANEL_FRONTEND_PATH = str(Path(__file__).parent / "meshcore-chattx-panel.js")
 
-PANEL_ICON = "mdi:radio-handheld"
+# The sidebar renders before the panel loads, so its icon comes from a small
+# separate script that the frontend loads at startup.
+ICONS_URL = "/meshcore_chattx_panel/chattx-icons.js"
+ICONS_FRONTEND_PATH = str(Path(__file__).parent / "chattx-icons.js")
+
+PANEL_ICON = "chattx:radio-handheld-x"
 PANEL_TITLE = "MeshCore Chattx"
 
 # Sidebar URL slug — the panel will be reachable at /meshcore-chattx in the HA UI.
@@ -64,13 +70,17 @@ async def async_register_panel(hass: HomeAssistant) -> None:
     `frontend` panel-lifecycle convention.
     """
     global _static_path_registered
+    integration = await async_get_integration(hass, DOMAIN)
     if not _static_path_registered:
         await hass.http.async_register_static_paths(
-            [StaticPathConfig(PANEL_URL, PANEL_FRONTEND_PATH, cache_headers=False)]
+            [
+                StaticPathConfig(PANEL_URL, PANEL_FRONTEND_PATH, cache_headers=False),
+                StaticPathConfig(ICONS_URL, ICONS_FRONTEND_PATH, cache_headers=False),
+            ]
         )
+        add_extra_js_url(hass, f"{ICONS_URL}?v={integration.version}")
         _static_path_registered = True
         _LOGGER.debug("Registered MeshCore Chattx panel static path %s", PANEL_URL)
-    integration = await async_get_integration(hass, DOMAIN)
     async_register_built_in_panel(
         hass,
         component_name="custom",
