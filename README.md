@@ -24,6 +24,8 @@ Works as a **companion** to the [core meshcore integration](https://github.com/m
 
 Everything below is new compared with the original MeshCore Chat.
 
+These features were built by [Michal Šiman](https://github.com/michalsiman) together with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant. Michal chose the features and tested them on his own MeshCore network, and Claude wrote most of the code.
+
 **Repeaters**, from the lock icon in a repeater's conversation:
 
 - Log in as admin or guest, optionally remembering the password in Home Assistant
