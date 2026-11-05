@@ -11,6 +11,7 @@ Differences vs. upstream:
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 from pathlib import Path
 
@@ -63,6 +64,14 @@ PANEL_TITLE = "MeshCore Chattx"
 PANEL_URL_PATH = "meshcore-chattx"
 
 
+def _bundle_fingerprint() -> str:
+    """Return a short hash of the bundle, or an empty string if unreadable."""
+    try:
+        return hashlib.sha256(Path(PANEL_FRONTEND_PATH).read_bytes()).hexdigest()[:10]
+    except OSError:
+        return ""
+
+
 async def async_register_panel(hass: HomeAssistant) -> None:
     """Register the MeshCore Chattx sidebar panel.
 
@@ -86,6 +95,12 @@ async def async_register_panel(hass: HomeAssistant) -> None:
         add_extra_js_url(hass, f"{ICONS_URL}?v={integration.version}")
         _static_path_registered = True
         _LOGGER.debug("Registered MeshCore Chattx panel static path %s", PANEL_URL)
+    # The version alone stays the same while a build is being tested, so a
+    # browser could keep the previous build; the content hash changes with it.
+    fingerprint = await hass.async_add_executor_job(_bundle_fingerprint)
+    bundle_version = (
+        f"{integration.version}-{fingerprint}" if fingerprint else str(integration.version)
+    )
     async_register_built_in_panel(
         hass,
         component_name="custom",
@@ -95,9 +110,9 @@ async def async_register_panel(hass: HomeAssistant) -> None:
         config={
             "_panel_custom": {
                 "name": "meshcore-chattx-panel",
-                # Version in the URL makes browsers fetch the new bundle
-                # after an update instead of reusing a cached copy.
-                "module_url": f"{PANEL_URL}?v={integration.version}",
+                # Version and content hash in the URL make browsers fetch
+                # the new bundle after an update instead of a cached copy.
+                "module_url": f"{PANEL_URL}?v={bundle_version}",
             }
         },
         require_admin=False,

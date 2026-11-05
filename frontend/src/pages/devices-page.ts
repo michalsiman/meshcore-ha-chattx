@@ -12,6 +12,8 @@ import '../components/command-dialog';
 import { longPress } from '../directives/long-press';
 import { loadMeshcoreEntityRegistry, type EntityInfo } from '../utils/classify-entity';
 import { attachDialogA11y } from '../utils/dialog-a11y';
+import { isMissingState, lastKnownFromHistory, oldestSubstitute, withLastKnown, type LastKnown } from '../utils/last-known';
+import '../components/read-age-note';
 
 @customElement('chattx-devices-page')
 export class DevicesPage extends LitElement {
@@ -44,6 +46,12 @@ export class DevicesPage extends LitElement {
   // Map: meshcore identifier key → HA device_id
   @state() private _meshcoreDeviceMap: Record<string, string> = {};
   @state() private _entityRegistryLoaded = false;
+
+  /** Last real value of sensors that are unavailable now (core meshcore
+   *  blanks repeater sensors on every HA restart until the next poll). */
+  @state() private _lastKnown: Record<string, LastKnown> = {};
+  /** Entities whose last known value was already asked for. */
+  private _lastKnownRequested = new Set<string>();
 
   // Hidden sensors: device identifier key → set of hidden entity_ids
   // Persisted to localStorage under 'chattx-hidden-sensors'
@@ -686,6 +694,54 @@ export class DevicesPage extends LitElement {
     if (changedProperties.has('hass') && this.hass && !this._entityRegistryLoaded) {
       this._loadEntityRegistry();
     }
+    if (changedProperties.has('hass') || changedProperties.has('_managedDevices')
+        || changedProperties.has('_deviceEntities')) {
+      void this._loadLastKnown();
+    }
+  }
+
+  /** Entity ids shown for a managed device: its sensors and status entity. */
+  private _managedEntityIds(device: ManagedDevice, type: 'repeater' | 'client'): string[] {
+    const ids = this._getDeviceEntities(device, type).map((e) => e.entity_id);
+    if (device.status_entity_id) ids.push(device.status_entity_id);
+    return ids;
+  }
+
+  /** Fetch the last real value of managed-device sensors that are
+   *  unavailable now, once per entity. */
+  private async _loadLastKnown(): Promise<void> {
+    if (!this.hass) return;
+    const wanted: string[] = [];
+    const lists: Array<[ManagedDevice[], 'repeater' | 'client']> = [
+      [this._managedDevices.repeaters, 'repeater'],
+      [this._managedDevices.clients, 'client'],
+    ];
+    for (const [devices, type] of lists) {
+      for (const device of devices) {
+        for (const id of this._managedEntityIds(device, type)) {
+          if (this._lastKnownRequested.has(id)) continue;
+          if (!isMissingState(this.hass.states[id]?.state)) continue;
+          this._lastKnownRequested.add(id);
+          wanted.push(id);
+        }
+      }
+    }
+    if (wanted.length === 0) return;
+    const end = Date.now();
+    try {
+      const history = await this.hass.callWS<Record<string, Array<{ s?: unknown; lu?: number; lc?: number }>>>({
+        type: 'history/history_during_period',
+        start_time: new Date(end - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        end_time: new Date(end).toISOString(),
+        entity_ids: wanted,
+        minimal_response: true,
+        no_attributes: true,
+        significant_changes_only: false,
+      });
+      this._lastKnown = { ...this._lastKnown, ...lastKnownFromHistory(history) };
+    } catch {
+      // Without history the tiles just stay blank, as before.
+    }
   }
 
   render() {
@@ -846,10 +902,14 @@ export class DevicesPage extends LitElement {
 
   private _renderDeviceSection(device: ManagedDevice, type: 'repeater' | 'client') {
     // Derive status from the entity if available, fall back to ws_api status field
+    // Sensors core blanked on an HA restart show their last known value,
+    // with a note saying how old it is.
+    const hass = withLastKnown(this.hass!, this._lastKnown);
+    const substitutedAt = oldestSubstitute(this.hass, this._managedEntityIds(device, type), this._lastKnown);
     let statusClass: 'online' | 'offline' | 'unknown' = 'unknown';
     let statusLabel = t('Unknown');
-    if (device.status_entity_id && this.hass?.states[device.status_entity_id]) {
-      const entityState = this.hass.states[device.status_entity_id].state;
+    if (device.status_entity_id && hass.states[device.status_entity_id]) {
+      const entityState = hass.states[device.status_entity_id].state;
       if (entityState === 'on') { statusClass = 'online'; statusLabel = t('Online'); }
       else if (entityState === 'off') { statusClass = 'offline'; statusLabel = t('Offline'); }
     } else if (device.status) {
@@ -868,6 +928,7 @@ export class DevicesPage extends LitElement {
     // lives here. Look up the uptime entity via the entity classifier's
     // metricKey tag.
     const uptimeInfo = entities.find(e => e.metricKey === 'uptime_hours');
+    // A last known uptime would be stale, so only a live one is shown.
     const uptimeLabel = isOnline && uptimeInfo
       ? this._formatUptimeFromEntity(uptimeInfo.entity_id)
       : '';
@@ -912,6 +973,12 @@ export class DevicesPage extends LitElement {
                 ${hasLoc
                   ? html`<span>${t('Loc')}: ${locLat.toFixed(4)}, ${locLon.toFixed(4)}</span>`
                   : nothing}
+                ${substitutedAt !== null
+                  ? html`<span class="last-known"
+                      title=${t('Home Assistant restarted after this repeater was last read, so these are the values from that read. New values come with the next read.')}>
+                      <chattx-read-age-note .readAt=${new Date(substitutedAt).toISOString()}></chattx-read-age-note>
+                    </span>`
+                  : nothing}
               </div>
             </div>
           </div>
@@ -931,7 +998,7 @@ export class DevicesPage extends LitElement {
         ${entities.length > 0
           ? html`
               <chattx-node-summary
-                .hass=${this.hass}
+                .hass=${hass}
                 .device=${{ ...device, type }}
                 .entities=${entities}
                 .hiddenCount=${hiddenCount}

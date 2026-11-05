@@ -1,4 +1,5 @@
 import { getLocale, t } from '../i18n';
+import { counterSamples, ratesFromCounters, type CounterSample } from '../utils/counter-rate';
 import { LitElement, html, css, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, ManagedDevice } from '../types';
@@ -84,8 +85,8 @@ export class NodeSummary extends LitElement {
    *  the coordinates in the Location hero tile. */
   @property({ type: Number }) fallbackUpdated?: number;
 
-  /** 48h message-rate history (msg/min) for the activity chart, fetched from
-   *  recorder statistics for the node's *_rate sensors. */
+  /** 48h message-rate history (msg/min) for the activity chart, computed from
+   *  the recorder history of the node's packet counters. */
   @state() private _rateHistory: RatePoint[] = [];
   /** Guard: the nb_sent entity_id the current _rateHistory was fetched for,
    *  so we fetch once per device rather than on every hass state push. */
@@ -429,17 +430,13 @@ export class NodeSummary extends LitElement {
     }
   }
 
-  /** Derive a `_rate` sibling entity_id from a totals entity_id. The rate
-   *  sensors are excluded from `entities` by classify-entity but follow the
-   *  fixed `..._<key>_rate_<suffix>` pattern (mirrors _readDerivedRate). */
-  private _deriveRateId(totalsEid: string, key: string): string {
-    return totalsEid.replace(`_${key}_`, `_${key}_rate_`);
-  }
-
+  /** Build the 48h rate chart from the repeater's packet counters.
+   *  Core's `*_rate` sensors report 0 for the first poll after every Home
+   *  Assistant restart, which drew hours of fake silence; the counters'
+   *  own history does not have that problem (see utils/counter-rate). */
   private async _fetchRateHistory(): Promise<void> {
     if (!this.hass) return;
     // Five series: sent + received split into flood/direct, plus errors.
-    // Each maps a totals entity to its `_rate` sibling statistic.
     const wanted: Array<[string, string]> = [
       ['sent_flood', 'sent_flood'],
       ['sent_direct', 'sent_direct'],
@@ -450,31 +447,27 @@ export class NodeSummary extends LitElement {
     const series: Array<[string, string]> = [];
     for (const [seriesKey, totalsKey] of wanted) {
       const info = this._findEntityIdMatching(totalsKey);
-      if (info) series.push([seriesKey, this._deriveRateId(info.entity_id, totalsKey)]);
+      if (info) series.push([seriesKey, info.entity_id]);
     }
     if (series.length === 0) { this._rateHistory = []; return; }
 
+    const end = Date.now();
+    const start = end - 48 * 60 * 60 * 1000;
     try {
-      const stats = await this.hass.callWS<Record<string, Array<{ start?: string; mean?: number }>>>({
-        type: 'recorder/statistics_during_period',
-        start_time: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
-        end_time: new Date().toISOString(),
-        statistic_ids: series.map(([, id]) => id),
-        period: 'hour',
+      const history = await this.hass.callWS<Record<string, Array<{ s?: unknown; lu?: number; lc?: number }>>>({
+        type: 'history/history_during_period',
+        start_time: new Date(start).toISOString(),
+        end_time: new Date(end).toISOString(),
+        entity_ids: series.map(([, id]) => id),
+        minimal_response: true,
+        no_attributes: true,
+        significant_changes_only: false,
       });
-      const byTs: Record<number, Record<string, number>> = {};
-      for (const [seriesKey, statId] of series) {
-        const pts = stats[statId];
-        if (!Array.isArray(pts)) continue;
-        for (const p of pts) {
-          if (p.start == null || p.mean == null) continue;
-          const ts = new Date(p.start).getTime();
-          (byTs[ts] ??= {})[seriesKey] = p.mean;
-        }
+      const samples: Record<string, CounterSample[]> = {};
+      for (const [seriesKey, entityId] of series) {
+        samples[seriesKey] = counterSamples(history?.[entityId]);
       }
-      this._rateHistory = Object.entries(byTs)
-        .map(([ts, values]) => ({ timestamp: parseInt(ts, 10), values }))
-        .sort((a, b) => a.timestamp - b.timestamp);
+      this._rateHistory = ratesFromCounters(samples, start, end);
     } catch {
       this._rateHistory = [];
     }
@@ -797,8 +790,8 @@ export class NodeSummary extends LitElement {
             </div>`
           : nothing}
         <div class="msg-legend">
-          <span><span class="msg-swatch flood"></span>Flood ${flood}</span>
-          <span><span class="msg-swatch direct"></span>Direct ${direct}</span>
+          <span><span class="msg-swatch flood"></span>Flood ${this._legendCount(flood)}</span>
+          <span><span class="msg-swatch direct"></span>Direct ${this._legendCount(direct)}</span>
           ${recvErrorsN > 0
             ? html`<span><span class="msg-swatch error"></span>Error ${recvErrorsN}</span>`
             : nothing}
@@ -852,6 +845,11 @@ export class NodeSummary extends LitElement {
         </chattx-stacked-bar>
       </div>
     `;
+  }
+
+  /** A count in a tile legend; a dash when the sensor has no value. */
+  private _legendCount(n: number): string {
+    return Number.isFinite(n) ? String(n) : '—';
   }
 
   /** Format an integer count with thousands separators (e.g., 13,807). */
@@ -1263,8 +1261,8 @@ export class NodeSummary extends LitElement {
   }
 
   // _readDerivedRate removed: the per-tile msg/min text is gone (rates now
-  // live in the 48h Message activity chart, which reads recorder statistics
-  // for the *_rate sensors via _fetchRateHistory / _deriveRateId).
+  // live in the 48h Message activity chart, built from the packet counters'
+  // history by _fetchRateHistory).
 
   // Traffic composite logic moved to the hero tile renderers
   // (_renderMessagesSentTile / _renderMessagesReceivedTile /

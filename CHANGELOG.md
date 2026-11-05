@@ -4,6 +4,15 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-11-05
+
+### Fixed
+
+- The repeater's 48-hour message activity chart dropped to zero for hours after every Home Assistant restart, although the repeater kept working. It used core meshcore's rate sensors, which report 0 for the first repeater poll after a restart. The chart now computes the rates from the repeater's packet counters, skipping restarts and repeater reboots, which also corrects the hours already recorded.
+- After a Home Assistant restart a repeater's tiles were blank and its status read "Unknown" until core meshcore's next repeater poll, up to two hours later. They now show the values from the last poll, with a "Loaded … ago" note in the header.
+- The received messages tile showed "Flood NaN" and "Direct NaN" when the counters had no value; it shows a dash now.
+- The panel's address now carries a hash of its content as well as the version, so a browser cannot keep running an older build of the same version.
+
 ## [0.3.3] - 2026-11-05
 
 ### Changed

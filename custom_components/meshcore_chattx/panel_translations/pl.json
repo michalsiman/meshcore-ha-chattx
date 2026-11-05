@@ -155,6 +155,7 @@
   "Hidden: {label}": "Ukryto: {label}",
   "Hide Sensor": "Ukryj czujnik",
   "Home": "Dom",
+  "Home Assistant restarted after this repeater was last read, so these are the values from that read. New values come with the next read.": "Home Assistant został uruchomiony ponownie po ostatnim odczycie repeatera, więc widoczne są wartości z tego odczytu. Nowe wartości pojawią się przy następnym odczycie.",
   "Home Assistant Zone": "Strefa Home Assistanta",
   "Home region": "Region domowy",
   "How the device determines its coordinates": "Jak urządzenie określa swoje współrzędne",

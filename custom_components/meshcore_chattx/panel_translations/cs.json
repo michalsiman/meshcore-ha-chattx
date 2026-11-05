@@ -180,6 +180,7 @@
   "Hidden: {label}": "Skryto: {label}",
   "Hide Sensor": "Skrýt senzor",
   "Home": "Domov",
+  "Home Assistant restarted after this repeater was last read, so these are the values from that read. New values come with the next read.": "Home Assistant se od posledního čtení repeateru restartoval, proto jsou tu hodnoty z toho čtení. Nové hodnoty přijdou s dalším čtením.",
   "Home Assistant Zone": "Zóna Home Assistantu",
   "Home region": "Domovský region",
   "Hop {number}: {hash}": "Hop {number}: {hash}",
