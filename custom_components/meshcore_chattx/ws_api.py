@@ -36,6 +36,16 @@ from .const import (
     MESHCORE_DOMAIN,
 )
 from .message_store import MessageStore
+from .radio_compat import (
+    cache_self_info,
+    contact_by_prefix,
+    forget_contact,
+    has_command,
+    mark_contacts_dirty,
+    radio_command,
+    radio_ready,
+)
+from .radio_compat import login as radio_login
 from .utils import (
     flood_scope_allowlist,
     format_entity_id,
@@ -968,7 +978,7 @@ async def _read_path_hash_mode(coordinator) -> int | None:
     """
     try:
         result = await asyncio.wait_for(
-            coordinator.api.mesh_core.commands.send_device_query(), timeout=5
+            radio_command(coordinator.api, "send_device_query"), timeout=5
         )
     except Exception as ex:  # noqa: BLE001 - the rest of the config is still useful
         _LOGGER.debug("Could not read path hash mode: %s", ex)
@@ -1202,7 +1212,7 @@ async def ws_set_device_config(hass, connection, msg):
             # (ConnectionError, TimeoutError, etc.) raised by `set_name`
             # propagate through the outer `except` without first
             # tripping a missing-meshcore-package import in test envs.
-            result = await coordinator.api.mesh_core.commands.set_name(new_name)
+            result = await radio_command(coordinator.api, "set_name", new_name)
             # Short-circuit None first so we don't need the meshcore.events
             # import on the never-responded path (defensive: lets tests
             # exercise the no-Event case without the patched_event_type
@@ -1334,7 +1344,7 @@ async def ws_set_device_config(hass, connection, msg):
 
         # Handle tx_power setting
         if "tx_power" in settings:
-            result = await coordinator.api.mesh_core.commands.set_tx_power(
+            result = await radio_command(coordinator.api, "set_tx_power",
                 settings["tx_power"]
             )
             reason = _device_config_failure_reason(result)
@@ -1347,7 +1357,7 @@ async def ws_set_device_config(hass, connection, msg):
 
         # Handle coordinates setting
         if "latitude" in settings and "longitude" in settings:
-            result = await coordinator.api.mesh_core.commands.set_coords(
+            result = await radio_command(coordinator.api, "set_coords",
                 settings["latitude"], settings["longitude"]
             )
             reason = _device_config_failure_reason(result)
@@ -1369,7 +1379,7 @@ async def ws_set_device_config(hass, connection, msg):
             cr = settings.get("coding_rate", self_info.get("radio_cr"))
 
             if all(v is not None for v in [freq, bw, sf, cr]):
-                result = await coordinator.api.mesh_core.commands.set_radio(
+                result = await radio_command(coordinator.api, "set_radio",
                     freq, bw, sf, cr
                 )
                 reason = _device_config_failure_reason(result)
@@ -1384,7 +1394,7 @@ async def ws_set_device_config(hass, connection, msg):
 
         # Handle path_hash_mode
         if "path_hash_mode" in settings:
-            result = await coordinator.api.mesh_core.commands.set_path_hash_mode(
+            result = await radio_command(coordinator.api, "set_path_hash_mode",
                 settings["path_hash_mode"]
             )
             reason = _device_config_failure_reason(result)
@@ -1398,8 +1408,8 @@ async def ws_set_device_config(hass, connection, msg):
         # Refresh self_info cache so subsequent reads return updated values
         if changed:
             try:
-                appstart_result = await coordinator.api.mesh_core.commands.send_appstart()
-                coordinator.api._cache_self_info_event(appstart_result)
+                appstart_result = await radio_command(coordinator.api, "send_appstart")
+                cache_self_info(coordinator.api, appstart_result)
             except Exception:
                 _LOGGER.warning("Failed to refresh self_info after set_device_config")
 
@@ -1463,7 +1473,7 @@ def _format_event_response(result) -> str:
 @websocket_api.require_admin
 @websocket_api.async_response
 async def ws_execute_local(hass, connection, msg):
-    """Execute a local mesh_core command."""
+    """Execute a local SDK command on the companion radio."""
     coordinator = _get_coordinator(hass, msg.get("entry_id"))
     if not coordinator:
         connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
@@ -1485,16 +1495,14 @@ async def ws_execute_local(hass, connection, msg):
         return
 
     try:
-        # Get the command method from mesh_core.commands
-        command_method = getattr(coordinator.api.mesh_core.commands, command, None)
-        if not command_method:
+        if not has_command(coordinator.api, command):
             connection.send_error(
                 msg["id"], "not_found", f"Command not found: {command}"
             )
             return
 
         # Execute the command with provided args
-        response = await command_method(**args)
+        response = await radio_command(coordinator.api, command, **args)
         timestamp = datetime.now().isoformat()
 
         # Extract meaningful text from Event objects
@@ -1560,7 +1568,7 @@ async def ws_execute_remote(hass, connection, msg):
             return
 
         # Get the contact for this device
-        contact = coordinator.api.mesh_core.get_contact_by_key_prefix(target_prefix)
+        contact = contact_by_prefix(coordinator.api, target_prefix)
         if not contact:
             connection.send_error(
                 msg["id"],
@@ -1579,13 +1587,11 @@ async def ws_execute_remote(hass, connection, msg):
         # the response so the user knows the login wasn't confirmed.
         login_unconfirmed = False
         if password:
-            login_result = await coordinator.api.mesh_core.commands.send_login_sync(
-                contact, password
-            )
+            login_result = await radio_login(coordinator.api, contact, password)
             login_unconfirmed = login_result is None
 
         # Send the command
-        cmd_result = await coordinator.api.mesh_core.commands.send_cmd(
+        cmd_result = await radio_command(coordinator.api, "send_cmd",
             contact, command
         )
 
@@ -1696,7 +1702,7 @@ def _find_contact(coordinator, prefix: str):
     api = coordinator.api
     if hasattr(api, "contact_by_prefix"):
         return api.contact_by_prefix(prefix)
-    return api.mesh_core.get_contact_by_key_prefix(prefix)
+    return contact_by_prefix(api, prefix)  # core meshcore 2.x
 
 
 def _mesh_wait_seconds(coordinator, contact) -> float:
@@ -1718,7 +1724,7 @@ async def _send_login(coordinator, contact, password: str):
     api = coordinator.api
     if hasattr(api, "login"):
         return await api.login(contact, password)
-    return await api.mesh_core.commands.send_login_sync(contact, password)
+    return await radio_login(api, contact, password)  # core meshcore 2.x
 
 
 @websocket_api.websocket_command(
@@ -2366,7 +2372,7 @@ async def ws_set_channel(hass, connection, msg):
             channel_secret = None
 
         # Call set_channel command
-        result = await coordinator.api.mesh_core.commands.set_channel(
+        result = await radio_command(coordinator.api, "set_channel",
             channel_idx, name, channel_secret
         )
 
@@ -2432,7 +2438,7 @@ async def ws_remove_channel(hass, connection, msg):
         # Clear the channel by setting empty name; pass None for key so the
         # SDK auto-derives it (passing "" causes ValueError — SDK expects
         # None or 16 raw bytes, not an empty string).
-        result = await coordinator.api.mesh_core.commands.set_channel(
+        result = await radio_command(coordinator.api, "set_channel",
             channel_idx, "", None
         )
 
@@ -2566,7 +2572,7 @@ async def ws_remove_neighbor(hass, connection, msg):
             return
 
         # Get the contact for this repeater
-        contact = coordinator.api.mesh_core.get_contact_by_key_prefix(target_prefix)
+        contact = contact_by_prefix(coordinator.api, target_prefix)
         if not contact:
             connection.send_error(
                 msg["id"],
@@ -2585,13 +2591,11 @@ async def ws_remove_neighbor(hass, connection, msg):
         # the response so the user knows the login wasn't confirmed.
         login_unconfirmed = False
         if password:
-            login_result = await coordinator.api.mesh_core.commands.send_login_sync(
-                contact, password
-            )
+            login_result = await radio_login(coordinator.api, contact, password)
             login_unconfirmed = login_result is None
 
         # Send neighbor.remove command to the repeater
-        cmd_result = await coordinator.api.mesh_core.commands.send_cmd(
+        cmd_result = await radio_command(coordinator.api, "send_cmd",
             contact, f"neighbor.remove {neighbor_pubkey}"
         )
 
@@ -2859,15 +2863,15 @@ async def ws_mark_read(hass, connection, msg):
 # The redesign abandons the service-delegation path and calls the SDK
 # directly:
 #
-# 1. ``coord.api.mesh_core.commands.import_private_key(seed_bytes)`` —
+# 1. ``radio_command(coord.api, "import_private_key", seed_bytes)`` —
 #    direct SDK call returning an ``Event``. ``EventType.ERROR`` is
 #    inspected and surfaced as ``IdentityImportError`` so the firmware's
 #    rejection (e.g. ``ERR_CODE_ILLEGAL_ARG``) reaches the user instead
 #    of getting buried as a false success.
-# 2. ``send_appstart`` + ``_cache_self_info_event`` — replicates
+# 2. ``send_appstart`` + ``cache_self_info`` — replicates
 #    services.py's ``_SELF_INFO_COMMANDS`` post-call refresh inline so we
 #    don't depend on the service for the cache update.
-# 3. ``coord.api.mesh_core.commands.reboot()`` — direct SDK call. The
+# 3. ``radio_command(coord.api, "reboot")`` — direct SDK call. The
 #    firmware only switches identities on next boot.
 # 4. Brief ``asyncio.sleep`` while transport-layer reconnect completes
 #    (SDK ``connection_manager`` handles the reconnect itself).
@@ -2964,7 +2968,7 @@ async def _do_identity_change(
     connection.send_message(
         websocket_api.event_message(msg_id, {"step": "importing"})
     )
-    result = await coord.api.mesh_core.commands.import_private_key(seed_bytes)
+    result = await radio_command(coord.api, "import_private_key", seed_bytes)
     if result is None or getattr(result, "type", None) == EventType.ERROR:
         code = "unknown"
         if result is not None:
@@ -2978,8 +2982,8 @@ async def _do_identity_change(
     # shouldn't abort the chain. The call itself must be present
     # (covered by a unit assertion).
     try:
-        appstart = await coord.api.mesh_core.commands.send_appstart()
-        coord.api._cache_self_info_event(appstart)
+        appstart = await radio_command(coord.api, "send_appstart")
+        cache_self_info(coord.api, appstart)
     except Exception:  # pragma: no cover - defensive
         _LOGGER.debug("self_info refresh after import_private_key failed; "
                       "the upcoming entry reload will re-fetch it")
@@ -2988,7 +2992,7 @@ async def _do_identity_change(
     connection.send_message(
         websocket_api.event_message(msg_id, {"step": "rebooting"})
     )
-    await coord.api.mesh_core.commands.reboot()
+    await radio_command(coord.api, "reboot")
 
     # Step 4 — wait for the device to come back. The SDK's
     # connection_manager handles transport-level reconnect; we just need
@@ -3237,7 +3241,7 @@ async def ws_add_contact(hass, connection, msg):
     # Execute the SDK add_contact command
     try:
         api = coordinator.api
-        if not api.connected or not api.mesh_core:
+        if not radio_ready(api):
             connection.send_error(msg["id"], "not_connected", "Device not connected")
             return
 
@@ -3302,7 +3306,7 @@ async def ws_add_contact(hass, connection, msg):
 
         # Fallback — inlined SDK add + manual coordinator sync. Correct on
         # integrations without the routed contact handling.
-        result = await api.mesh_core.commands.add_contact(contact_data)
+        result = await radio_command(api, "add_contact", contact_data)
 
         from meshcore.events import EventType
         if result.type == EventType.ERROR:
@@ -3310,7 +3314,7 @@ async def ws_add_contact(hass, connection, msg):
             return
 
         # Post-command: sync coordinator state (same logic as services.py)
-        api.mesh_core._contacts_dirty = True
+        mark_contacts_dirty(api)
         pubkey = contact_data.get("public_key", "")
         if pubkey:
             contact_data["added_to_node"] = True
@@ -3375,7 +3379,7 @@ async def ws_remove_contact(hass, connection, msg):
     # Execute the SDK remove_contact command
     try:
         api = coordinator.api
-        if not api.connected or not api.mesh_core:
+        if not radio_ready(api):
             connection.send_error(msg["id"], "not_connected", "Device not connected")
             return
 
@@ -3440,7 +3444,7 @@ async def ws_remove_contact(hass, connection, msg):
         # Fallback — inlined SDK remove + manual coordinator sync. Correct on
         # integrations without the routed entity cleanup (no per-contact
         # binary_sensor exists there to orphan).
-        result = await api.mesh_core.commands.remove_contact(contact_data)
+        result = await radio_command(api, "remove_contact", contact_data)
 
         from meshcore.events import EventType
         if result.type == EventType.ERROR:
@@ -3448,12 +3452,11 @@ async def ws_remove_contact(hass, connection, msg):
             return
 
         # Post-command: sync coordinator state (same logic as services.py)
-        api.mesh_core._contacts_dirty = True
+        mark_contacts_dirty(api)
         pubkey = contact_data.get("public_key", "")
         if pubkey:
             # Remove from SDK internal dict
-            if pubkey in api.mesh_core._contacts:
-                del api.mesh_core._contacts[pubkey]
+            forget_contact(api, pubkey)
 
             # Remove from coordinator
             if prefix in coordinator._contacts:
@@ -3579,7 +3582,7 @@ async def ws_trace(
     flood-discovery floor, ``added_to_node`` gate, etc.
 
     Explicit-path traces (``msg["path"]`` supplied) bypass the service
-    and call ``mesh_core.commands.send_trace`` directly, preserving the
+    and send ``send_trace`` to the radio directly, preserving the
     Session 53 / Session 55 Addendum 2 workaround for production cases
     where flood path discovery doesn't return a PATH_RESPONSE.
 
@@ -3650,7 +3653,7 @@ async def _ws_trace_explicit(
 
     When the user supplies an explicit comma-hex hop sequence via the
     ``path`` parameter, bypass ``meshcore.trace`` and call
-    ``mesh_core.commands.send_trace`` directly. The upstream service
+    ``send_trace`` on the radio directly. The upstream service
     (PR #216) does not accept an explicit-path argument; if it gains
     one, this branch can collapse into the service call and the
     SDK-level coupling here disappears.
@@ -3671,7 +3674,7 @@ async def _ws_trace_explicit(
         return
 
     api = coordinator.api
-    if not api.connected or not api.mesh_core:
+    if not radio_ready(api):
         connection.send_error(msg["id"], "not_connected", "Device not connected")
         return
 
@@ -3733,7 +3736,7 @@ async def _ws_trace_explicit(
 
         try:
             from meshcore.events import EventType as _EventType
-            send_result = await api.mesh_core.commands.send_trace(
+            send_result = await radio_command(api, "send_trace",
                 0, tag, flags, trace_path_arg
             )
             if send_result is None or getattr(send_result, "type", None) == _EventType.ERROR:

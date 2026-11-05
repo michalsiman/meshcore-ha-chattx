@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-11-05
+
+### Changed
+
+- Chattx talks to the radio only through the calls meshcore-ha 3.x supports, instead of reaching into `api.mesh_core` and other 2.x internals (upstream issue #47). This removes the deprecation warnings and keeps Chattx working when meshcore-ha deletes those internals. With meshcore-ha 3.x, commands from Chattx now wait their turn with the integration's own radio traffic instead of interleaving with it. meshcore-ha 2.x still works the old way.
+
 ## [0.3.2] - 2026-11-05
 
 ### Fixed
