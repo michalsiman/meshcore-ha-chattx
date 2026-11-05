@@ -20,7 +20,101 @@ Works as a **companion** to the [core meshcore integration](https://github.com/m
 - Live device telemetry, neighbor tables, and remote command issue from the same UI
 - Network-wide node discovery view (typically hundreds of nodes)
 
-## Screenshots
+## What Chattx adds
+
+Everything below is new compared with the original MeshCore Chat.
+
+**Repeaters**, from the lock icon in a repeater's conversation:
+
+- Log in as admin or guest, optionally remembering the password in Home Assistant
+- Read settings group by group: name, firmware, radio, location, features, network health and more
+- Read telemetry: battery voltage, temperature and any other sensors the repeater reports
+- Read neighbours with SNR and when they were last heard
+- Read and edit regions: add and remove them, set flood permission, home and default scope
+- Terminal: send any command, such as `set tx 22`, and read the reply
+- Values stay available after reading, with their age: orange after an hour, red after a day
+- Replies to settings reads stay out of the chat and out of the unread counts
+
+**Writing messages**
+
+- Bytes-left counter that counts in UTF-8 bytes and blocks messages that are too long
+- Switch that sends text without diacritics, which leaves more room in a message
+- Emoji picker, inserting at the cursor
+- Quick messages, managed in Settings
+- One-tap "Slyším, N hops!" reply with the sender's name and the message's hop count (the text is Czech)
+- The cursor moves to the message field when you pick a conversation
+
+**Conversation list**
+
+- Sorted by the newest message, with its age in minutes, hours or days
+- Readable initials in the circles: `Forest Hill Relay` is FH, `#hiking` is HI, `Anna K. 📟` is A📟
+- Switch in the gear menu that hides contact IDs and channel numbers
+
+**Messages**
+
+- Hop count and path size on received messages, for example `3 hops (2B)`
+
+**Phones**
+
+- The top bar and Back button stay reachable when the keyboard opens
+- The keyboard stays open when you press a button next to the message field or send a message
+- Shorter title, `MC Chattx`, so the header stays on one line
+
+Parts of the new interface are in Czech when the browser language is Czech. The rest is in English.
+
+### Screenshots of the new features
+
+These use demo data, and the names and values are made up.
+
+<table>
+<tr>
+<td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png" alt="Chat with initials, message ages and hop counts"></a></td>
+<td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-composer.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-composer.png" alt="Emoji picker, bytes-left counter and diacritics switch"></a></td>
+</tr>
+<tr>
+<td><b>Chat</b> — initials and message ages in the list, hop count and path size on messages.</td>
+<td><b>Writing</b> — quick messages and the diacritics switch on the left, emoji and bytes left on the right.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png" alt="Message dialog with the heard reply"></a></td>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png" alt="Switch that hides contact IDs and channel numbers"></a></td>
+</tr>
+<tr>
+<td><b>Quick reply</b> — one tap puts "Slyším, N hops!" with the sender's name in the message field.</td>
+<td><b>Cleaner list</b> — the gear menu hides contact IDs and channel numbers.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-login-telemetry.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-login-telemetry.png" alt="Repeater login, telemetry and neighbours"></a></td>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-settings.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-settings.png" alt="Repeater settings"></a></td>
+</tr>
+<tr>
+<td><b>Repeater login, telemetry and neighbours</b> — the header stays in place while the content scrolls.</td>
+<td><b>Repeater settings</b> — read group by group, with the age of each group.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-regions.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-regions.png" alt="Repeater regions"></a></td>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-terminal.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-repeater-terminal.png" alt="Repeater terminal"></a></td>
+</tr>
+<tr>
+<td><b>Regions</b> — edit the region tree and save it to the repeater.</td>
+<td><b>Terminal</b> — send any command to the repeater.</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="50%" align="center"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-list.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-list.png" alt="Conversation list on a phone" width="300"></a></td>
+<td width="50%" align="center"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-chat.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-chat.png" alt="Chat on a phone" width="300"></a></td>
+</tr>
+<tr>
+<td align="center"><b>Phone</b> — conversation list.</td>
+<td align="center"><b>Phone</b> — chat with the compact message bar.</td>
+</tr>
+</table>
+
+## More screenshots
+
+These come from the original MeshCore Chat, so some details differ from the current version.
 
 ### The four main tabs
 
