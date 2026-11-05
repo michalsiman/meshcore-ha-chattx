@@ -1,3 +1,4 @@
+import { getLocale, t } from '../i18n';
 import { LitElement, html, css, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, ManagedDevice } from '../types';
@@ -397,7 +398,7 @@ export class NodeSummary extends LitElement {
       ${groups.length > 0
         ? html`
           <div class="subsection-label">
-            Sensors${this.hiddenCount > 0
+            ${t('Sensors')}${this.hiddenCount > 0
               ? html`<span class="hidden-suffix">(${this.hiddenCount} hidden)</span>`
               : nothing}
           </div>
@@ -482,7 +483,7 @@ export class NodeSummary extends LitElement {
   private _renderMessageActivityCard() {
     if (!this._rateHistory.length) return nothing;
     return html`
-      <div class="subsection-label">Message activity (48h)</div>
+      <div class="subsection-label">${t('Message activity (48h)')}</div>
       <chattx-message-rate-chart .data=${this._rateHistory}></chattx-message-rate-chart>
     `;
   }
@@ -547,7 +548,7 @@ export class NodeSummary extends LitElement {
     return html`
       <div class="hero-tile" @click=${() => this._fireMoreInfo(battery.entity_id)}>
         <div class="hero-tile-head">
-          <span>Battery${this._renderInfoTip(ev)}</span>
+          <span>${t('Battery')}${this._renderInfoTip(ev)}</span>
           <span class="status-dot ${ev.band}"></span>
         </div>
         <div class="hero-tile-value">
@@ -579,7 +580,7 @@ export class NodeSummary extends LitElement {
     return html`
       <div class="hero-tile" @click=${() => this._fireMoreInfo(rssi.entity_id)}>
         <div class="hero-tile-head">
-          <span>Last message strength${this._renderInfoTip(ev)}</span>
+          <span>${t('Last message strength')}${this._renderInfoTip(ev)}</span>
           <span class="status-dot ${ev.band}"></span>
         </div>
         <div class="hero-tile-value">
@@ -618,7 +619,7 @@ export class NodeSummary extends LitElement {
     const segments: StackedBarSegment[] = [
       { value: txN, label: `TX ${txN.toFixed(1)}%`, kind: 'tx' },
       { value: rxN, label: `RX ${rxN.toFixed(1)}%`, kind: 'rx' },
-      { value: idleN, label: `Idle ${idleN.toFixed(1)}%`, kind: 'idle' },
+      { value: idleN, label: `${t('Idle')} ${idleN.toFixed(1)}%`, kind: 'idle' },
     ];
 
     // Click handlers for the TX / RX text segments — open more-info for
@@ -640,13 +641,10 @@ export class NodeSummary extends LitElement {
       <div class="hero-tile"
            @click=${() => tx && this._fireMoreInfo(tx.entity_id)}>
         <div class="hero-tile-head">
-          <span>Radio activity${this._renderInfoTip({
+          <span>${t('Radio activity')}${this._renderInfoTip({
             band: dotBand,
             fillPct: 0,
-            tooltip: 'Half-duplex composition over the last reporting interval. ' +
-                     'The radio can transmit OR receive, never both. TX above 10% ' +
-                     'indicates duty-cycle pressure; sustained TX+RX above 30% ' +
-                     'means the channel is congested.',
+            tooltip: t('Half-duplex composition over the last reporting interval. The radio can transmit OR receive, never both. TX above 10% indicates duty-cycle pressure; sustained TX+RX above 30% means the channel is congested.'),
           })}</span>
           <span class="status-dot ${dotBand}"></span>
         </div>
@@ -703,13 +701,11 @@ export class NodeSummary extends LitElement {
     return html`
       <div class="hero-tile" @click=${() => this._fireMoreInfo(nbSent.entity_id)}>
         <div class="hero-tile-head">
-          <span>Messages Sent${this._renderInfoTip({
+          <span>${t('Messages Sent')}${this._renderInfoTip({
             band: 'info',
             fillPct: 0,
             tooltip:
-              'Messages sent (lifetime), split by send mode:\n' +
-              '• Flood — broadcast retransmits visible to all neighbours.\n' +
-              '• Direct — routed point-to-point along a path.',
+              t('Messages sent (lifetime), split by send mode:\n• Flood — broadcast retransmits visible to all neighbours.\n• Direct — routed point-to-point along a path.'),
           })}</span>
           <span class="status-dot info"></span>
         </div>
@@ -773,22 +769,11 @@ export class NodeSummary extends LitElement {
     return html`
       <div class="hero-tile" @click=${() => this._fireMoreInfo(nbRecv.entity_id)}>
         <div class="hero-tile-head">
-          <span>Messages Received${this._renderInfoTip({
+          <span>${t('Messages Received')}${this._renderInfoTip({
             band: 'info',
             fillPct: 0,
             tooltip:
-              'Messages received (lifetime), split by receive mode:\n' +
-              '• Flood — broadcast packets received from neighbours.\n' +
-              '• Direct — routed packets where this node is on the path.\n\n' +
-              'Each bar below is a percentage of its own total:\n' +
-              '• Red = receive errors (CRC failures), as a share of all ' +
-              'reception attempts (received + errors) — i.e. the error rate.\n' +
-              '• Amber = duplicate receptions, as a share of received ' +
-              'messages (duplicates are a subset of received).\n\n' +
-              'Both are context only, not banded — in a flooding mesh every ' +
-              'active neighbour retransmits the same flood once, so a high ' +
-              'duplicate ratio is normal (a 2-neighbour repeater sees ~50%, ' +
-              'a 3-neighbour ~67%, etc.).',
+              t('Messages received (lifetime), split by receive mode:\n• Flood — broadcast packets received from neighbours.\n• Direct — routed packets where this node is on the path.\n\nEach bar below is a percentage of its own total:\n• Red = receive errors (CRC failures), as a share of all reception attempts (received + errors) — i.e. the error rate.\n• Amber = duplicate receptions, as a share of received messages (duplicates are a subset of received).\n\nBoth are context only, not banded — in a flooding mesh every active neighbour retransmits the same flood once, so a high duplicate ratio is normal (a 2-neighbour repeater sees ~50%, a 3-neighbour ~67%, etc.).'),
           })}</span>
           <span class="status-dot info"></span>
         </div>
@@ -801,13 +786,13 @@ export class NodeSummary extends LitElement {
         </chattx-stacked-bar>
         ${recvErrorsN > 0
           ? html`<div class="err-line"
-                      title="Receive errors (CRC failures): ${recvErrorsN} — ${errRatio.toFixed(1)}% of reception attempts (received + errors)">
+                      title=${t('Receive errors (CRC failures): {recvErrorsN} — {errRatio}% of reception attempts (received + errors)', { recvErrorsN, errRatio: errRatio.toFixed(1) })}>
               <div class="err-line-fill" style="width:${Math.min(100, errRatio).toFixed(1)}%"></div>
             </div>`
           : nothing}
         ${totalDups > 0
           ? html`<div class="dup-line"
-                      title="Duplicate receptions: ${totalDups} — ${dupRatio.toFixed(1)}% of received messages">
+                      title=${t('Duplicate receptions: {totalDups} — {dupRatio}% of received messages', { totalDups, dupRatio: dupRatio.toFixed(1) })}>
               <div class="dup-line-fill" style="width:${Math.min(100, dupRatio).toFixed(1)}%"></div>
             </div>`
           : nothing}
@@ -839,15 +824,11 @@ export class NodeSummary extends LitElement {
       : { band: 'info', fillPct: 0, tooltip: '' };
 
     const tooltip =
-      'Outgoing requests this node initiated (login, telemetry, ' +
-      'neighbour query) and how they resolved. Success rate bands: ' +
-      'Green > 90%, Yellow 70–90%, Red < 70%, with a minimum sample ' +
-      'of 50 attempts to colour. Below the floor, the bar stays ' +
-      'neutral — too few samples to judge.';
+      t('Outgoing requests this node initiated (login, telemetry, neighbour query) and how they resolved. Success rate bands: Green > 90%, Yellow 70–90%, Red < 70%, with a minimum sample of 50 attempts to colour. Below the floor, the bar stays neutral — too few samples to judge.');
 
     const segs: StackedBarSegment[] = [
       { value: sVal, label: `OK ${sVal}`,    kind: 'success' },
-      { value: fVal, label: `Fail ${fVal}`, kind: 'failure' },
+      { value: fVal, label: `${t('Fail')} ${fVal}`, kind: 'failure' },
     ];
 
     consumed.add(successes.entity_id);
@@ -856,7 +837,7 @@ export class NodeSummary extends LitElement {
     return html`
       <div class="hero-tile" @click=${() => this._fireMoreInfo(successes.entity_id)}>
         <div class="hero-tile-head">
-          <span>Requests${this._renderInfoTip({ ...ev, tooltip })}</span>
+          <span>${t('Requests')}${this._renderInfoTip({ ...ev, tooltip })}</span>
           <span class="status-dot ${ev.band}"></span>
         </div>
         <div class="hero-tile-value">
@@ -876,7 +857,7 @@ export class NodeSummary extends LitElement {
   /** Format an integer count with thousands separators (e.g., 13,807). */
   private _formatCount(n: number): string {
     if (!Number.isFinite(n)) return '—';
-    return Math.round(n).toLocaleString();
+    return Math.round(n).toLocaleString(getLocale());
   }
 
   private _renderLocationTile() {
@@ -930,7 +911,7 @@ export class NodeSummary extends LitElement {
     return html`
       <div class="hero-tile" @click=${onClick}>
         <div class="hero-tile-head">
-          <span>Location${source === 'fallback'
+          <span>${t('Location')}${source === 'fallback'
             ? html`<span style="opacity:0.55;text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px;">via contact</span>`
             : nothing}</span>
         </div>
@@ -1002,7 +983,7 @@ export class NodeSummary extends LitElement {
     const segments: StackedBarSegment[] = [
       { value: txN, label: `TX ${txN.toFixed(1)}%`, kind: 'tx' },
       { value: rxN, label: `RX ${rxN.toFixed(1)}%`, kind: 'rx' },
-      { value: idleN, label: `Idle ${idleN.toFixed(1)}%`, kind: 'idle' },
+      { value: idleN, label: `${t('Idle')} ${idleN.toFixed(1)}%`, kind: 'idle' },
     ];
 
     const totalUsed = txN + rxN;
@@ -1019,15 +1000,10 @@ export class NodeSummary extends LitElement {
       <div class="hero-tile"
            @click=${() => txAir && this._fireMoreInfo(txAir.entity_id)}>
         <div class="hero-tile-head">
-          <span>Radio activity${this._renderInfoTip({
+          <span>${t('Radio activity')}${this._renderInfoTip({
             band: dotBand,
             fillPct: 0,
-            tooltip: 'Lifetime-average half-duplex composition: cumulative TX / RX ' +
-                     'airtime divided by uptime since the node last booted. The radio ' +
-                     'can transmit OR receive, never both. Unlike a managed repeater ' +
-                     '(which reports utilisation over the last interval), the companion ' +
-                     'exposes only cumulative airtime, so this is a long-run average and ' +
-                     'will not reflect short recent bursts.',
+            tooltip: t('Lifetime-average half-duplex composition: cumulative TX / RX airtime divided by uptime since the node last booted. The radio can transmit OR receive, never both. Unlike a managed repeater (which reports utilisation over the last interval), the companion exposes only cumulative airtime, so this is a long-run average and will not reflect short recent bursts.'),
           })}</span>
           <span class="status-dot ${dotBand}"></span>
         </div>
@@ -1181,7 +1157,7 @@ export class NodeSummary extends LitElement {
 
   private _renderGroup(g: { name: GroupName; rows: TemplateResult[] }) {
     return html`
-      <div class="group-label">${g.name}</div>
+      <div class="group-label">${t(g.name)}</div>
       ${g.rows}
     `;
   }
@@ -1202,7 +1178,7 @@ export class NodeSummary extends LitElement {
              @contextmenu=${(e: MouseEvent) => this._fireContextMenu(e, info)}
              ${longPress(() => this._fireContextMenu(undefined, info))}>
           <span class="status-dot ${band}"></span>
-          <span class="si-label">${info.label}</span>
+          <span class="si-label">${t(info.label)}</span>
           <span class="si-value">${unknown ? '—' : on ? 'Detected' : 'OK'}</span>
           <span class="si-bar"></span>
         </div>
@@ -1237,7 +1213,7 @@ export class NodeSummary extends LitElement {
            ${longPress(() => this._fireContextMenu(undefined, info))}>
         <span class="status-dot ${band}"></span>
         <span class="si-label">
-          ${info.label}${tooltipEv ? this._renderInfoTip(tooltipEv) : nothing}
+          ${t(info.label)}${tooltipEv ? this._renderInfoTip(tooltipEv) : nothing}
         </span>
         <span class="si-value">
           ${formattedValue}${unit ? html`<span class="unit">${unit}</span>` : nothing}
@@ -1334,7 +1310,7 @@ export class NodeSummary extends LitElement {
   private _renderInfoTip(ev: SensorEval): TemplateResult | typeof nothing {
     if (!ev.tooltip) return nothing;
     return html`<chattx-info-tip
-      .content=${ev.tooltip}
+      .content=${t(ev.tooltip)}
       .source=${ev.source ?? ''}>
     </chattx-info-tip>`;
   }

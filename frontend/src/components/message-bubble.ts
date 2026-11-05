@@ -1,9 +1,10 @@
+import { getLocale, t, tn } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { ChatMessage, MessageGroup, DeliveryStatus } from '../types';
 import { fewestHops, formatHopLabel, formatTimestamp } from '../chat/message-parser';
 import { attachDialogA11y } from '../utils/dialog-a11y';
-import { isCzech } from '../utils/language';
+import { formatHeardReply } from '../utils/heard-reply';
 
 /**
  * Generate a deterministic color from a string (e.g., pubkey prefix).
@@ -360,16 +361,16 @@ export class MessageBubble extends LitElement {
     switch (status) {
       case 'pending':
       case 'waiting':
-        return 'Waiting...';
+        return t('Waiting...');
       case 'sent':
-        return repeats > 0 ? 'Repeated' : 'Unheard';
+        return repeats > 0 ? t('Repeated') : t('Unheard');
       case 'delivered':
-        return 'Delivered';
+        return t('Delivered');
       case 'failed':
-        return 'Failed';
+        return t('Failed');
       case 'unconfirmed':
       default:
-        return 'Sent';
+        return t('Sent');
     }
   }
 
@@ -431,7 +432,7 @@ export class MessageBubble extends LitElement {
           .join(' | ')
       : '';
 
-    const fullDateTime = msg.timestamp.toLocaleString(undefined, {
+    const fullDateTime = msg.timestamp.toLocaleString(getLocale(), {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -441,22 +442,22 @@ export class MessageBubble extends LitElement {
       second: '2-digit',
     });
     const hops = fewestHops(msg.rxLogData);
-    const heardText = hops === null ? '' : `Slyším, ${hops} ${hops === 1 ? 'hop' : 'hops'}!`;
+    const heardText = hops === null ? '' : formatHeardReply(hops);
     const footerStyle = 'padding: 8px 16px; font-size: 12px; color: var(--secondary-text-color); border-top: 1px solid var(--divider-color, #e0e0e0);';
 
     return html`
       <div class="message-dialog-overlay" @click=${() => { this._selectedMessage = null; }}>
         <div class="message-dialog"
-             role="dialog" aria-modal="true" aria-label="Message actions"
+             role="dialog" aria-modal="true" aria-label=${t('Message actions')}
              @click=${(e: Event) => e.stopPropagation()}>
           <div class="message-dialog-preview">${msg.text}</div>
           <button class="message-dialog-action" @click=${() => this._copyText(msg.text)}>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>${isCzech() ? 'Kopírovat text' : 'Copy Text'}
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>${t('Copy Text')}
           </button>
           ${!msg.isOutgoing && !msg.isSystem
             ? html`
                 <button class="message-dialog-action" @click=${() => this._replyToSender(msg.sender)}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>${isCzech() ? 'Odpovědět' : 'Reply'}
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>${t('Reply')}
                 </button>
                 ${heardText
                   ? html`
@@ -470,19 +471,19 @@ export class MessageBubble extends LitElement {
           ${hasRoute
             ? html`
                 <div class="message-dialog-route" @click=${() => this._copyText(routeText)}>
-                  Route: ${routeText}
+                  ${t('Route: {route}', { route: routeText })}
                 </div>
               `
             : html``}
           <div style=${footerStyle}>
-            ${msg.isOutgoing ? 'Sent' : 'Received'}: ${fullDateTime}
+            ${msg.isOutgoing ? t('Sent') : t('Received')}: ${fullDateTime}
           </div>
           ${msg.isOutgoing && msg.deliveryStatus
             ? html`
                 <div style=${footerStyle}>
                   ${(msg.deliveryStatus.repeaterCount ?? 0) > 0
-                    ? `${msg.deliveryStatus.repeaterCount} repeater${msg.deliveryStatus.repeaterCount === 1 ? '' : 's'} responded`
-                    : 'No repeaters responded'}${msg.deliveryStatus.ackReceived ? ' · ACK received' : ''}${msg.deliveryStatus.roundTripMs ? ` · ${msg.deliveryStatus.roundTripMs}ms RTT` : ''}
+                    ? tn('{n} repeater responded', '{n} repeaters responded', msg.deliveryStatus.repeaterCount ?? 0)
+                    : t('No repeaters responded')}${msg.deliveryStatus.ackReceived ? ` · ${t('ACK received')}` : ''}${msg.deliveryStatus.roundTripMs ? ` · ${msg.deliveryStatus.roundTripMs}ms RTT` : ''}
                 </div>
               `
             : html``}

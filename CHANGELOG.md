@@ -4,6 +4,18 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-05
+
+### Added
+
+- Translations: the panel is fully in English and Czech, except the descriptions in the command catalog. Terms from the MeshCore documentation, such as repeater, flood and hop, stay in English.
+- Language setting in the Settings tab: automatic (Home Assistant profile, then browser) or a specific language, per browser.
+- The text of the quick reply can be changed in the Settings tab. The default follows the panel language: "Heard, 3 hops!" or "Slyším, 3 hops!".
+
+### Fixed
+
+- Settings showed the path hash mode as 1 byte whatever the device used. It now reads the mode from the device, and shows Unknown if the device does not say.
+
 ## [0.1.20] - 2026-11-05
 
 ### Changed

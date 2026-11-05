@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { panelStyles } from '../styles';
@@ -61,18 +62,18 @@ export class ConfirmDialog extends LitElement {
             ${this.requireTyped
               ? html`
                   <div class="form-group">
-                    <label class="form-label">Type to confirm</label>
+                    <label class="form-label">${t('Type to confirm')}</label>
                     <input
                       type="text"
                       class="form-input"
-                      placeholder="Type '${this.requireTyped}'"
+                      placeholder=${t('Type \'{requireTyped}\'', { requireTyped: this.requireTyped })}
                       .value=${this._typedValue}
                       @input=${(e: Event) => {
                         this._typedValue = (e.target as HTMLInputElement).value;
                       }}
                     />
                     <div class="form-description">
-                      Type '${this.requireTyped}' to enable confirmation
+                      ${t('Type {text} to enable confirmation', { text: this.requireTyped })}
                     </div>
                   </div>
                 `

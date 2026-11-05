@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
@@ -85,7 +86,7 @@ export class SNRChart extends LitElement {
     if (!this.data || this.data.length === 0 || this.neighbors.length === 0) {
       return html`
         <div class="chart-container">
-          <div class="empty-state">No data available</div>
+          <div class="empty-state">${t('No data available')}</div>
         </div>
       `;
     }
@@ -242,7 +243,7 @@ export class SNRChart extends LitElement {
     if (hoursAgo >= 24) {
       return `${Math.round(hoursAgo)}h ago`;
     } else if (hoursAgo === 0) {
-      return 'Now';
+      return t('Now');
     } else {
       return `${Math.round(hoursAgo)}h`;
     }

@@ -1,8 +1,8 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getQuickMessages } from '../api';
-import { isCzech } from '../utils/language';
 
 /** Composer button with a list of quick messages; fires `quick-message-selected`. */
 @customElement('chattx-quick-message-picker')
@@ -99,8 +99,7 @@ export class QuickMessagePicker extends LitElement {
   }
 
   render() {
-    const cs = isCzech();
-    const label = cs ? 'Předpřipravené zprávy' : 'Quick messages';
+    const label = t('Quick messages');
     return html`
       <button class="toggle" title=${label} aria-label=${label} aria-expanded=${this._open ? 'true' : 'false'} ?disabled=${this.disabled} @click=${this._toggle}>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
@@ -109,7 +108,7 @@ export class QuickMessagePicker extends LitElement {
         <div class="menu">
           ${this._messages === null ? ''
             : this._messages.length === 0
-              ? html`<div class="empty">${cs ? 'Zatím tu nic není. Zprávy přidáš v záložce Settings.' : 'Nothing here yet. Add messages in the Settings tab.'}</div>`
+              ? html`<div class="empty">${t('Nothing here yet. Add messages in the Settings tab.')}</div>`
               : this._messages.map((message) => html`<button class="item" @click=${() => this._select(message)}>${message}</button>`)}
         </div>
       ` : ''}

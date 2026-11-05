@@ -1,3 +1,4 @@
+import { getLocale, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { Contact, ManagedDevice } from '../types';
@@ -141,7 +142,7 @@ export class NodeCard extends LitElement {
     else if (isClient) { avatarSvg = html`<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>`; typeLabel = 'Client'; typeClass = 'client'; }
 
     const hasLocation = isContact && ((this.node as Contact).adv_lat !== 0 || (this.node as Contact).adv_lon !== 0);
-    const lastHeardTime = lastHeard ? new Date(lastHeard * 1000).toLocaleTimeString() : 'Unknown';
+    const lastHeardTime = lastHeard ? new Date(lastHeard * 1000).toLocaleTimeString(getLocale()) : t('Unknown');
 
     return html`
       <div class=${this.selected ? 'node-card selected' : 'node-card'}>
@@ -162,12 +163,12 @@ export class NodeCard extends LitElement {
 
         <div class="node-actions">
           ${isContact ? html`
-            <button class="action-btn" @click=${(e: Event) => { e.stopPropagation(); this._dispatch('node-message'); }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>Message</button>
+            <button class="action-btn" @click=${(e: Event) => { e.stopPropagation(); this._dispatch('node-message'); }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>${t('Message')}</button>
           ` : html``}
           ${isRepeater ? html`
-            <button class="action-btn" @click=${(e: Event) => { e.stopPropagation(); this._dispatch('node-telemetry'); }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Telemetry</button>
+            <button class="action-btn" @click=${(e: Event) => { e.stopPropagation(); this._dispatch('node-telemetry'); }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>${t('Telemetry')}</button>
           ` : html``}
-          <button class="action-btn danger" @click=${(e: Event) => { e.stopPropagation(); this._dispatch('node-delete'); }}>Delete</button>
+          <button class="action-btn danger" @click=${(e: Event) => { e.stopPropagation(); this._dispatch('node-delete'); }}>${t('Delete')}</button>
         </div>
       </div>
     `;

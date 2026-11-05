@@ -1,0 +1,58 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "MeshCore Chattx",
+        "description": "Přidání doplňkové integrace MeshCore Chattx. Aby panel dostával zprávy, musí být nainstalovaná i základní integrace MeshCore."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "MeshCore Chattx už je nastavený.",
+      "meshcore_not_installed": "Integrace MeshCore není nainstalovaná. Nejdřív ji nainstaluj přes Marketplace nebo HACS a pak přidej MeshCore Chattx."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Možnosti MeshCore Chattx",
+        "description": "Nastavení, jak dlouho se uchovává historie konverzací. Změny se projeví při dalším uložení zprávy a při příštím restartu Home Assistantu.",
+        "data": {
+          "max_messages_per_conversation": "Max. počet zpráv v konverzaci",
+          "message_retention_days": "Uchování zpráv (dny)"
+        },
+        "data_description": {
+          "max_messages_per_conversation": "Po překročení tohoto počtu se odstraní nejstarší zprávy. Rozsah: 50–5000. Výchozí: 500.",
+          "message_retention_days": "Starší zprávy se odstraní při startu a při pravidelném čištění. Rozsah: 1–365. Výchozí: 90."
+        }
+      }
+    }
+  },
+  "issues": {
+    "upstream_meshcore_unavailable": {
+      "title": "Integrace MeshCore není nastavená",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "MeshCore Chattx potřebuje integraci MeshCore",
+            "description": "MeshCore Chattx je doplněk k základní integraci MeshCore, ale žádné zařízení MeshCore teď není nastavené. Nejdřív nainstaluj a nastav integraci MeshCore (Nastavení → Zařízení a služby → Přidat integraci → MeshCore), nebo MeshCore Chattx odeber, pokud ho už nepotřebuješ.\n\nKliknutím na Odeslat upozornění potvrdíš. Samo zmizí, až bude zařízení MeshCore nastavené."
+          }
+        }
+      }
+    },
+    "name_changed": {
+      "title": "Zařízení MeshCore přejmenováno",
+      "description": "Zařízení MeshCore bylo přejmenováno z `{old_name}` na `{new_name}`. Počet automaticky převedených ID entit z přípony `_{old_suffix}` na `_{new_suffix}`: {count}.\n\n**Přejmenované entity:**\n\n{entity_list}\n\nPokud stará ID entit používají automatizace, skripty nebo dashboardy, musíš je ručně upravit na novou příponu.\n\nAž nastavení zkontroluješ, můžeš toto upozornění zavřít."
+    }
+  },
+  "exceptions": {
+    "operation_failed": { "message": "Operace selhala" },
+    "device_not_connected": { "message": "Zařízení není připojené" },
+    "operation_timed_out": { "message": "Operace vypršela" },
+    "invalid_request": { "message": "Neplatné parametry požadavku" },
+    "no_meshcore_coordinator": { "message": "Žádný aktivní koordinátor MeshCore" },
+    "invalid_key_length": { "message": "Private key musí mít 64 nebo 128 hex znaků" },
+    "invalid_key_hex": { "message": "Private key smí obsahovat jen hex znaky (0-9, a-f)" },
+    "import_rejected": { "message": "Firmware zařízení novou identitu odmítl. Identita zařízení se nezměnila." },
+    "verify_failed": { "message": "Nová identita se v zařízení neprojevila. Identita zařízení se možná nezměnila." }
+  }
+}

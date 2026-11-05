@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, Channel } from '../types';
@@ -266,27 +267,27 @@ export class ConversationList extends LitElement {
   render() {
     return html`
       <div class="sidebar-header">
-        <span class="sidebar-title">Chats</span>
+        <span class="sidebar-title">${t('Chats')}</span>
         <button
           class="compose-btn"
-          title="Manage contacts & channels"
-          aria-label="Manage contacts and channels"
+          title=${t('Manage contacts & channels')}
+          aria-label=${t('Manage contacts and channels')}
           @click=${() => this.dispatchEvent(new CustomEvent('manage-requested', { bubbles: true, composed: true }))}>
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
             <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
           </svg>
         </button>
       </div>
-      <div class="filter-bar" role="tablist" aria-label="Conversation filter">
-        ${this._renderFilterBtn('all', 'All')}
-        ${this._renderFilterBtn('unread', 'Unread')}
-        ${this._renderFilterBtn('dms', 'DMs')}
-        ${this._renderFilterBtn('channels', 'Channels')}
+      <div class="filter-bar" role="tablist" aria-label=${t('Conversation filter')}>
+        ${this._renderFilterBtn('all', t('All'))}
+        ${this._renderFilterBtn('unread', t('Unread'))}
+        ${this._renderFilterBtn('dms', t('DMs'))}
+        ${this._renderFilterBtn('channels', t('Channels'))}
       </div>
       <div
         class="conversation-list"
         role="listbox"
-        aria-label="Conversations"
+        aria-label=${t('Conversations')}
         @keydown=${this._onListKeyDown}>
         ${this._filteredConversations.length > 0
           ? this._filteredConversations.map((conv, idx) => this._renderConversation(conv, idx))
@@ -366,10 +367,10 @@ export class ConversationList extends LitElement {
 
   private _emptyMessage(): string {
     switch (this._activeFilter) {
-      case 'unread': return 'No unread conversations';
-      case 'dms': return 'No direct messages';
-      case 'channels': return 'No channels';
-      default: return 'No conversations yet';
+      case 'unread': return t('No unread conversations');
+      case 'dms': return t('No direct messages');
+      case 'channels': return t('No channels');
+      default: return t('No conversations yet');
     }
   }
 
@@ -378,7 +379,7 @@ export class ConversationList extends LitElement {
     const id = isContact ? (conv as Contact).pubkey_prefix : String((conv as Channel).channel_idx);
     const name = isContact ? (conv as Contact).adv_name : (conv as Channel).name;
     const age = formatLastActivity(lastActivityOf(conv, this.activity, this.nodePrefix), Date.now(), isCzech());
-    const idLabel = isContact ? (conv as Contact).pubkey_prefix : `Channel ${(conv as Channel).channel_idx}`;
+    const idLabel = isContact ? (conv as Contact).pubkey_prefix : t('Channel {index}', { index: (conv as Channel).channel_idx });
     const label = this.showContactIds ? idLabel : '';
     const detail = [label, age].filter(Boolean).join(' · ');
     const avatar = avatarLabel(

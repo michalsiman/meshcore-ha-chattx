@@ -1,18 +1,18 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterNeighbours, type RepeaterNeighbour } from '../api';
-import { isCzech } from '../utils/language';
 import './read-age-note';
 
-export function formatHeardAgo(seconds: number, cs: boolean): string {
-  if (seconds < 60) return cs ? `před ${seconds} s` : `${seconds} s ago`;
+export function formatHeardAgo(seconds: number): string {
+  if (seconds < 60) return t('{seconds} s ago', { seconds });
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return cs ? `před ${minutes} min` : `${minutes} min ago`;
+  if (minutes < 60) return t('{minutes} min ago', { minutes });
   const hours = Math.round(minutes / 60);
-  if (hours < 48) return cs ? `před ${hours} h` : `${hours} h ago`;
+  if (hours < 48) return t('{hours} h ago', { hours });
   const days = Math.round(hours / 24);
-  return cs ? `před ${days} d` : `${days} d ago`;
+  return t('{days} d ago', { days });
 }
 
 /** Nodes a repeater has heard directly, read ten at a time. */
@@ -102,21 +102,21 @@ export class RepeaterNeighbours extends LitElement {
         this._total = result.total ?? this._neighbours.length;
         this._readAt = result.read_at ?? new Date().toISOString();
       } else if (result.reason === 'no_response') {
-        this._error = 'The repeater did not answer. It may be out of reach, or it may no longer accept this login. In that case, log in again.';
+        this._error = t('The repeater did not answer. It may be out of reach, or it may no longer accept this login. In that case, log in again.');
       } else {
-        this._error = result.message ?? 'Reading neighbours failed.';
+        this._error = result.message ?? t('Reading neighbours failed.');
       }
     } finally {
       if (prefix === this.prefix) this._loading = false;
     }
   }
 
-  private _renderList(cs: boolean) {
+  private _renderList() {
     if (this._neighbours === null) {
-      return html`<div class="hint">${cs ? 'Zatím nenačteno.' : 'Not loaded yet.'}</div>`;
+      return html`<div class="hint">${t('Not loaded yet.')}</div>`;
     }
     if (this._neighbours.length === 0) {
-      return html`<div class="hint">${cs ? 'Repeater žádné sousedy nehlásí.' : 'The repeater reports no neighbours.'}</div>`;
+      return html`<div class="hint">${t('The repeater reports no neighbours.')}</div>`;
     }
     const sinceRead = (n: RepeaterNeighbour) => {
       const readAt = n.read_at ?? this._readAt;
@@ -125,22 +125,20 @@ export class RepeaterNeighbours extends LitElement {
     const sorted = [...this._neighbours].sort((a, b) => b.snr - a.snr);
     return html`
       <table>
-        <thead><tr><th>${cs ? 'Uzel' : 'Node'}</th><th class="number">SNR (dB)</th><th class="number">${cs ? 'Slyšen' : 'Heard'}</th></tr></thead>
+        <thead><tr><th>${t('Node')}</th><th class="number">${t('SNR (dB)')}</th><th class="number">${t('Heard')}</th></tr></thead>
         <tbody>${sorted.map((n) => html`
           <tr>
             <td title=${n.pubkey}>${n.name}</td>
             <td class="number">${n.snr.toFixed(2)}</td>
-            <td class="number">${formatHeardAgo(Math.round(n.secs_ago + sinceRead(n)), cs)}</td>
+            <td class="number">${formatHeardAgo(Math.round(n.secs_ago + sinceRead(n)))}</td>
           </tr>
         `)}</tbody>
       </table>
       ${this._total > this._neighbours.length
         ? html`<div class="more">
-            <span class="hint">${cs
-              ? `Načteno ${this._neighbours.length} z ${this._total}, nejdřív naposledy slyšení.`
-              : `Loaded ${this._neighbours.length} of ${this._total}, most recently heard first.`}</span>
+            <span class="hint">${t('Loaded {length} of {total}, most recently heard first.', { length: this._neighbours.length, total: this._total })}</span>
             <button class="next" ?disabled=${!this.canLoad || this._loading} @click=${() => this._load(this._neighbours!.length)}>
-              ${cs ? 'Načíst dalších 10' : 'Load 10 more'}
+              ${t('Load 10 more')}
             </button>
           </div>`
         : ''}
@@ -148,22 +146,21 @@ export class RepeaterNeighbours extends LitElement {
   }
 
   render() {
-    const cs = isCzech();
     return html`
       ${this._error ? html`<div class="error" role="alert">${this._error}</div>` : ''}
       <div class="header">
         ${this._waitSeconds
-          ? html`<span class="hint" role="status">${cs ? `Limit provozu sítě, pokračuji za ${this._waitSeconds} s.` : `Mesh traffic limit, continuing in ${this._waitSeconds} s.`}</span>`
+          ? html`<span class="hint" role="status">${t('Mesh traffic limit, continuing in {waitSeconds} s.', { waitSeconds: this._waitSeconds })}</span>`
           : this._readAt
             ? html`<chattx-read-age-note .readAt=${this._readAt}></chattx-read-age-note>`
             : ''}
         <button class="reload" ?disabled=${!this.canLoad || this._loading} @click=${() => this._load(0)}>
           ${this._loading
-            ? (cs ? 'Načítám…' : 'Loading…')
-            : this._neighbours !== null ? (cs ? 'Přenačíst' : 'Reload') : (cs ? 'Načíst' : 'Load')}
+            ? (t('Loading…'))
+            : this._neighbours !== null ? (t('Reload')) : (t('Load'))}
         </button>
       </div>
-      ${this._renderList(cs)}
+      ${this._renderList()}
     `;
   }
 }

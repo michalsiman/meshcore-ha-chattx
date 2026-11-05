@@ -1,3 +1,4 @@
+import { getLocale, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, ManagedDevice, HomeAssistant } from '../types';
@@ -342,7 +343,7 @@ export class NodeDetailDialog extends LitElement {
           class="dialog"
           role="dialog"
           aria-modal="true"
-          aria-label="Node detail — ${name}"
+          aria-label=${t('Node detail — {name}', { name })}
           @click=${(e: Event) => e.stopPropagation()}>
           <div class="dialog-header">
             <div class=${`dialog-avatar ${typeClass}`}>${avatarSvg}</div>
@@ -350,14 +351,14 @@ export class NodeDetailDialog extends LitElement {
               <div class="dialog-name">${name}</div>
               <div class="dialog-type">${typeLabel}</div>
             </div>
-            <button class="dialog-close" aria-label="Close" @click=${this._close}>✕</button>
+            <button class="dialog-close" aria-label=${t('Close')} @click=${this._close}>✕</button>
           </div>
 
           <div class="dialog-content">
             ${this._showLogin || this.loginOnly
               ? html`
                   <div class="section">
-                    <div class="section-header">Log in to repeater</div>
+                    <div class="section-header">${t('Log in to repeater')}</div>
                     <chattx-repeater-login
                       .hass=${this.hass}
                       .prefix=${prefix}
@@ -370,7 +371,7 @@ export class NodeDetailDialog extends LitElement {
                       }}></chattx-repeater-login>
                   </div>
                   <div class="section">
-                    <div class="section-header">Telemetry</div>
+                    <div class="section-header">${t('Telemetry')}</div>
                     <chattx-repeater-telemetry
                       .hass=${this.hass}
                       .prefix=${prefix}
@@ -378,7 +379,7 @@ export class NodeDetailDialog extends LitElement {
                       .canLoad=${this._canLoadSettings}></chattx-repeater-telemetry>
                   </div>
                   <div class="section">
-                    <div class="section-header">Neighbours</div>
+                    <div class="section-header">${t('Neighbours')}</div>
                     <chattx-repeater-neighbours
                       .hass=${this.hass}
                       .prefix=${prefix}
@@ -386,7 +387,7 @@ export class NodeDetailDialog extends LitElement {
                       .canLoad=${this._canLoadSettings}></chattx-repeater-neighbours>
                   </div>
                   <div class="section">
-                    <div class="section-header">Regions</div>
+                    <div class="section-header">${t('Regions')}</div>
                     <chattx-repeater-regions
                       .hass=${this.hass}
                       .prefix=${prefix}
@@ -394,7 +395,7 @@ export class NodeDetailDialog extends LitElement {
                       .canEdit=${this._canLoadSettings}></chattx-repeater-regions>
                   </div>
                   <div class="section">
-                    <div class="section-header">Settings</div>
+                    <div class="section-header">${t('Settings')}</div>
                     <chattx-repeater-settings
                       .hass=${this.hass}
                       .prefix=${prefix}
@@ -402,7 +403,7 @@ export class NodeDetailDialog extends LitElement {
                       .canLoad=${this._canLoadSettings}></chattx-repeater-settings>
                   </div>
                   <div class="section">
-                    <div class="section-header">Terminal</div>
+                    <div class="section-header">${t('Terminal')}</div>
                     <chattx-repeater-terminal
                       .hass=${this.hass}
                       .prefix=${prefix}
@@ -415,34 +416,34 @@ export class NodeDetailDialog extends LitElement {
               ? html`
                   <div class="confirm-section">
                     <div class="confirm-text">
-                      ${this._confirmAction === 'remove-contact' ? 'Remove this as an Added Contact?' : ''}
+                      ${this._confirmAction === 'remove-contact' ? t('Remove this as an Added Contact?') : ''}
                     </div>
                     ${this._confirmAction === 'remove-contact' ? html`
-                      <div class="confirm-description">Removing the contact will make it a Discovered Contact.</div>
+                      <div class="confirm-description">${t('Removing the contact will make it a Discovered Contact.')}</div>
                     ` : html``}
                     <div class="confirm-actions">
-                      <button class="confirm-btn yes" @click=${() => this._confirmAction_exec()}>Yes</button>
-                      <button class="confirm-btn no" @click=${() => { this._confirming = false; this._confirmAction = null; }}>Cancel</button>
+                      <button class="confirm-btn yes" @click=${() => this._confirmAction_exec()}>${t('Yes')}</button>
+                      <button class="confirm-btn no" @click=${() => { this._confirming = false; this._confirmAction = null; }}>${t('Cancel')}</button>
                     </div>
                   </div>
                 `
               : html`
                   <div class="section">
-                    <div class="section-header">Quick Actions</div>
+                    <div class="section-header">${t('Quick Actions')}</div>
                     <div class="quick-actions ${isContact ? '' : 'full'}">
                       ${canLogin ? html`
                         <button class=${this._loggedIn ? 'action-btn logged-in' : 'action-btn'} @click=${() => { this._showLogin = true; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>${this._loggedIn ? 'Logged in' : 'Log in'}</button>
                       ` : html``}
                       ${isContact && (this.node as Contact).added_to_node && (isClient || isRoomServer) ? html`
-                        <button class="action-btn" @click=${() => this._dispatchEvent('message')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>Message</button>
+                        <button class="action-btn" @click=${() => this._dispatchEvent('message')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>${t('Message')}</button>
                       ` : html``}
                       ${prefix && !isClient ? html`
-                        <button class="action-btn" @click=${() => this._dispatchEvent('trace')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2 12a2 2 0 104 0 2 2 0 10-4 0zM10 12a2 2 0 104 0 2 2 0 10-4 0zM18 12a2 2 0 104 0 2 2 0 10-4 0zM7 10l3 2-3 2zM15 10l3 2-3 2z"/></svg>Trace</button>
+                        <button class="action-btn" @click=${() => this._dispatchEvent('trace')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2 12a2 2 0 104 0 2 2 0 10-4 0zM10 12a2 2 0 104 0 2 2 0 10-4 0zM18 12a2 2 0 104 0 2 2 0 10-4 0zM7 10l3 2-3 2zM15 10l3 2-3 2z"/></svg>${t('Trace')}</button>
                       ` : html``}
                       ${isContact && (this.node as Contact).added_to_node
                         ? html`<button class="action-btn warning"
                             ?disabled=${this.pendingAction === 'remove-contact'}
-                            @click=${() => { this._confirming = true; this._confirmAction = 'remove-contact'; }}>${this.pendingAction === 'remove-contact' ? 'Removing…' : 'Remove Contact'}</button>`
+                            @click=${() => { this._confirming = true; this._confirmAction = 'remove-contact'; }}>${this.pendingAction === 'remove-contact' ? t('Removing…') : t('Remove Contact')}</button>`
                         : isContact ? html`<button class="action-btn"
                             ?disabled=${this.pendingAction === 'add-contact'}
                             @click=${() => this._dispatchEvent('add-contact')}>${this.pendingAction === 'add-contact'
@@ -453,27 +454,27 @@ export class NodeDetailDialog extends LitElement {
                   </div>
 
                   <div class="section">
-                    <div class="section-header">Information</div>
+                    <div class="section-header">${t('Information')}</div>
                     <div class="info-grid">
                       <div class="info-item">
-                        <div class="info-label">Public Key Prefix</div>
+                        <div class="info-label">${t('Public Key Prefix')}</div>
                         <div class="info-value">${prefix}</div>
                       </div>
                       <div class="info-item">
-                        <div class="info-label">Type</div>
+                        <div class="info-label">${t('Type')}</div>
                         <div class="info-value">${typeLabel}</div>
                       </div>
                       ${isContact ? html`
                         <div class="info-item">
-                          <div class="info-label">Last Advert</div>
+                          <div class="info-label">${t('Last Advert')}</div>
                           <div class="info-value">
                             ${(this.node as Contact).last_advert
-                              ? new Date((this.node as Contact).last_advert * 1000).toLocaleString()
-                              : 'Unknown'}
+                              ? new Date((this.node as Contact).last_advert * 1000).toLocaleString(getLocale())
+                              : t('Unknown')}
                           </div>
                         </div>
                         <div class="info-item">
-                          <div class="info-label">Status</div>
+                          <div class="info-label">${t('Status')}</div>
                           <div class="info-value">${(this.node as Contact).added_to_node ? 'Added Contact' : 'Discovered Contact'}</div>
                         </div>
                       ` : html``}
@@ -483,14 +484,14 @@ export class NodeDetailDialog extends LitElement {
                   ${isContact && ((this.node as Contact).adv_lat !== 0 || (this.node as Contact).adv_lon !== 0)
                     ? html`
                         <div class="section">
-                          <div class="section-header">Location</div>
+                          <div class="section-header">${t('Location')}</div>
                           <div class="info-grid">
                             <div class="info-item">
-                              <div class="info-label">Latitude</div>
+                              <div class="info-label">${t('Latitude')}</div>
                               <div class="info-value">${(this.node as Contact).adv_lat.toFixed(6)}</div>
                             </div>
                             <div class="info-item">
-                              <div class="info-label">Longitude</div>
+                              <div class="info-label">${t('Longitude')}</div>
                               <div class="info-value">${(this.node as Contact).adv_lon.toFixed(6)}</div>
                             </div>
                           </div>
@@ -500,15 +501,15 @@ export class NodeDetailDialog extends LitElement {
                   ${isContact && (this.node as Contact).out_path
                     ? html`
                         <div class="section">
-                          <div class="section-header">Network</div>
+                          <div class="section-header">${t('Network')}</div>
                           <div class="info-item">
-                            <div class="info-label">Route (Outgoing Path)</div>
+                            <div class="info-label">${t('Route (Outgoing Path)')}</div>
                             <div class="info-value">${(this.node as Contact).out_path}</div>
                           </div>
                           ${(this.node as Contact).out_path_len
                             ? html`
                                 <div class="info-item" style="margin-top: 8px;">
-                                  <div class="info-label">Path Length</div>
+                                  <div class="info-label">${t('Path Length')}</div>
                                   <div class="info-value">${(this.node as Contact).out_path_len} hops</div>
                                 </div>
                               ` : html``}

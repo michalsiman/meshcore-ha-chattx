@@ -1,5 +1,6 @@
-/** Whether the browser asks for Czech; the rest of the panel is English. */
+import { getLanguage } from '../i18n';
+
+/** Whether the panel is in Czech, for helpers that decline words themselves. */
 export function isCzech(): boolean {
-  const language = typeof navigator !== 'undefined' ? navigator.language : 'en';
-  return language.toLowerCase().startsWith('cs');
+  return getLanguage() === 'cs';
 }

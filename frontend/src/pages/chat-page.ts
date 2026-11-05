@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, Contact, Channel } from '../types';
@@ -6,7 +7,6 @@ import { UnreadController, pillLabel } from '../chat/unread-controller';
 import { buildRenderItems } from '../chat/message-parser';
 import { remainingMessageBytes } from '../utils/message-limit';
 import { loadStripDiacritics, saveStripDiacritics, stripDiacritics } from '../utils/diacritics';
-import { isCzech } from '../utils/language';
 import { loadShowContactIds, saveShowContactIds } from '../utils/contact-ids';
 import { discoverChannelEntity, discoverContactEntity } from '../chat/entity-resolver';
 import { getRepeaterLoginState, sendDirectMessage, sendChannelMessage } from '../api';
@@ -768,7 +768,7 @@ export class ChatPage extends LitElement {
                 <span class="narrow-conv-name">${this._getConversationName()}${this._renderScopeChip()}</span>
                 <div class="chat-header-actions">
                   ${this._renderRepeaterButton()}
-                  <button class="header-action-btn" title="Search messages" aria-label="Search messages" @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+                  <button class="header-action-btn" title=${t('Search messages')} aria-label=${t('Search messages')} @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
                 </div>
               </div>
               ${this._renderChatArea()}
@@ -849,7 +849,7 @@ export class ChatPage extends LitElement {
               </div>
               <div class="chat-header-actions">
                 ${this._renderRepeaterButton()}
-                <button class="header-action-btn" title="Search messages" aria-label="Search messages" @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+                <button class="header-action-btn" title=${t('Search messages')} aria-label=${t('Search messages')} @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
               </div>
             </div>
           ` : ''}
@@ -890,8 +890,8 @@ export class ChatPage extends LitElement {
       return html`
         <div class="empty-state">
           <div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.5"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg></div>
-          <div class="empty-text">Select a conversation to start</div>
-          <div class="empty-subtext">Choose a channel or contact from the list</div>
+          <div class="empty-text">${t('Select a conversation to start')}</div>
+          <div class="empty-subtext">${t('Choose a channel or contact from the list')}</div>
         </div>
       `;
     }
@@ -900,8 +900,8 @@ export class ChatPage extends LitElement {
       return html`
         <div class="empty-state">
           <div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
-          <div class="empty-text">Conversation unavailable</div>
-          <div class="empty-subtext">This contact may no longer be added to the node</div>
+          <div class="empty-text">${t('Conversation unavailable')}</div>
+          <div class="empty-subtext">${t('This contact may no longer be added to the node')}</div>
         </div>
       `;
     }
@@ -914,9 +914,7 @@ export class ChatPage extends LitElement {
     });
 
     const remaining = this._remainingBytes();
-    const diacriticsLabel = isCzech()
-      ? 'Odesílat bez diakritiky. Text se upraví až při odeslání.'
-      : 'Send without diacritics. The text changes when it is sent.';
+    const diacriticsLabel = t('Send without diacritics. The text changes when it is sent.');
     return html`
       <div class="chat-container" @reply-to-sender=${this._onReplyToSender} @scroll=${this._onChatScroll}>
         ${this._messageStore.loadingOlder
@@ -934,7 +932,7 @@ export class ChatPage extends LitElement {
           ? html`
               <div class="loading-state">
                 <div class="loading-spinner"></div>
-                Loading messages...
+                ${t('Loading messages...')}
               </div>
             `
           : html``}
@@ -942,8 +940,8 @@ export class ChatPage extends LitElement {
           ? html`
               <div class="empty-state">
                 <div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.5"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/></svg></div>
-                <div class="empty-text">No messages yet</div>
-                <div class="empty-subtext">Be the first to send a message!</div>
+                <div class="empty-text">${t('No messages yet')}</div>
+                <div class="empty-subtext">${t('Be the first to send a message!')}</div>
               </div>
             `
           : html``}
@@ -964,8 +962,8 @@ export class ChatPage extends LitElement {
             @click=${this._toggleStripDiacritics}>á→a</button>
         </div>
         <textarea
-          placeholder="Type a message..."
-          aria-label="Message text. Press Enter to send, Shift+Enter for newline."
+          placeholder=${t('Type a message...')}
+          aria-label=${t('Message text. Press Enter to send, Shift+Enter for newline.')}
           .value=${this._inputText}
           @input=${(e: Event) => {
             const ta = e.target as HTMLTextAreaElement;
@@ -985,11 +983,11 @@ export class ChatPage extends LitElement {
             @emoji-selected=${this._onEmojiSelected}></chattx-emoji-picker>
           <span
             class=${remaining <= 0 ? 'byte-counter at-limit' : 'byte-counter'}
-            title="Bytes left. Letters with diacritics take 2, emoji take 4. In channels your node name is part of the message.">${remaining}</span>
+            title=${t('Bytes left. Letters with diacritics take 2, emoji take 4. In channels your node name is part of the message.')}>${remaining}</span>
         </div>
         <button
           class="send-button"
-          aria-label="Send message"
+          aria-label=${t('Send message')}
           @click=${() => this._sendMessage()}
           ?disabled=${this._sending || !this.selectedId || !this._inputText.trim() || remaining < 0}>
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1029,7 +1027,7 @@ export class ChatPage extends LitElement {
       if (!dividerInserted && dividerAtMessageIdx !== null && messageIdx === dividerAtMessageIdx) {
         results.push(html`
           <div class="unread-divider">
-            <span>New messages</span>
+            <span>${t('New messages')}</span>
           </div>
         `);
         dividerInserted = true;
@@ -1440,7 +1438,7 @@ export class ChatPage extends LitElement {
 
   private _renderRepeaterButton() {
     if (!this._selectedRepeater()) return '';
-    const label = this._repeaterLoggedIn ? 'Logged in. Repeater settings' : 'Repeater login and settings';
+    const label = this._repeaterLoggedIn ? t('Logged in. Repeater settings') : t('Repeater login and settings');
     return html`<button class=${this._repeaterLoggedIn ? 'header-action-btn repeater-login-btn logged-in' : 'header-action-btn repeater-login-btn'} title=${label} aria-label=${label} @click=${() => { this._repeaterDialogOpen = true; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></button>`;
   }
 
@@ -1467,8 +1465,8 @@ export class ChatPage extends LitElement {
     if (!scope) return '';
     return html`<button
       class="scope-chip"
-      title="Region scope: messages on this channel flood only through '${scope}' repeaters. Click to manage."
-      aria-label="Region scope ${scope} — manage channels"
+      title=${t('Region scope: messages on this channel flood only through \'{scope}\' repeaters. Click to manage.', { scope })}
+      aria-label=${t('Region scope {scope} — manage channels', { scope })}
       @click=${() => {
         this._manageInitialTab = 'channels';
         this._manageOpen = true;

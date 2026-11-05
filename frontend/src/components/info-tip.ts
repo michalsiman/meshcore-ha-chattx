@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
@@ -117,7 +118,7 @@ export class InfoTip extends LitElement {
     return html`
       <button class="info-tip"
               type="button"
-              aria-label="More information"
+              aria-label=${t('More information')}
               @mouseenter=${this._onOpen}
               @mouseleave=${this._onClose}
               @focus=${this._onOpen}

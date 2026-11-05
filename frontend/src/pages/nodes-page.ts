@@ -1,3 +1,4 @@
+import { N_, t } from '../i18n';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, Channel, HomeAssistant, PanelConfig } from '../types';
@@ -26,10 +27,10 @@ const NODE_TYPE_MAP: Record<NodeType, number> = {
 // the stylesheet, not in inline style attributes.
 
 const TYPE_LABELS: Record<NodeType, string> = {
-  clients: 'Clients',
-  repeaters: 'Repeaters',
-  room_servers: 'Room Servers',
-  sensors: 'Sensors',
+  clients: N_('Clients'),
+  repeaters: N_('Repeaters'),
+  room_servers: N_('Room Servers'),
+  sensors: N_('Sensors'),
 };
 
 @customElement('chattx-nodes-page')
@@ -440,9 +441,9 @@ export class NodesPage extends LitElement {
         <div class="nodes-header">
           <!-- Level 1 filters -->
           <div class="l1-filters">
-            ${this._renderL1Button('all', 'All')}
-            ${this._renderL1Button('added', '★ Added')}
-            ${this._renderL1Button('discovered', 'Discovered')}
+            ${this._renderL1Button('all', t('All'))}
+            ${this._renderL1Button('added', `★ ${t('Added')}`)}
+            ${this._renderL1Button('discovered', t('Discovered'))}
           </div>
 
           <!-- Level 2 filters (hidden when L1 = All) -->
@@ -471,18 +472,18 @@ export class NodesPage extends LitElement {
                 this._sortBy = (e.target as HTMLSelectElement).value as 'last_heard' | 'name' | 'prefix';
                 this._loadPage(true);
               }}>
-              <option value="last_heard">Last Heard</option>
-              <option value="name">Name</option>
-              <option value="prefix">Pub Prefix</option>
+              <option value="last_heard">${t('Last Heard')}</option>
+              <option value="name">${t('Name')}</option>
+              <option value="prefix">${t('Pub Prefix')}</option>
             </select>
             <button class="clear-btn"
               @click=${() => this._clearStaleContacts()}
-              title="Remove discovered contacts older than the configured threshold">
-              Clear Stale
+              title=${t('Remove discovered contacts older than the configured threshold')}>
+              ${t('Clear Stale')}
             </button>
             <button class="sync-btn"
               @click=${() => this._syncAll()}>
-              ⟳ Sync
+              ⟳ ${t('Sync')}
             </button>
           </div>
         </div>
@@ -532,13 +533,13 @@ export class NodesPage extends LitElement {
     const types: NodeType[] = ['clients', 'repeaters', 'room_servers', 'sensors'];
     return types
       .filter((t) => this._typeCounts[t] > 0)
-      .map((t) => {
-        const isActive = this._typeFilter === t;
+      .map((kind) => {
+        const isActive = this._typeFilter === kind;
         return html`
           <button
             class=${`l2-btn ${t} ${isActive ? 'active' : ''}`}
-            @click=${() => this._setTypeFilter(t)}>
-            ${TYPE_LABELS[t]} <span class="l2-count">(${this._typeCounts[t]})</span>
+            @click=${() => this._setTypeFilter(kind)}>
+            ${t(TYPE_LABELS[kind])} <span class="l2-count">(${this._typeCounts[kind]})</span>
           </button>
         `;
       });
@@ -577,9 +578,9 @@ export class NodesPage extends LitElement {
 
   private _getSearchPlaceholder(): string {
     const cat = this._primaryFilter;
-    const type = this._typeFilter ? TYPE_LABELS[this._typeFilter].toLowerCase() : 'nodes';
-    if (cat === 'all') return 'Search all nodes...';
-    return `Search ${cat} ${type}...`;
+    const type = this._typeFilter ? t(TYPE_LABELS[this._typeFilter]).toLowerCase() : 'nodes';
+    if (cat === 'all') return t('Search all nodes...');
+    return t('Search {cat} {type}...', { cat, type });
   }
 
   // ─── Data loading ─────────────────────────────────────────────────
@@ -627,7 +628,7 @@ export class NodesPage extends LitElement {
 
   private async _clearStaleContacts() {
     if (!this.hass) return;
-    const days = prompt('Remove discovered contacts older than how many days?', '30');
+    const days = prompt(t('Remove discovered contacts older than how many days?'), '30');
     if (!days) return;
     const daysNum = parseInt(days, 10);
     if (isNaN(daysNum) || daysNum < 1 || daysNum > 365) return;
@@ -651,7 +652,7 @@ export class NodesPage extends LitElement {
     if (this._loading && this._displayedContacts.length === 0) {
       return html`
         <div class="empty-state">
-          <div class="empty-text">Loading...</div>
+          <div class="empty-text">${t('Loading...')}</div>
         </div>
       `;
     }
@@ -675,7 +676,7 @@ export class NodesPage extends LitElement {
       ${this._displayedContacts.length < this._totalCount ? html`
         <div class="load-more">
           <button ?disabled=${this._loading} @click=${() => this._loadPage()}>
-            ${this._loading ? 'Loading...' : `Load More (${this._displayedContacts.length} of ${this._totalCount})`}
+            ${this._loading ? t('Loading...') : t('Load More ({length} of {totalCount})', { length: this._displayedContacts.length, totalCount: this._totalCount })}
           </button>
         </div>
       ` : nothing}
@@ -687,21 +688,21 @@ export class NodesPage extends LitElement {
     const type = this._typeFilter;
 
     let icon = html`<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.5"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>`;
-    let text = 'No nodes found';
+    let text = t('No nodes found');
     let subtext = '';
 
     if (this._searchQuery) {
-      text = 'No matching nodes';
-      subtext = `No results for "${this._searchQuery}"`;
+      text = t('No matching nodes');
+      subtext = t('No results for "{searchQuery}"', { searchQuery: this._searchQuery });
     } else if (cat === 'added') {
-      text = 'No added contacts';
-      subtext = type ? `No added ${TYPE_LABELS[type].toLowerCase()}` : 'Add discovered contacts to see them here';
+      text = t('No added contacts');
+      subtext = type ? t('No added {type}', { type: t(TYPE_LABELS[type]).toLowerCase() }) : t('Add discovered contacts to see them here');
     } else if (cat === 'discovered') {
-      text = 'No discovered nodes';
-      subtext = type ? `No discovered ${TYPE_LABELS[type].toLowerCase()}` : 'Nodes seen on the mesh will appear here';
+      text = t('No discovered nodes');
+      subtext = type ? t('No discovered {type}', { type: t(TYPE_LABELS[type]).toLowerCase() }) : t('Nodes seen on the mesh will appear here');
     } else if (cat === 'all') {
-      text = 'No nodes';
-      subtext = 'No contacts or discovered nodes yet';
+      text = t('No nodes');
+      subtext = t('No contacts or discovered nodes yet');
     }
 
     return html`

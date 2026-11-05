@@ -46,10 +46,10 @@ const offsets = (callWS: ReturnType<typeof vi.fn>) =>
 
 describe('formatHeardAgo', () => {
   it('picks a readable unit', () => {
-    expect(formatHeardAgo(30, false)).toBe('30 s ago');
-    expect(formatHeardAgo(300, false)).toBe('5 min ago');
-    expect(formatHeardAgo(7200, true)).toBe('před 2 h');
-    expect(formatHeardAgo(259200, true)).toBe('před 3 d');
+    expect(formatHeardAgo(30)).toBe('30 s ago');
+    expect(formatHeardAgo(300)).toBe('5 min ago');
+    expect(formatHeardAgo(7200)).toBe('2 h ago');
+    expect(formatHeardAgo(259200)).toBe('3 d ago');
   });
 });
 

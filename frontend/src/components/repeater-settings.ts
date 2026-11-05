@@ -1,8 +1,8 @@
+import { N_, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterSetting } from '../api';
-import { isCzech } from '../utils/language';
 import './read-age-note';
 
 interface SettingField {
@@ -22,78 +22,78 @@ interface SettingGroup {
 // Same grouping as the MeshCore clients' repeater settings screen.
 export const REPEATER_SETTING_GROUPS: SettingGroup[] = [
   {
-    title: 'Basic',
+    title: N_('Basic'),
     fields: [
-      { command: 'get name', label: 'Name' },
-      { command: 'get role', label: 'Role' },
-      { command: 'ver', label: 'Firmware' },
-      { command: 'board', label: 'Board' },
+      { command: 'get name', label: N_('Name') },
+      { command: 'get role', label: N_('Role') },
+      { command: 'ver', label: N_('Firmware') },
+      { command: 'board', label: N_('Board') },
     ],
   },
   {
-    title: 'Radio',
+    title: N_('Radio'),
     fields: [
       {
         command: 'get radio',
-        label: 'Radio',
+        label: N_('Radio'),
         parts: [
-          { label: 'Frequency', unit: 'MHz', decimals: 3 },
-          { label: 'Bandwidth', unit: 'kHz' },
-          { label: 'Spreading factor' },
-          { label: 'Coding rate' },
+          { label: N_('Frequency'), unit: 'MHz', decimals: 3 },
+          { label: N_('Bandwidth'), unit: 'kHz' },
+          { label: N_('Spreading factor') },
+          { label: N_('Coding rate') },
         ],
       },
-      { command: 'get tx', label: 'TX power', unit: 'dBm' },
-      { command: 'get radio.rxgain', label: 'RX boosted gain' },
+      { command: 'get tx', label: N_('TX power'), unit: 'dBm' },
+      { command: 'get radio.rxgain', label: N_('RX boosted gain') },
     ],
   },
   {
-    title: 'Location',
+    title: N_('Location'),
     fields: [
-      { command: 'get lat', label: 'Latitude' },
-      { command: 'get lon', label: 'Longitude' },
+      { command: 'get lat', label: N_('Latitude') },
+      { command: 'get lon', label: N_('Longitude') },
     ],
   },
   {
-    title: 'Features',
+    title: N_('Features'),
     fields: [
-      { command: 'get repeat', label: 'Packet forwarding' },
-      { command: 'get allow.read.only', label: 'Guest read-only access' },
-      { command: 'get multi.acks', label: 'Multi-ACKs' },
+      { command: 'get repeat', label: N_('Packet forwarding') },
+      { command: 'get allow.read.only', label: N_('Guest read-only access') },
+      { command: 'get multi.acks', label: N_('Multi-ACKs') },
     ],
   },
   {
-    title: 'Network health',
+    title: N_('Network health'),
     fields: [
-      { command: 'get loop.detect', label: 'Loop detection' },
-      { command: 'get dutycycle', label: 'Duty cycle' },
-      { command: 'get rxdelay', label: 'Receive delay' },
+      { command: 'get loop.detect', label: N_('Loop detection') },
+      { command: 'get dutycycle', label: N_('Duty cycle') },
+      { command: 'get rxdelay', label: N_('Receive delay') },
     ],
   },
   {
-    title: 'Advertisement',
+    title: N_('Advertisement'),
     fields: [
-      { command: 'get advert.interval', label: 'Local advert interval', unit: 'min' },
-      { command: 'get flood.advert.interval', label: 'Flood advert interval', unit: 'h' },
-      { command: 'get flood.max', label: 'Flood max hops' },
-      { command: 'get flood.max.advert', label: 'Flood max hops, adverts' },
-      { command: 'get flood.max.unscoped', label: 'Flood max hops, unscoped' },
+      { command: 'get advert.interval', label: N_('Local advert interval'), unit: 'min' },
+      { command: 'get flood.advert.interval', label: N_('Flood advert interval'), unit: 'h' },
+      { command: 'get flood.max', label: N_('Flood max hops') },
+      { command: 'get flood.max.advert', label: N_('Flood max hops, adverts') },
+      { command: 'get flood.max.unscoped', label: N_('Flood max hops, unscoped') },
     ],
   },
   {
-    title: 'Operator info',
-    fields: [{ command: 'get owner.info', label: 'Operator info' }],
+    title: N_('Operator info'),
+    fields: [{ command: 'get owner.info', label: N_('Operator info') }],
   },
   {
-    title: 'Advanced',
+    title: N_('Advanced'),
     fields: [
-      { command: 'get path.hash.mode', label: 'Node ID size in paths' },
-      { command: 'get txdelay', label: 'Flood TX delay' },
-      { command: 'get direct.txdelay', label: 'Direct TX delay' },
-      { command: 'get int.thresh', label: 'Interference threshold' },
-      { command: 'get cad', label: 'Channel activity detection' },
-      { command: 'get agc.reset.interval', label: 'AGC reset interval' },
-      { command: 'get adc.multiplier', label: 'Battery voltage calibration' },
+      { command: 'get path.hash.mode', label: N_('Node ID size in paths') },
+      { command: 'get txdelay', label: N_('Flood TX delay') },
+      { command: 'get direct.txdelay', label: N_('Direct TX delay') },
+      { command: 'get int.thresh', label: N_('Interference threshold') },
+      { command: 'get cad', label: N_('Channel activity detection') },
+      { command: 'get agc.reset.interval', label: N_('AGC reset interval') },
+      { command: 'get adc.multiplier', label: N_('Battery voltage calibration') },
     ],
   },
 ];
@@ -243,7 +243,7 @@ export class RepeaterSettings extends LitElement {
           this._setField(field.command, previous && 'readAt' in previous ? previous : { kind: 'no_response' });
           unanswered += 1;
           if (unanswered >= MAX_CONSECUTIVE_NO_RESPONSE) {
-            this._error = 'The repeater stopped answering. It may be out of reach, or it may no longer accept this login. In that case, log in again.';
+            this._error = t('The repeater stopped answering. It may be out of reach, or it may no longer accept this login. In that case, log in again.');
             return;
           }
         } else {
@@ -251,7 +251,7 @@ export class RepeaterSettings extends LitElement {
           if (previous) fields[field.command] = previous;
           else delete fields[field.command];
           this._fields = fields;
-          this._error = result.message ?? 'Reading the setting failed.';
+          this._error = result.message ?? t('Reading the setting failed.');
           return;
         }
       }
@@ -274,10 +274,10 @@ export class RepeaterSettings extends LitElement {
     if (state?.kind === 'loading') {
       value = '…';
     } else if (state?.kind === 'no_response') {
-      value = 'No response';
+      value = t('No response');
       problem = true;
     } else if (state?.kind === 'unsupported') {
-      value = 'Not supported';
+      value = t('Not supported');
       problem = true;
     } else if (state?.kind === 'value') {
       value = partIndex === undefined ? state.value : state.value.split(',')[partIndex]?.trim() ?? '';
@@ -295,20 +295,17 @@ export class RepeaterSettings extends LitElement {
   private _renderField(field: SettingField) {
     const state = this._fields[field.command];
     if (field.parts) {
-      return field.parts.map((part, index) => this._renderInput(part.label, part.unit, state, index, part.decimals));
+      return field.parts.map((part, index) => this._renderInput(t(part.label), part.unit, state, index, part.decimals));
     }
-    return this._renderInput(field.label, field.unit, state);
+    return this._renderInput(t(field.label), field.unit, state);
   }
 
   render() {
-    const cs = isCzech();
     const disabled = !this.canLoad || this._loading;
     return html`
-      ${this.canLoad ? '' : html`<div class="hint">Log in as administrator to load values.</div>`}
+      ${this.canLoad ? '' : html`<div class="hint">${t('Log in as administrator to load values.')}</div>`}
       ${this._waitSeconds
-        ? html`<div class="hint" role="status">${cs
-            ? `Limit provozu sítě, pokračuji za ${this._waitSeconds} s.`
-            : `Mesh traffic limit, continuing in ${this._waitSeconds} s.`}</div>`
+        ? html`<div class="hint" role="status">${t('Mesh traffic limit, continuing in {waitSeconds} s.', { waitSeconds: this._waitSeconds })}</div>`
         : ''}
       ${this._error ? html`<div class="error" role="alert">${this._error}</div>` : ''}
       ${REPEATER_SETTING_GROUPS.map((group) => {
@@ -317,9 +314,9 @@ export class RepeaterSettings extends LitElement {
         return html`
         <section>
           <div class="group-header">
-            <h4>${group.title}</h4>
+            <h4>${t(group.title)}</h4>
             <button ?disabled=${disabled} @click=${() => this._loadGroup(group)}>
-              ${loaded ? (cs ? 'Přenačíst' : 'Reload') : (cs ? 'Načíst' : 'Load')}
+              ${loaded ? (t('Reload')) : (t('Load'))}
             </button>
           </div>
           ${readAt

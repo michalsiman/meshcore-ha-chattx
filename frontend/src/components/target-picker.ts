@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { panelStyles } from '../styles';
@@ -232,34 +233,34 @@ export class TargetPicker extends LitElement {
           class="dialog"
           role="dialog"
           aria-modal="true"
-          aria-label="Choose trace target"
+          aria-label=${t('Choose trace target')}
           @click=${(e: Event) => e.stopPropagation()}>
           <div class="dialog-header">
-            <div class="dialog-title">Choose Trace Target</div>
-            <button class="dialog-close" aria-label="Close" @click=${this._close} title="Close">✕</button>
+            <div class="dialog-title">${t('Choose Trace Target')}</div>
+            <button class="dialog-close" aria-label=${t('Close')} @click=${this._close} title=${t('Close')}>✕</button>
           </div>
           <div class="dialog-content">
             <div class="filter-row">
               <div class="form-group" style="margin: 0;">
-                <label class="form-label">Type</label>
+                <label class="form-label">${t('Type')}</label>
                 <select
                   class="form-select"
                   .value=${this._typeFilter}
                   @change=${this._onTypeChange}
                 >
-                  <option value="all">All</option>
-                  <option value="client">Companion / Client</option>
-                  <option value="repeater">Repeater</option>
-                  <option value="room_server">Room Server</option>
-                  <option value="sensor">Sensor</option>
+                  <option value="all">${t('All')}</option>
+                  <option value="client">${t('Companion / Client')}</option>
+                  <option value="repeater">${t('Repeater')}</option>
+                  <option value="room_server">${t('Room Server')}</option>
+                  <option value="sensor">${t('Sensor')}</option>
                 </select>
               </div>
               <div class="form-group" style="margin: 0;">
-                <label class="form-label">Search</label>
+                <label class="form-label">${t('Search')}</label>
                 <input
                   class="form-input"
                   type="text"
-                  placeholder="Name or pubkey prefix…"
+                  placeholder=${t('Name or pubkey prefix…')}
                   .value=${this._search}
                   @input=${this._onSearchInput}
                   autocomplete="off"
@@ -269,12 +270,12 @@ export class TargetPicker extends LitElement {
             </div>
             <div class="results-list">
               ${filtered.length === 0
-                ? html`<div class="empty">No matching contacts</div>`
+                ? html`<div class="empty">${t('No matching contacts')}</div>`
                 : filtered.map(c => html`
                     <div
                       class="result-row"
                       @click=${() => this._select(c)}
-                      title="Trace to ${c.adv_name || c.pubkey_prefix}"
+                      title=${t('Trace to {pubkey_prefix}', { pubkey_prefix: c.adv_name || c.pubkey_prefix })}
                     >
                       <span class="result-icon">${this._iconFor(c.type)}</span>
                       <span class="result-name">${c.adv_name || c.pubkey_prefix}</span>

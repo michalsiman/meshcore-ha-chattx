@@ -1,3 +1,4 @@
+import { N_, t } from '../i18n';
 import { LitElement, html, css, svg, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
@@ -11,11 +12,11 @@ export interface RatePoint {
 // Errors = red); line style distinguishes route within a family
 // (Flood = solid, Direct = dashed).
 const SERIES: Array<{ key: string; label: string; color: string; dash: boolean }> = [
-  { key: 'sent_flood',  label: 'Sent · Flood',  color: 'var(--info, #2196f3)', dash: false },
-  { key: 'sent_direct', label: 'Sent · Direct', color: 'var(--info, #2196f3)', dash: true },
-  { key: 'recv_flood',  label: 'Recv · Flood',  color: 'var(--good, #4caf50)', dash: false },
-  { key: 'recv_direct', label: 'Recv · Direct', color: 'var(--good, #4caf50)', dash: true },
-  { key: 'errors',      label: 'Errors',        color: 'var(--bad, #f44336)',  dash: false },
+  { key: 'sent_flood',  label: N_('Sent · Flood'),  color: 'var(--info, #2196f3)', dash: false },
+  { key: 'sent_direct', label: N_('Sent · Direct'), color: 'var(--info, #2196f3)', dash: true },
+  { key: 'recv_flood',  label: N_('Recv · Flood'),  color: 'var(--good, #4caf50)', dash: false },
+  { key: 'recv_direct', label: N_('Recv · Direct'), color: 'var(--good, #4caf50)', dash: true },
+  { key: 'errors',      label: N_('Errors'),        color: 'var(--bad, #f44336)',  dash: false },
 ];
 
 /** Geometry + scales shared by the renderer and the pointer hit-test. */
@@ -126,7 +127,7 @@ export class MessageRateChart extends LitElement {
           ${SERIES.map(
             (s) => html`<div class="legend-item">
               <span class="legend-line ${s.dash ? 'dashed' : ''}"
-                    style="border-top-color:${s.color}"></span>${s.label}
+                    style="border-top-color:${s.color}"></span>${t(s.label)}
             </div>`,
           )}
         </div>
@@ -136,7 +137,7 @@ export class MessageRateChart extends LitElement {
 
   private _timeLabel(ts: number, now: number): string {
     const h = Math.round((now - ts) / 3_600_000);
-    return h <= 0 ? 'now' : `-${h}h`;
+    return h <= 0 ? t('now') : `-${h}h`;
   }
 
   /** Format a msg/min value for the tooltip; '—' when the bucket has no datum. */
@@ -263,7 +264,7 @@ export class MessageRateChart extends LitElement {
 
     return svg`
       <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img"
-           aria-label="Message rate over the last ${this.timeRange} hours"
+           aria-label=${t('Message rate over the last {timeRange} hours', { timeRange: this.timeRange })}
            @pointermove="${this._onPointerMove}"
            @pointerdown="${this._onPointerDown}"
            @pointerleave="${this._onPointerLeave}">
@@ -303,7 +304,7 @@ export class MessageRateChart extends LitElement {
         ${SERIES.map(
           (s) => html`<div class="tt-row">
             <span class="sw ${s.dash ? 'dashed' : ''}" style="border-top-color:${s.color}"></span>
-            <span class="lbl">${s.label}</span>
+            <span class="lbl">${t(s.label)}</span>
             <span class="val">${this._fmtValue(hp.values[s.key])}</span>
           </div>`,
         )}

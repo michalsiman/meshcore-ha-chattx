@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type {
   PanelConfig,
   ChatMessage,
@@ -519,7 +520,7 @@ export class MessageStore {
       this._retryCount = 0;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this._error = `Failed to fetch messages: ${message}`;
+      this._error = t('Failed to fetch messages: {message}', { message });
       this._retryCount++;
     } finally {
       this._loading = false;
@@ -603,7 +604,7 @@ export class MessageStore {
       this._retryCount = 0;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this._error = `Failed to fetch messages: ${message}`;
+      this._error = t('Failed to fetch messages: {message}', { message });
       this._retryCount++;
     } finally {
       this._loading = false;

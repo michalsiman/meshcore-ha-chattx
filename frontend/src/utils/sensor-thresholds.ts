@@ -1,3 +1,4 @@
+import { N_ } from '../i18n';
 // Threshold table and band evaluation for the node-summary aggregated card.
 //
 // Single source of truth for the colour bands used by hero tiles and the
@@ -63,9 +64,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 100,
     direction: 'higher_better',
     classify: (v) => (v < 20 ? 'bad' : v < 50 ? 'warn' : 'good'),
-    tooltip:
-      'Green ≥ 50%, Yellow 20–50%, Red < 20% (critical < 10%). ' +
-      'Home Assistant low-battery convention.',
+    tooltip: N_('Green ≥ 50%, Yellow 20–50%, Red < 20% (critical < 10%). Home Assistant low-battery convention.'),
     source:
       'https://community.home-assistant.io/t/low-battery-level-detection-notification-for-all-battery-sensors/258664',
   },
@@ -76,9 +75,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: -30,
     direction: 'higher_better',
     classify: (v) => (v < -115 ? 'bad' : v < -100 ? 'warn' : 'good'),
-    tooltip:
-      'Green > −100 dBm, Yellow −100 to −115 dBm, Red < −115 dBm. ' +
-      'Lower (more negative) RSSI means a weaker received signal.',
+    tooltip: N_('Green > −100 dBm, Yellow −100 to −115 dBm, Red < −115 dBm. Lower (more negative) RSSI means a weaker received signal.'),
     source: 'https://www.thethingsnetwork.org/docs/lorawan/rssi-and-snr/',
   },
 
@@ -88,9 +85,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 20,
     direction: 'higher_better',
     classify: (v) => (v < -7 ? 'bad' : v < 0 ? 'warn' : 'good'),
-    tooltip:
-      'Green > 0 dB, Yellow −7 to 0 dB, Red < −7 dB. ' +
-      'Demodulation floor is spreading-factor dependent (Semtech AN1200.13).',
+    tooltip: N_('Green > 0 dB, Yellow −7 to 0 dB, Red < −7 dB. Demodulation floor is spreading-factor dependent (Semtech AN1200.13).'),
     source:
       'https://www.openhacks.com/uploadsproductos/loradesignguide_std.pdf',
   },
@@ -101,10 +96,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: -90,
     direction: 'lower_better',
     classify: (v) => (v > -105 ? 'bad' : v > -115 ? 'warn' : 'good'),
-    tooltip:
-      'Green < −115 dBm, Yellow −115 to −105 dBm, Red > −105 dBm. ' +
-      'Above −105 dBm typically indicates man-made RF interference, ' +
-      'not thermal noise.',
+    tooltip: N_('Green < −115 dBm, Yellow −115 to −105 dBm, Red > −105 dBm. Above −105 dBm typically indicates man-made RF interference, not thermal noise.'),
     source:
       'https://www.openhacks.com/uploadsproductos/loradesignguide_std.pdf',
   },
@@ -115,10 +107,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 20,
     direction: 'lower_better',
     classify: (v) => (v > 10 ? 'bad' : v > 2 ? 'warn' : 'good'),
-    tooltip:
-      'Green < 2%, Yellow 2–10%, Red > 10%. ' +
-      'EU868 sub-band 1% / general 10% duty-cycle ceiling ' +
-      '(ETSI EN 300 220-2; eCFR 47 CFR 15.247).',
+    tooltip: N_('Green < 2%, Yellow 2–10%, Red > 10%. EU868 sub-band 1% / general 10% duty-cycle ceiling (ETSI EN 300 220-2; eCFR 47 CFR 15.247).'),
     source:
       'https://www.etsi.org/deliver/etsi_en/300200_300299/30022002/03.03.01_60/en_30022002v030301p.pdf',
   },
@@ -128,10 +117,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 100,
     direction: 'lower_better',
     classify: (v) => (v > 50 ? 'bad' : v > 25 ? 'warn' : 'good'),
-    tooltip:
-      'Green < 25%, Yellow 25–50%, Red > 50%. ' +
-      'High RX utilisation usually means heavy mesh traffic or ' +
-      'environmental interference saturating the receiver.',
+    tooltip: N_('Green < 25%, Yellow 25–50%, Red > 50%. High RX utilisation usually means heavy mesh traffic or environmental interference saturating the receiver.'),
     // Editorial — no published threshold for receive-side saturation.
   },
 
@@ -140,9 +126,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 100,
     direction: 'lower_better',
     classify: (v) => (v > 50 ? 'bad' : v > 25 ? 'warn' : 'good'),
-    tooltip:
-      'Green < 25%, Yellow 25–50%, Red > 50%. ' +
-      'Channel utilisation aggregates all activity on the radio channel.',
+    tooltip: N_('Green < 25%, Yellow 25–50%, Red > 50%. Channel utilisation aggregates all activity on the radio channel.'),
     // Editorial.
   },
 
@@ -151,10 +135,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 32,
     direction: 'lower_better',
     classify: (v) => (v >= 16 ? 'bad' : v >= 7 ? 'warn' : 'good'),
-    tooltip:
-      'Green ≤ 6, Yellow 7–15, Red ≥ 16. ' +
-      'MeshCore allows up to 64 hops; community-recommended meshes run ' +
-      'well under 32. Each hop adds airtime cost and latency.',
+    tooltip: N_('Green ≤ 6, Yellow 7–15, Red ≥ 16. MeshCore allows up to 64 hops; community-recommended meshes run well under 32. Each hop adds airtime cost and latency.'),
     source: 'https://nodakmesh.org/blog/meshcore-path-hash-explained',
   },
 
@@ -163,9 +144,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 168, // 1 week
     direction: 'higher_better',
     classify: (v) => (v < 1 ? 'bad' : v < 24 ? 'warn' : 'good'),
-    tooltip:
-      'Green > 24 h, Yellow 1–24 h, Red < 1 h. ' +
-      'Very recent reboot suggests a watchdog reset or brownout.',
+    tooltip: N_('Green > 24 h, Yellow 1–24 h, Red < 1 h. Very recent reboot suggests a watchdog reset or brownout.'),
     // Editorial.
   },
 
@@ -174,11 +153,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 6,
     direction: 'lower_better',
     classify: (v) => (v > 4 ? 'bad' : v > 2 ? 'warn' : 'good'),
-    tooltip:
-      'Green < 2 h, Yellow 2–4 h, Red > 4 h. ' +
-      'Should be tuned to the node’s advertising interval; nodes ' +
-      'that advertise hourly should appear far more often than nodes ' +
-      'that advertise every 6 hours.',
+    tooltip: N_('Green < 2 h, Yellow 2–4 h, Red > 4 h. Should be tuned to the node’s advertising interval; nodes that advertise hourly should appear far more often than nodes that advertise every 6 hours.'),
     // Editorial.
   },
 
@@ -187,11 +162,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 100,
     direction: 'higher_better',
     classify: (v) => (v < 70 ? 'bad' : v < 90 ? 'warn' : 'good'),
-    tooltip:
-      'Green > 90%, Yellow 70–90%, Red < 70%. ' +
-      'Caller is responsible for the min-sample floor — bars should ' +
-      'render with band="info" until at least 50 attempts have ' +
-      'accumulated.',
+    tooltip: N_('Green > 90%, Yellow 70–90%, Red < 70%. Caller is responsible for the min-sample floor — bars should render with band="info" until at least 50 attempts have accumulated.'),
     // Editorial — no published MeshCore threshold.
   },
 
@@ -209,7 +180,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     //   https://meshtastic.org/docs/overview/mesh-algo/
     //   https://github.com/meshcore-dev/MeshCore/blob/main/docs/faq.md
     classify: () => 'info',
-    tooltip: '',
+    tooltip: N_(''),
   },
 
   tx_queue_len: {
@@ -217,10 +188,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 30,
     direction: 'lower_better',
     classify: (v) => (v > 10 ? 'bad' : v > 5 ? 'warn' : 'good'),
-    tooltip:
-      'Number of messages queued for transmission. ' +
-      'Healthy nodes drain the queue quickly. Sustained backlog (> 10) ' +
-      'indicates channel saturation or a stuck transmitter.',
+    tooltip: N_('Number of messages queued for transmission. Healthy nodes drain the queue quickly. Sustained backlog (> 10) indicates channel saturation or a stuck transmitter.'),
     // Threshold is a UI design choice; no published MeshCore band.
   },
 
@@ -240,10 +208,7 @@ const METRICS: Record<MetricKey, MetricSpec> = {
     displayMax: 140,
     direction: 'higher_better',
     classify: (v) => (v < 0 || v > 125 ? 'bad' : 'good'),
-    tooltip:
-      'Red below 0°F (≈ −18°C) or above 125°F (≈ 52°C); ' +
-      'green otherwise. Extreme ambient temperatures risk damage to ' +
-      'the radio, battery, or enclosure.',
+    tooltip: N_('Red below 0°F (≈ −18°C) or above 125°F (≈ 52°C); green otherwise. Extreme ambient temperatures risk damage to the radio, battery, or enclosure.'),
     // No source — chosen for electronics-stress, not ambient comfort.
   },
 };
@@ -276,11 +241,11 @@ export function evaluateSensor(
   value: number,
 ): SensorEval {
   if (!Number.isFinite(value)) {
-    return { band: 'info', fillPct: 0, tooltip: '' };
+    return { band: 'info', fillPct: 0, tooltip: N_('') };
   }
   const spec = METRICS[metricKey];
   if (!spec) {
-    return { band: 'info', fillPct: 0, tooltip: '' };
+    return { band: 'info', fillPct: 0, tooltip: N_('') };
   }
   return {
     band: spec.classify(value),

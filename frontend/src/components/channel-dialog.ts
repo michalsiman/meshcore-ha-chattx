@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
@@ -144,7 +145,7 @@ export class ChannelDialog extends LitElement {
           class="dialog"
           role="dialog"
           aria-modal="true"
-          aria-label=${this.editMode ? 'Edit channel' : 'Add channel'}>
+          aria-label=${this.editMode ? t('Edit channel') : t('Add channel')}>
           <div class="dialog-header">
             <div class="dialog-header-title">${this.editMode ? 'Edit Channel' : 'Add Channel'}</div>
           </div>
@@ -157,7 +158,7 @@ export class ChannelDialog extends LitElement {
 
             <!-- Channel Index -->
             <div class="form-group">
-              <label class="form-label required">Channel Index</label>
+              <label class="form-label required">${t('Channel Index')}</label>
               ${this.editMode
                 ? html`
                     <select class="form-select" disabled>
@@ -179,22 +180,22 @@ export class ChannelDialog extends LitElement {
 
             <!-- Channel Name -->
             <div class="form-group">
-              <label class="form-label required">Channel Name</label>
+              <label class="form-label required">${t('Channel Name')}</label>
               <input
                 type="text"
                 class="form-input"
-                placeholder="e.g., general, alerts"
+                placeholder=${t('e.g., general, alerts')}
                 .value=${this._channelName}
                 @input=${(e: Event) => {
                   this._channelName = (e.target as HTMLInputElement).value;
                 }}
               />
-              <div class="form-description">Friendly name for the channel</div>
+              <div class="form-description">${t('Friendly name for the channel')}</div>
             </div>
 
             <!-- Region Scope -->
             <div class="form-group">
-              <label class="form-label">Region scope</label>
+              <label class="form-label">${t('Region scope')}</label>
               ${this._renderScopeField()}
             </div>
 
@@ -208,10 +209,10 @@ export class ChannelDialog extends LitElement {
                     this._autoKey = (e.target as HTMLInputElement).checked;
                   }}
                 />
-                <span class="form-toggle-label">Auto-generate key from name</span>
+                <span class="form-toggle-label">${t('Auto-generate key from name')}</span>
               </label>
               <div class="form-description">
-                Auto-key generates SHA256 hash of the channel name
+                ${t('Auto-key generates SHA256 hash of the channel name')}
               </div>
             </div>
 
@@ -219,11 +220,11 @@ export class ChannelDialog extends LitElement {
             ${!this._autoKey
               ? html`
                   <div class="form-group">
-                    <label class="form-label required">Custom Key</label>
+                    <label class="form-label required">${t('Custom Key')}</label>
                     <input
                       type="text"
                       class="form-input hex-input"
-                      placeholder="32 hex characters (a-f, 0-9)"
+                      placeholder=${t('32 hex characters (a-f, 0-9)')}
                       .value=${this._customKey}
                       @input=${(e: Event) => {
                         const val = (e.target as HTMLInputElement).value
@@ -235,7 +236,7 @@ export class ChannelDialog extends LitElement {
                     <div class="hex-counter">${this._customKey.length} / 32 hex characters</div>
                     <div class="form-description">
                       ${hexValid
-                        ? 'Valid hex key (16 bytes / 128-bit AES)'
+                        ? t('Valid hex key (16 bytes / 128-bit AES)')
                         : `Invalid: expected 32 characters, got ${hexLength}`}
                     </div>
                   </div>
@@ -247,13 +248,13 @@ export class ChannelDialog extends LitElement {
               class="dialog-button"
               ?disabled=${this._saving}
               @click=${this._onCancel}>
-              Cancel
+              ${t('Cancel')}
             </button>
             <button
               class="dialog-button primary"
               ?disabled=${!this._channelName || this._saving || (!this._autoKey && !hexValid) || (!this.editMode && this.availableIndices.length === 0)}
               @click=${this._onSave}>
-              ${this._saving ? 'Saving...' : 'Save'}
+              ${this._saving ? t('Saving...') : t('Save')}
             </button>
           </div>
         </div>
@@ -274,7 +275,7 @@ export class ChannelDialog extends LitElement {
     if (scopes === null) {
       return html`
         <select class="form-select scope-select" disabled>
-          <option selected>Loading…</option>
+          <option selected>${t('Loading…')}</option>
         </select>
       `;
     }
@@ -298,14 +299,14 @@ export class ChannelDialog extends LitElement {
     if (scopes.length === 0 && !orphaned && !this._globalAllowed) {
       return html`
         <select class="form-select scope-select" disabled>
-          <option selected>All regions (global flood)</option>
+          <option selected>${t('All regions (global flood)')}</option>
         </select>
         <div class="form-description scope-empty-hint">
-          No region scopes are configured yet. Add scope names in the
+          ${t('No region scopes are configured yet. Add scope names in the')}
           <a
             href="/config/integrations/integration/meshcore"
             target="_blank"
-            rel="noopener">MeshCore integration</a>
+            rel="noopener">${t('MeshCore integration')}</a>
           first (Configure → Global Settings → Flood Scope Allowlist),
           then reopen this dialog. Region names are agreed within your
           local mesh community — check your community's reference, or
@@ -320,7 +321,7 @@ export class ChannelDialog extends LitElement {
         @change=${(e: Event) => {
           this._scope = (e.target as HTMLSelectElement).value;
         }}>
-        <option value=${globalValue} ?selected=${globalSelected}>All regions (global flood)</option>
+        <option value=${globalValue} ?selected=${globalSelected}>${t('All regions (global flood)')}</option>
         ${orphaned
           ? html`<option value=${this._scope} selected>${this._scope} (not in allowlist)</option>`
           : ''}
@@ -331,8 +332,7 @@ export class ChannelDialog extends LitElement {
         )}
       </select>
       <div class="form-description">
-        Send this channel's messages only through repeaters configured
-        for the selected region. "All regions" floods the whole mesh.
+        ${t('Send this channel\'s messages only through repeaters configured for the selected region. "All regions" floods the whole mesh.')}
       </div>
     `;
   }
@@ -369,10 +369,10 @@ export class ChannelDialog extends LitElement {
         );
         this._reset();
       } else {
-        this._error = 'Failed to save channel';
+        this._error = t('Failed to save channel');
       }
     } catch (error) {
-      this._error = `Error: ${String(error)}`;
+      this._error = t('Error: {error}', { error: String(error) });
     } finally {
       this._saving = false;
     }

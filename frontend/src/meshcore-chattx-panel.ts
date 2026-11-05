@@ -1,3 +1,4 @@
+import { t, setHassLanguage } from './i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice } from './types';
@@ -711,6 +712,10 @@ export class MeshCorePanel extends LitElement {
     return this._devices.find((d) => d.entry_id === this._selectedEntryId);
   }
 
+  protected willUpdate() {
+    setHassLanguage(this.hass?.language);
+  }
+
   render() {
     if (this._loading) {
       return html`
@@ -730,18 +735,18 @@ export class MeshCorePanel extends LitElement {
       // copy, so point the user at Settings → System → Repairs.
       // Other error strings (e.g. "Failed to load: ...") keep the
       // legacy generic copy.
-      const isNoDevices = this._error === 'No MeshCore devices found';
+      const isNoDevices = this._error === t('No MeshCore devices found');
       return html`
         <div class="panel">
           <div class="center-message">
             <div>
-              <p>${this._error}</p>
+              <p>${t(this._error)}</p>
               <p style="font-size: 12px; margin-top: 8px;">
                 ${isNoDevices
-                  ? html`Open <a href="/config/repairs">Settings &rarr; System &rarr; Repairs</a>
-                         for setup guidance, or add the MeshCore integration via
-                         <a href="/config/integrations">Settings &rarr; Devices &amp; Services</a>.`
-                  : 'Check that the MeshCore integration is loaded and connected.'}
+                  ? html`${t('Open')} <a href="/config/repairs">${t('Settings → System → Repairs')}</a>
+                         ${t('for setup guidance, or add the MeshCore integration via')}
+                         <a href="/config/integrations">${t('Settings → Devices & Services')}</a>.`
+                  : t('Check that the MeshCore integration is loaded and connected.')}
               </p>
             </div>
           </div>
@@ -756,13 +761,13 @@ export class MeshCorePanel extends LitElement {
         <div class="panel-header">
           <div class="header-left">
             ${this.narrow || this.hass?.dockedSidebar === 'always_hidden'
-              ? html`<button class="menu-icon" @click=${this._toggleMenu} aria-label="Toggle sidebar">
+              ? html`<button class="menu-icon" @click=${this._toggleMenu} aria-label=${t('Toggle sidebar')}>
                   <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
                 </button>`
               : html``}
             <div class="panel-title">
-              <span class="title-full">MeshCore Chattx</span>
-              <span class="title-short">MC Chattx</span>
+              <span class="title-full">${t('MeshCore Chattx')}</span>
+              <span class="title-short">${t('MC Chattx')}</span>
             </div>
           </div>
           <div class="header-right">
@@ -770,7 +775,7 @@ export class MeshCorePanel extends LitElement {
               ? html`
                   <span class="connection-status ${this._getNodeStatus(device) === 'online' ? 'online' : 'offline'}">
                     <span class="status-dot ${this._getNodeStatus(device) === 'online' ? 'online' : 'offline'}"></span>
-                    ${this._getNodeStatus(device) === 'online' ? 'Connected' : 'Disconnected'}
+                    ${this._getNodeStatus(device) === 'online' ? t('Connected') : t('Disconnected')}
                   </span>`
               : html``}
             ${device && this._getBatteryLevel(device) !== null
@@ -839,22 +844,22 @@ export class MeshCorePanel extends LitElement {
           <button
             class=${this._activeTab === 'chat' ? 'active' : ''}
             @click=${() => (this._activeTab = 'chat')}>
-            Chat
+            ${t('Chat')}
           </button>
           <button
             class=${this._activeTab === 'devices' ? 'active' : ''}
             @click=${() => (this._activeTab = 'devices')}>
-            Devices
+            ${t('Devices')}
           </button>
           <button
             class=${this._activeTab === 'nodes' ? 'active' : ''}
             @click=${() => (this._activeTab = 'nodes')}>
-            Nodes
+            ${t('Nodes')}
           </button>
           <button
             class=${this._activeTab === 'settings' ? 'active' : ''}
             @click=${() => (this._activeTab = 'settings')}>
-            Settings
+            ${t('Settings')}
           </button>
         </div>
 
@@ -980,7 +985,7 @@ export class MeshCorePanel extends LitElement {
       this._devices = devices;
 
       if (devices.length === 0) {
-        this._error = 'No MeshCore devices found';
+        this._error = t('No MeshCore devices found');
         this._loading = false;
         return;
       }
@@ -1004,7 +1009,7 @@ export class MeshCorePanel extends LitElement {
       await this._loadUnreadCounts();
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this._error = `Failed to load: ${message}`;
+      this._error = t('Failed to load: {message}', { message });
       console.error('MeshCore panel load error:', err);
     } finally {
       this._loading = false;
@@ -1257,7 +1262,7 @@ export class MeshCorePanel extends LitElement {
       // prefer the human-readable message, fall back to code, then to
       // a generic string.  Never call String(err) on the raw object —
       // it yields "[object Object]".
-      this._traceDialogError = err?.message || err?.code || 'Unknown error';
+      this._traceDialogError = err?.message || err?.code || t('Unknown error');
     }
   };
 

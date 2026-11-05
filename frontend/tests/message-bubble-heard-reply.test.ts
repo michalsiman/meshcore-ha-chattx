@@ -46,27 +46,27 @@ describe('message dialog reply actions', () => {
 
   it('puts the sender and the fewest hops in the composer text', async () => {
     const { el, actions } = await openDialog(makeMessage());
-    const heard = actions().find((b) => b.textContent!.includes('Slyším'))!;
-    expect(heard.textContent!.trim()).toBe('Slyším, 3 hops!');
+    const heard = actions().find((b) => b.textContent!.includes('Heard'))!;
+    expect(heard.textContent!.trim()).toBe('Heard, 3 hops!');
 
     const details: Array<{ mention: string }> = [];
     el.addEventListener('reply-to-sender', (e) => details.push((e as CustomEvent).detail));
     heard.click();
-    expect(details).toEqual([{ mention: '@[Alice] Slyším, 3 hops! ' }]);
+    expect(details).toEqual([{ mention: '@[Alice] Heard, 3 hops! ' }]);
   });
 
   it('uses the singular for one hop and keeps zero hops', async () => {
     const one = await openDialog(makeMessage({ rxLogData: [{ hop_count: 1 }] }));
-    expect(one.actions().some((b) => b.textContent!.includes('Slyším, 1 hop!'))).toBe(true);
+    expect(one.actions().some((b) => b.textContent!.includes('Heard, 1 hop!'))).toBe(true);
     const zero = await openDialog(makeMessage({ rxLogData: [{ hop_count: 0 }] }));
-    expect(zero.actions().some((b) => b.textContent!.includes('Slyším, 0 hops!'))).toBe(true);
+    expect(zero.actions().some((b) => b.textContent!.includes('Heard, 0 hops!'))).toBe(true);
   });
 
   it('hides the option without a hop count or on own messages', async () => {
     const unknown = await openDialog(makeMessage({ rxLogData: [{ snr: 5 }] }));
-    expect(unknown.actions().some((b) => b.textContent!.includes('Slyším'))).toBe(false);
+    expect(unknown.actions().some((b) => b.textContent!.includes('Heard'))).toBe(false);
     const own = await openDialog(makeMessage({ isOutgoing: true }));
-    expect(own.actions().some((b) => b.textContent!.includes('Slyším'))).toBe(false);
+    expect(own.actions().some((b) => b.textContent!.includes('Heard'))).toBe(false);
   });
 
   it('translates the buttons for Czech browsers only', async () => {

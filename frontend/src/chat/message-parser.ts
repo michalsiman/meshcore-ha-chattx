@@ -1,3 +1,4 @@
+import { getLanguage, getLocale, t } from '../i18n';
 import type { PanelConfig, ChatMessage, StoredMessage, DeliveryStatus, MessageGroup, RenderItem } from '../types';
 import {
   MENTION_BRACKET_REGEX,
@@ -223,12 +224,12 @@ export function formatDateSeparator(date: Date): string {
   const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const diffDays = Math.floor((today.getTime() - target.getTime()) / 86400000);
 
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
+  if (diffDays === 0) return t('Today');
+  if (diffDays === 1) return t('Yesterday');
   if (diffDays < 7) {
-    return date.toLocaleDateString(undefined, { weekday: 'long' });
+    return date.toLocaleDateString(getLocale(), { weekday: 'long' });
   }
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(getLocale(), {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -297,7 +298,7 @@ export function formatRelativeTime(date: Date): string {
   if (diffSec < 60) return 'now';
   if (diffMin < 60) return `${diffMin}m`;
   if (diffHour < 24) return `${diffHour}h`;
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
 }
 
 /**
@@ -323,11 +324,11 @@ export function pathHashSize(rxLogData: Array<Record<string, unknown>> | undefin
 /**
  * Label for the fewest hops any received copy of a message took, with the
  * path's bytes per hop when known, or '' when no copy reports a hop count.
- * Czech for cs browsers, English otherwise.
+ * In the panel language.
  */
 export function formatHopLabel(
   rxLogData: Array<Record<string, unknown>> | undefined,
-  language: string = typeof navigator !== 'undefined' ? navigator.language : 'en',
+  language: string = getLanguage(),
 ): string {
   const hops = fewestHops(rxLogData);
   if (hops === null) return '';
@@ -346,9 +347,9 @@ export function formatTimestamp(date: Date, format: 'relative' | 'time' | 'datet
     case 'relative':
       return formatRelativeTime(date);
     case 'time':
-      return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+      return date.toLocaleTimeString(getLocale(), { hour: 'numeric', minute: '2-digit' });
     case 'datetime':
-      return date.toLocaleString(undefined, {
+      return date.toLocaleString(getLocale(), {
         month: 'short',
         day: 'numeric',
         hour: 'numeric',

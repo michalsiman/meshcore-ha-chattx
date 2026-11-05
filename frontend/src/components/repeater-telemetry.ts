@@ -1,8 +1,8 @@
+import { N_, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterTelemetry, type TelemetrySensor } from '../api';
-import { isCzech } from '../utils/language';
 import './read-age-note';
 
 // Units of the Cayenne LPP types, as the core meshcore integration shows them.
@@ -31,11 +31,11 @@ const UNITS: Record<string, string> = {
 /** Firmware reports the node's battery voltage and MCU temperature on this channel. */
 const SELF_CHANNEL = 1;
 const SELF_NAMES: Record<string, string> = {
-  voltage: 'Battery voltage',
-  temperature: 'MCU temperature',
+  voltage: N_('Battery voltage'),
+  temperature: N_('MCU temperature'),
 };
 
-const PLACEHOLDERS = ['Battery voltage (V)', 'MCU temperature (°C)'];
+const PLACEHOLDERS = [{ channel: SELF_CHANNEL, type: 'voltage' }, { channel: SELF_CHANNEL, type: 'temperature' }];
 
 function title(type: string): string {
   return type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ');
@@ -44,8 +44,8 @@ function title(type: string): string {
 export function telemetryLabel(sensor: TelemetrySensor): string {
   const unit = UNITS[sensor.type];
   const name = sensor.channel === SELF_CHANNEL
-    ? SELF_NAMES[sensor.type] ?? title(sensor.type)
-    : `${title(sensor.type)}, channel ${sensor.channel}`;
+    ? t(SELF_NAMES[sensor.type] ?? title(sensor.type))
+    : t('{sensor}, channel {channel}', { sensor: t(title(sensor.type)), channel: sensor.channel });
   return unit ? `${name} (${unit})` : name;
 }
 
@@ -157,9 +157,9 @@ export class RepeaterTelemetry extends LitElement {
         this._sensors = result.sensors ?? [];
         this._readAt = new Date().toISOString();
       } else if (result.reason === 'no_response') {
-        this._error = 'The repeater did not answer. It may be out of reach, or it may no longer accept this login. In that case, log in again.';
+        this._error = t('The repeater did not answer. It may be out of reach, or it may no longer accept this login. In that case, log in again.');
       } else {
-        this._error = result.message ?? 'Reading telemetry failed.';
+        this._error = result.message ?? t('Reading telemetry failed.');
       }
     } finally {
       if (prefix === this.prefix) this._loading = false;
@@ -171,29 +171,28 @@ export class RepeaterTelemetry extends LitElement {
   }
 
   render() {
-    const cs = isCzech();
     const loaded = this._sensors !== null;
     return html`
       ${this._error ? html`<div class="error" role="alert">${this._error}</div>` : ''}
       <div class="header">
         ${this._waitSeconds
-          ? html`<span class="hint" role="status">${cs ? `Limit provozu sítě, pokračuji za ${this._waitSeconds} s.` : `Mesh traffic limit, continuing in ${this._waitSeconds} s.`}</span>`
+          ? html`<span class="hint" role="status">${t('Mesh traffic limit, continuing in {waitSeconds} s.', { waitSeconds: this._waitSeconds })}</span>`
           : this._readAt
             ? html`<chattx-read-age-note .readAt=${this._readAt}></chattx-read-age-note>`
             : ''}
         <button ?disabled=${!this.canLoad || this._loading} @click=${this._load}>
           ${this._loading
-            ? (cs ? 'Načítám…' : 'Loading…')
-            : loaded ? (cs ? 'Přenačíst' : 'Reload') : (cs ? 'Načíst' : 'Load')}
+            ? (t('Loading…'))
+            : loaded ? (t('Reload')) : (t('Load'))}
         </button>
       </div>
       ${loaded && this._sensors!.length === 0
-        ? html`<div class="hint">${cs ? 'Repeater nehlásí žádné senzory.' : 'The repeater reports no sensors.'}</div>`
+        ? html`<div class="hint">${t('The repeater reports no sensors.')}</div>`
         : html`<div class="fields">${loaded
           ? [...this._sensors!]
             .sort((a, b) => a.channel - b.channel)
             .map((sensor) => this._field(telemetryLabel(sensor), telemetryValue(sensor)))
-          : PLACEHOLDERS.map((label) => this._field(label, ''))}</div>`}
+          : PLACEHOLDERS.map((sensor) => this._field(telemetryLabel(sensor as TelemetrySensor), ''))}</div>`}
     `;
   }
 }

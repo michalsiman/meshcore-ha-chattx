@@ -1,3 +1,4 @@
+import { getLocale, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { Contact } from '../types';
@@ -120,7 +121,7 @@ export class ContactCard extends LitElement {
           <div class="contact-name">${c.adv_name}</div>
           <div class="contact-prefix">${c.pubkey_prefix}</div>
           <div class="contact-meta">
-            ${c.lastmod ? `Last heard ${new Date(c.lastmod * 1000).toLocaleString()}` : ''}
+            ${c.lastmod ? t('Last heard {lastmod}', { lastmod: new Date(c.lastmod * 1000).toLocaleString(getLocale()) }) : ''}
           </div>
         </div>
         <span class="category-badge ${catCls}">${catLabel}</span>
@@ -129,8 +130,8 @@ export class ContactCard extends LitElement {
   }
 
   private _getCategoryBadge(c: Contact): { label: string; cls: string } {
-    if (c.added_to_node) return { label: 'Added', cls: 'added' };
-    return { label: 'Discovered', cls: 'discovered' };
+    if (c.added_to_node) return { label: t('Added'), cls: 'added' };
+    return { label: t('Discovered'), cls: 'discovered' };
   }
 
   private _getTypeClass(type: number): string {

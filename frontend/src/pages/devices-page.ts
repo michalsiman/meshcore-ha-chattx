@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { panelStyles } from '../styles';
@@ -689,7 +690,7 @@ export class DevicesPage extends LitElement {
 
   render() {
     if (!this.hass) {
-      return html`<div class="content-area"><div class="loading-state"><div class="loading-spinner"></div> Initializing...</div></div>`;
+      return html`<div class="content-area"><div class="loading-state"><div class="loading-spinner"></div> ${t('Initializing...')}</div></div>`;
     }
 
     return html`
@@ -698,15 +699,15 @@ export class DevicesPage extends LitElement {
           ${this._error ? html`<div class="error-state"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg> ${this._error}</div>` : nothing}
 
           ${this._loading
-            ? html`<div class="loading-state"><div class="loading-spinner"></div> Loading devices...</div>`
+            ? html`<div class="loading-state"><div class="loading-spinner"></div> ${t('Loading devices...')}</div>`
             : html`
                 ${this._renderDeviceSections(this._managedDevices.repeaters, 'repeater')}
                 ${this._renderDeviceSections(this._managedDevices.clients, 'client')}
                 ${this._managedDevices.repeaters.length === 0 && this._managedDevices.clients.length === 0
                   ? html`
                       <div class="empty-state">
-                        <div class="empty-text">No managed devices</div>
-                        <div class="empty-subtext">Add repeaters or clients in Settings → Integration to manage them here.</div>
+                        <div class="empty-text">${t('No managed devices')}</div>
+                        <div class="empty-subtext">${t('Add repeaters or clients in Settings → Integration to manage them here.')}</div>
                       </div>
                     `
                   : nothing}
@@ -741,18 +742,18 @@ export class DevicesPage extends LitElement {
              @pointerdown=${this._onOverlayPointerDown}
              @click=${this._closeContextMenu}>
           <div class="modal-card" data-a11y="tile-context"
-               role="dialog" aria-modal="true" aria-label="${this._contextMenu.label} actions"
+               role="dialog" aria-modal="true" aria-label=${t('{label} actions', { label: this._contextMenu.label })}
                @click=${(e: Event) => e.stopPropagation()}
                @pointerdown=${(e: Event) => e.stopPropagation()}>
             <div class="modal-header">
               <span class="modal-title">${this._contextMenu.label}</span>
-              <button class="modal-close" aria-label="Close" @click=${this._dismissContextMenu}
+              <button class="modal-close" aria-label=${t('Close')} @click=${this._dismissContextMenu}
                       @pointerdown=${(e: Event) => e.stopPropagation()}>&times;</button>
             </div>
             <div class="modal-body">
               <button class="modal-action danger" @click=${this._hideSensorFromContext}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg></span>
-                Hide Sensor
+                ${t('Hide Sensor')}
               </button>
             </div>
           </div>
@@ -765,18 +766,18 @@ export class DevicesPage extends LitElement {
              @pointerdown=${this._onOverlayPointerDown}
              @click=${this._closeNeighborContextMenu}>
           <div class="modal-card" data-a11y="neighbor-context"
-               role="dialog" aria-modal="true" aria-label="${this._neighborContextMenu.name} actions"
+               role="dialog" aria-modal="true" aria-label=${t('{name} actions', { name: this._neighborContextMenu.name })}
                @click=${(e: Event) => e.stopPropagation()}
                @pointerdown=${(e: Event) => e.stopPropagation()}>
             <div class="modal-header">
               <span class="modal-title">${this._neighborContextMenu.name}</span>
-              <button class="modal-close" aria-label="Close" @click=${this._dismissNeighborContextMenu}
+              <button class="modal-close" aria-label=${t('Close')} @click=${this._dismissNeighborContextMenu}
                       @pointerdown=${(e: Event) => e.stopPropagation()}>&times;</button>
             </div>
             <div class="modal-body">
               <button class="modal-action danger" @click=${this._removeNeighborFromContext}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></span>
-                Remove Neighbor
+                ${t('Remove Neighbor')}
               </button>
             </div>
           </div>
@@ -789,11 +790,11 @@ export class DevicesPage extends LitElement {
         return ctx ? html`
         <div class="modal-overlay" @click=${this._closeSettingsModal}>
           <div class="modal-card" data-a11y="device-settings"
-               role="dialog" aria-modal="true" aria-label="${ctx.name} settings"
+               role="dialog" aria-modal="true" aria-label=${t('{name} settings', { name: ctx.name })}
                @click=${(e: Event) => e.stopPropagation()}>
             <div class="modal-header">
               <span class="modal-title">${ctx.name} Settings</span>
-              <button class="modal-close" aria-label="Close" @click=${this._closeSettingsModal}>&times;</button>
+              <button class="modal-close" aria-label=${t('Close')} @click=${this._closeSettingsModal}>&times;</button>
             </div>
             <div class="modal-body">
               <button class="modal-action" @click=${this._openHiddenSensorsList}>
@@ -804,7 +805,7 @@ export class DevicesPage extends LitElement {
               <!-- Issue Command -->
               <button class="modal-action" ?disabled=${!ctx.isOnline} @click=${() => { this._closeSettingsModal(); this._openCommandDialog(ctx.device!, false); }}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 19V7H4v12h16m0-16a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h16m-7 14v-2h5v2h-5m-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59l4-4z"/></svg></span>
-                Issue Command
+                ${t('Issue Command')}
               </button>
 
               <div class="modal-divider"></div>
@@ -812,14 +813,14 @@ export class DevicesPage extends LitElement {
               <!-- Reboot -->
               <button class="modal-action danger" ?disabled=${!ctx.isOnline} @click=${() => { this._closeSettingsModal(); this._confirmActionDialog(`Reboot ${ctx.name}?`, 'The device will restart.', () => this._executeRemoteAction(ctx.device!, 'reboot')); }}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></span>
-                Reboot Device
+                ${t('Reboot Device')}
               </button>
 
               <!-- Start OTA (repeaters only) -->
               ${ctx.type === 'repeater' ? html`
                 <button class="modal-action danger" ?disabled=${!ctx.isOnline} @click=${() => { this._closeSettingsModal(); this._confirmActionDialog(`Start OTA on ${ctx.name}?`, 'The device will enter update mode.', () => this._executeRemoteAction(ctx.device!, 'start ota')); }}>
                   <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M5 18h14v2H5v-2zm4.6-2.7L5 10.7l2-1.9 2.6 2.6L17 4l2 2-9.4 9.3z"/></svg></span>
-                  Start OTA Update
+                  ${t('Start OTA Update')}
                 </button>
               ` : nothing}
             </div>
@@ -846,14 +847,14 @@ export class DevicesPage extends LitElement {
   private _renderDeviceSection(device: ManagedDevice, type: 'repeater' | 'client') {
     // Derive status from the entity if available, fall back to ws_api status field
     let statusClass: 'online' | 'offline' | 'unknown' = 'unknown';
-    let statusLabel = 'Unknown';
+    let statusLabel = t('Unknown');
     if (device.status_entity_id && this.hass?.states[device.status_entity_id]) {
       const entityState = this.hass.states[device.status_entity_id].state;
-      if (entityState === 'on') { statusClass = 'online'; statusLabel = 'Online'; }
-      else if (entityState === 'off') { statusClass = 'offline'; statusLabel = 'Offline'; }
+      if (entityState === 'on') { statusClass = 'online'; statusLabel = t('Online'); }
+      else if (entityState === 'off') { statusClass = 'offline'; statusLabel = t('Offline'); }
     } else if (device.status) {
       statusClass = device.status === 'online' ? 'online' : device.status === 'offline' ? 'offline' : 'unknown';
-      statusLabel = device.status === 'online' ? 'Online' : device.status === 'offline' ? 'Offline' : 'Unknown';
+      statusLabel = device.status === 'online' ? t('Online') : device.status === 'offline' ? t('Offline') : t('Unknown');
     }
     const isOnline = statusClass === 'online';
     const deviceKey = this._getManagedDeviceKey(device, type);
@@ -905,17 +906,17 @@ export class DevicesPage extends LitElement {
             <div>
               <div class="device-name">${device.name}</div>
               <div class="device-meta">
-                <span>${type === 'repeater' ? 'Repeater' : 'Client'}</span>
-                ${device.firmware_version ? html`<span>Firmware: v${device.firmware_version.match(/(\d+\.\d+\.\d+)/)?.[1] ?? device.firmware_version}</span>` : nothing}
-                <span>Key: ${device.pubkey_prefix}</span>
+                <span>${type === 'repeater' ? t('Repeater') : t('Client')}</span>
+                ${device.firmware_version ? html`<span>${t('Firmware')}: v${device.firmware_version.match(/(\d+\.\d+\.\d+)/)?.[1] ?? device.firmware_version}</span>` : nothing}
+                <span>${t('Key')}: ${device.pubkey_prefix}</span>
                 ${hasLoc
-                  ? html`<span>Loc: ${locLat.toFixed(4)}, ${locLon.toFixed(4)}</span>`
+                  ? html`<span>${t('Loc')}: ${locLat.toFixed(4)}, ${locLon.toFixed(4)}</span>`
                   : nothing}
               </div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:4px;">
-            <button class="settings-btn" @click=${() => this._settingsDeviceKey = deviceKey} title="Device settings" aria-label="Device settings">
+            <button class="settings-btn" @click=${() => this._settingsDeviceKey = deviceKey} title=${t('Device settings')} aria-label=${t('Device settings')}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             </button>
             <div class="status-badge ${statusClass}"
@@ -944,8 +945,8 @@ export class DevicesPage extends LitElement {
         ${showNeighbors ? this._renderInlineNeighbors(device, neighborState) : nothing}
 
         <div class="actions-row">
-          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeRemoteAction(device, 'advert')}>Flood Advert</button>
-          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeRemoteAction(device, 'clock sync')}>Sync Clock</button>
+          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeRemoteAction(device, 'advert')}>${t('Flood Advert')}</button>
+          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeRemoteAction(device, 'clock sync')}>${t('Sync Clock')}</button>
         </div>
       </div>
     `;
@@ -960,8 +961,8 @@ export class DevicesPage extends LitElement {
     if (!state || state.loading) {
       return html`
         <div class="neighbor-section">
-          <div class="subsection-label">Neighbors</div>
-          <div class="neighbor-loading"><div class="loading-spinner"></div> Loading neighbors...</div>
+          <div class="subsection-label">${t('Neighbors')}</div>
+          <div class="neighbor-loading"><div class="loading-spinner"></div> ${t('Loading neighbors...')}</div>
         </div>
       `;
     }
@@ -969,8 +970,8 @@ export class DevicesPage extends LitElement {
     if (state.neighbors.length === 0) {
       return html`
         <div class="neighbor-section">
-          <div class="subsection-label">Neighbors</div>
-          <div style="font-size: 13px; color: var(--secondary-text-color); padding: 8px 0;">No neighbors found</div>
+          <div class="subsection-label">${t('Neighbors')}</div>
+          <div style="font-size: 13px; color: var(--secondary-text-color); padding: 8px 0;">${t('No neighbors found')}</div>
         </div>
       `;
     }
@@ -996,10 +997,10 @@ export class DevicesPage extends LitElement {
         <table class="neighbor-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>SNR</th>
-              <th>Seen (48h)</th>
-              <th>Last Heard</th>
+              <th>${t('Name')}</th>
+              <th>${t('SNR')}</th>
+              <th>${t('Seen (48h)')}</th>
+              <th>${t('Last Heard')}</th>
             </tr>
           </thead>
           <tbody>
@@ -1178,7 +1179,7 @@ export class DevicesPage extends LitElement {
       // Failure is non-fatal — Location tile will just render "—".
       this._loadContacts();
     } catch (error) {
-      this._error = `Failed to load devices: ${String(error)}`;
+      this._error = t('Failed to load devices: {error}', { error: String(error) });
     } finally {
       this._loading = false;
     }
@@ -1273,7 +1274,7 @@ export class DevicesPage extends LitElement {
       try {
         await this._confirmAction.onConfirm();
       } catch (error) {
-        this._showStatusMessage(`Error: ${String(error)}`, 'error');
+        this._showStatusMessage(t('Error: {error}', { error: String(error) }), 'error');
       }
     }
     this._confirmAction = null;
@@ -1388,7 +1389,7 @@ export class DevicesPage extends LitElement {
   private _hideSensorFromContext() {
     if (!this._contextMenu) return;
     this._hideSensor(this._contextMenu.deviceKey, this._contextMenu.entityId);
-    this._showStatusMessage(`Hidden: ${this._contextMenu.label}`, 'success');
+    this._showStatusMessage(t('Hidden: {label}', { label: this._contextMenu.label }), 'success');
     this._contextMenu = null;
   }
 
@@ -1422,8 +1423,8 @@ export class DevicesPage extends LitElement {
     const { name, neighborPubkey, repeaterPubkey } = this._neighborContextMenu;
     this._neighborContextMenu = null;
     this._confirmActionDialog(
-      `Remove neighbor ${name}?`,
-      'This will remove the neighbor from the repeater and delete its sensors from HA. This cannot be undone.',
+      t('Remove neighbor {name}?', { name }),
+      t('This will remove the neighbor from the repeater and delete its sensors from HA. This cannot be undone.'),
       () => this._executeRemoveNeighbor(repeaterPubkey, neighborPubkey, name),
     );
   }
@@ -1461,12 +1462,12 @@ export class DevicesPage extends LitElement {
         neighbor_pubkey: neighborPubkey,
       });
       const entitiesRemoved = result?.entities_removed ?? 0;
-      this._showStatusMessage(`Removed ${name} (${entitiesRemoved} sensors deleted)`, 'success');
+      this._showStatusMessage(t('Removed {name} ({entitiesRemoved} sensors deleted)', { name, entitiesRemoved }), 'success');
       // Refresh the neighbor list — find the device and reload
       const device = this._managedDevices.repeaters.find(r => r.pubkey_prefix === repeaterPubkey);
       if (device) await this._loadNeighbors(device);
     } catch (err: any) {
-      this._showStatusMessage(`Failed to remove ${name}: ${err.message || err}`, 'error');
+      this._showStatusMessage(t('Failed to remove {name}: {err}', { name, err: err.message || err }), 'error');
     }
   }
 
@@ -1534,29 +1535,29 @@ export class DevicesPage extends LitElement {
     return html`
       <div class="modal-overlay" @click=${this._closeHiddenSensorsModal}>
         <div class="modal-card" data-a11y="hidden-sensors"
-             role="dialog" aria-modal="true" aria-label="Hidden sensors"
+             role="dialog" aria-modal="true" aria-label=${t('Hidden sensors')}
              @click=${(e: Event) => e.stopPropagation()}>
           <div class="modal-header">
-            <span class="modal-title">Hidden Sensors</span>
-            <button class="modal-close" aria-label="Close" @click=${this._closeHiddenSensorsModal}>&times;</button>
+            <span class="modal-title">${t('Hidden Sensors')}</span>
+            <button class="modal-close" aria-label=${t('Close')} @click=${this._closeHiddenSensorsModal}>&times;</button>
           </div>
           <div class="modal-body">
             ${hiddenItems.length === 0
-              ? html`<div class="empty-hidden">No hidden sensors</div>`
+              ? html`<div class="empty-hidden">${t('No hidden sensors')}</div>`
               : hiddenItems.map(item => html`
                   <div class="hidden-sensor-item">
                     <div>
                       <div class="hidden-sensor-name">${item.label}</div>
                       <div class="hidden-sensor-id">${item.entityId}</div>
                     </div>
-                    <button class="unhide-btn" @click=${() => this._unhideSensor(deviceKey, item.entityId)}>Unhide</button>
+                    <button class="unhide-btn" @click=${() => this._unhideSensor(deviceKey, item.entityId)}>${t('Unhide')}</button>
                   </div>
                 `)}
           </div>
           ${hiddenItems.length > 1
             ? html`
                 <div class="modal-footer">
-                  <button class="action-btn" @click=${() => { this._unhideAllSensors(deviceKey); }}>Unhide All</button>
+                  <button class="action-btn" @click=${() => { this._unhideAllSensors(deviceKey); }}>${t('Unhide All')}</button>
                 </div>
               `
             : nothing}

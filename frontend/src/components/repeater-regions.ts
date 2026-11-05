@@ -1,9 +1,9 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 import type { HomeAssistant } from '../types';
 import { getRememberedRepeaterSettings, readRepeaterSetting, sendRepeaterCommand } from '../api';
-import { isCzech } from '../utils/language';
 import './read-age-note';
 
 export interface RegionRow {
@@ -171,16 +171,13 @@ export class RepeaterRegions extends LitElement {
   }
 
   private _failure(reason: string | undefined, retryAfter: number | undefined, message: string | undefined): string {
-    const cs = isCzech();
     if (reason === 'rate_limited') {
-      return cs ? `Limit provozu sítě, zkus to za ${retryAfter} s.` : `Mesh traffic limit, try again in ${retryAfter} s.`;
+      return t('Mesh traffic limit, try again in {retryAfter} s.', { retryAfter: retryAfter ?? 0 });
     }
     if (reason === 'no_response') {
-      return cs
-        ? 'Repeater neodpověděl. Změna se mohla provést, načti regiony znovu.'
-        : 'The repeater did not answer. A change may still have applied, so load the regions again.';
+      return t('The repeater did not answer. A change may still have applied, so load the regions again.');
     }
-    return message ?? (cs ? 'Požadavek selhal.' : 'The request failed.');
+    return message ?? (t('The request failed.'));
   }
 
   private async _load() {
@@ -215,7 +212,7 @@ export class RepeaterRegions extends LitElement {
         return;
       }
       this._dirty = !options.saves;
-      if (options.saves) this._notice = isCzech() ? 'Uloženo do repeateru.' : 'Saved to the repeater.';
+      if (options.saves) this._notice = t('Saved to the repeater.');
       await this._readRegions();
     } finally {
       this._busy = false;
@@ -223,14 +220,11 @@ export class RepeaterRegions extends LitElement {
   }
 
   private _toggleFlood(row: RegionRow) {
-    const cs = isCzech();
     const command = `region ${row.flood ? 'denyf' : 'allowf'} ${row.name}`;
     if (row.flood && row.name === '*') {
       this._confirm = {
         command,
-        text: cs
-          ? 'Repeater začne zahazovat všechny flood pakety bez regionu, tedy i běžný provoz v síti. Opravdu?'
-          : 'The repeater will drop all flood packets without a region, including ordinary traffic. Are you sure?',
+        text: t('The repeater will drop all flood packets without a region, including ordinary traffic. Are you sure?'),
       };
       return;
     }
@@ -238,77 +232,71 @@ export class RepeaterRegions extends LitElement {
   }
 
   private _askRemove(row: RegionRow) {
-    const cs = isCzech();
     this._confirm = {
       command: `region remove ${row.name}`,
-      text: cs ? `Odebrat region ${row.name}?` : `Remove region ${row.name}?`,
+      text: t('Remove region {name}?', { name: row.name }),
     };
   }
 
   private _setDefault(scope: string) {
-    const cs = isCzech();
     this._confirm = {
       command: `region default ${scope}`,
       saves: true,
-      text: cs
-        ? 'Změna výchozího regionu se ihned uloží do repeateru, a s ní všechny dosud neuložené změny regionů. Pokračovat?'
-        : 'Changing the default scope saves to the repeater right away, along with any unsaved region changes. Continue?',
+      text: t('Changing the default scope saves to the repeater right away, along with any unsaved region changes. Continue?'),
     };
   }
 
   private _add(e: Event) {
     e.preventDefault();
-    const cs = isCzech();
     const name = this._newName.trim();
     if (!name) return;
     if (/\s/.test(name)) {
-      this._error = cs ? 'Název regionu nesmí obsahovat mezery.' : 'A region name cannot contain spaces.';
+      this._error = t('A region name cannot contain spaces.');
       return;
     }
     // On an existing name, firmware would move that region and allow flood on it.
     const bare = name.replace(/^#/, '');
     if (this._rows?.some((row) => row.name.replace(/^#/, '') === bare)) {
-      this._error = cs ? `Region ${name} už existuje.` : `Region ${name} already exists.`;
+      this._error = t('Region {name} already exists.', { name });
       return;
     }
     this._newName = '';
     void this._run(this._newParent === '*' ? `region put ${name}` : `region put ${name} ${this._newParent}`);
   }
 
-  private _renderRows(cs: boolean) {
+  private _renderRows() {
     const disabled = !this.canEdit || this._busy;
     return this._rows!.map((row) => html`
       <div class="row" style="padding-left: ${row.depth * 16}px">
         <span class="name">${row.name}</span>
         <label class="flood">
           <input type="checkbox" .checked=${row.flood} ?disabled=${disabled} @click=${(e: Event) => { e.preventDefault(); this._toggleFlood(row); }} />
-          Flood
+          ${t('Flood')}
         </label>
         <button class=${row.home ? 'quiet home-on' : 'quiet'} ?disabled=${disabled || row.home}
-          title=${cs ? 'Domovský region' : 'Home region'} @click=${() => this._run(`region home ${row.name}`)}>${cs ? 'Domov' : 'Home'}</button>
+          title=${t('Home region')} @click=${() => this._run(`region home ${row.name}`)}>${t('Home')}</button>
         ${row.name === '*' ? '' : html`
-          <button class="quiet" ?disabled=${disabled} aria-label=${cs ? `Odebrat ${row.name}` : `Remove ${row.name}`} @click=${() => this._askRemove(row)}>✕</button>
+          <button class="quiet" ?disabled=${disabled} aria-label=${t('Remove {name}', { name: row.name })} @click=${() => this._askRemove(row)}>✕</button>
         `}
       </div>
     `);
   }
 
   render() {
-    const cs = isCzech();
     const disabled = !this.canEdit || this._busy;
     return html`
       ${this._dirty ? html`
         <div class="warning" role="status">
-          <span>${cs ? 'Změny nejsou uložené. Po restartu repeateru se ztratí.' : 'Changes are not saved. They will be lost when the repeater restarts.'}</span>
-          <button class="save" ?disabled=${disabled} @click=${() => this._run('region save', { saves: true })}>${cs ? 'Uložit' : 'Save'}</button>
+          <span>${t('Changes are not saved. They will be lost when the repeater restarts.')}</span>
+          <button class="save" ?disabled=${disabled} @click=${() => this._run('region save', { saves: true })}>${t('Save')}</button>
         </div>
       ` : ''}
       ${this._confirm ? html`
         <div class="confirm" role="alertdialog">
           ${this._confirm.text}
           <div class="confirm-actions">
-            <button class="danger" @click=${() => { const c = this._confirm!; void this._run(c.command, { saves: c.saves }); }}>${cs ? 'Ano' : 'Yes'}</button>
-            <button class="quiet" @click=${() => { this._confirm = null; }}>${cs ? 'Zrušit' : 'Cancel'}</button>
+            <button class="danger" @click=${() => { const c = this._confirm!; void this._run(c.command, { saves: c.saves }); }}>${t('Yes')}</button>
+            <button class="quiet" @click=${() => { this._confirm = null; }}>${t('Cancel')}</button>
           </div>
         </div>
       ` : ''}
@@ -320,35 +308,33 @@ export class RepeaterRegions extends LitElement {
           : ''}
         <button class="load" ?disabled=${disabled} @click=${this._load}>
           ${this._busy
-            ? (cs ? 'Pracuji…' : 'Working…')
-            : this._rows ? (cs ? 'Přenačíst' : 'Reload') : (cs ? 'Načíst' : 'Load')}
+            ? (t('Working…'))
+            : this._rows ? (t('Reload')) : (t('Load'))}
         </button>
       </div>
       ${this._rows === null
-        ? html`<div class="hint">${cs ? 'Zatím nenačteno.' : 'Not loaded yet.'}</div>`
+        ? html`<div class="hint">${t('Not loaded yet.')}</div>`
         : html`
-          ${this._cut ? html`<div class="error">${cs
-            ? 'Seznam se nevešel do jedné odpovědi repeateru (160 bajtů), takže část regionů tu chybí. Úplný seznam je dostupný jen přes sériový port.'
-            : 'The list did not fit in one repeater reply (160 bytes), so some regions are missing here. The full list is only available over the serial port.'}</div>` : ''}
-          ${this._renderRows(cs)}
+          ${this._cut ? html`<div class="error">${t('The list did not fit in one repeater reply (160 bytes), so some regions are missing here. The full list is only available over the serial port.')}</div>` : ''}
+          ${this._renderRows()}
           <div class="scope">
-            ${cs ? 'Výchozí region' : 'Default scope'}
+            ${t('Default scope')}
             <select .value=${live(this._defaultScope ?? '<null>')} ?disabled=${disabled} @change=${(e: Event) => this._setDefault((e.target as HTMLSelectElement).value)}>
-              <option value="<null>" ?selected=${this._defaultScope === null}>${cs ? 'žádný' : 'none'}</option>
+              <option value="<null>" ?selected=${this._defaultScope === null}>${t('none')}</option>
               ${this._rows.filter((row) => row.name !== '*').map((row) => html`
                 <option value=${row.name} ?selected=${this._defaultScope === row.name}>${row.name}</option>
               `)}
             </select>
           </div>
           <form class="add" @submit=${this._add}>
-            <input type="text" aria-label=${cs ? 'Název nového regionu' : 'New region name'} placeholder=${cs ? 'Nový region' : 'New region'}
+            <input type="text" aria-label=${t('New region name')} placeholder=${t('New region')}
               autocapitalize="off" spellcheck="false" ?disabled=${disabled} .value=${this._newName}
               @input=${(e: Event) => { this._newName = (e.target as HTMLInputElement).value; }} />
-            <select aria-label=${cs ? 'Nadřazený region' : 'Parent region'} ?disabled=${disabled}
+            <select aria-label=${t('Parent region')} ?disabled=${disabled}
               @change=${(e: Event) => { this._newParent = (e.target as HTMLSelectElement).value; }}>
               ${this._rows.map((row) => html`<option value=${row.name} ?selected=${this._newParent === row.name}>${row.name}</option>`)}
             </select>
-            <button type="submit" ?disabled=${disabled || !this._newName.trim()}>${cs ? 'Přidat' : 'Add'}</button>
+            <button type="submit" ?disabled=${disabled || !this._newName.trim()}>${t('Add')}</button>
           </form>
         `}
     `;

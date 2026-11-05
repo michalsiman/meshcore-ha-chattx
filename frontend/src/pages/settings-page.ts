@@ -1,3 +1,5 @@
+import { N_, t, tn, LANGUAGE_NAMES, loadLanguageSetting, saveLanguageSetting } from '../i18n';
+import { defaultHeardReply, loadHeardReply, saveHeardReply } from '../utils/heard-reply';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, DeviceConfig, MeshCoreDevice } from '../types';
@@ -72,12 +74,12 @@ const IDENTITY_FLOW_STEP_ORDER: ReadonlyArray<{
   step: IdentityFlowStep;
   label: string;
 }> = [
-  { step: 'generating', label: 'Generating new key' },
-  { step: 'importing', label: 'Sending key to device' },
-  { step: 'rebooting', label: 'Rebooting device' },
-  { step: 'reconnecting', label: 'Waiting for device reconnect' },
-  { step: 'reloading', label: 'Reloading MeshCore integration' },
-  { step: 'verifying', label: 'Verifying new identity' },
+  { step: 'generating', label: N_('Generating new key') },
+  { step: 'importing', label: N_('Sending key to device') },
+  { step: 'rebooting', label: N_('Rebooting device') },
+  { step: 'reconnecting', label: N_('Waiting for device reconnect') },
+  { step: 'reloading', label: N_('Reloading MeshCore integration') },
+  { step: 'verifying', label: N_('Verifying new identity') },
 ];
 
 /**
@@ -726,7 +728,7 @@ export class SettingsPage extends LitElement {
         this._locationSource = this._deviceConfig.location_source as 'gps' | 'manual' | 'ha_location';
       }
     } catch (error) {
-      this._error = `Failed to load device configuration: ${String(error)}`;
+      this._error = t('Failed to load device configuration: {error}', { error: String(error) });
     } finally {
       this._loading = false;
     }
@@ -739,7 +741,7 @@ export class SettingsPage extends LitElement {
           <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--secondary-text-color);">
             <div style="display: flex; align-items: center; gap: 8px;">
               <div class="loading-spinner"></div>
-              <span>Loading settings...</span>
+              <span>${t('Loading settings...')}</span>
             </div>
           </div>
         </div>
@@ -757,7 +759,7 @@ export class SettingsPage extends LitElement {
     }
 
     if (!this._deviceConfig) {
-      return html`<div>No device config loaded</div>`;
+      return html`<div>${t('No device config loaded')}</div>`;
     }
 
     return html`
@@ -770,25 +772,50 @@ export class SettingsPage extends LitElement {
           <div class="settings-grid">
             <!-- Companion Information -->
             <div class="device-section">
-              <div class="card-title">General</div>
+              <div class="card-title">${t('General')}</div>
               ${this._renderDeviceInfo()}
             </div>
 
             <!-- Radio & RF Settings -->
             <div class="device-section">
-              <div class="card-title">Radio</div>
+              <div class="card-title">${t('Radio')}</div>
               ${this._renderRadioSettings()}
             </div>
 
             <!-- Location -->
             <div class="device-section">
-              <div class="card-title">Location</div>
+              <div class="card-title">${t('Location')}</div>
               ${this._renderLocation()}
+            </div>
+
+            <!-- Language of the panel and the quick reply text, per browser -->
+            <div class="device-section">
+              <div class="card-title">${t('Language')}</div>
+              <div class="section-row">
+                <div class="form-group-inline">
+                  <label class="form-label" for="chattx-language">${t('Panel language')}</label>
+                  <select id="chattx-language" class="form-input" .value=${loadLanguageSetting()} @change=${this._onLanguageChanged}>
+                    <option value="auto" ?selected=${loadLanguageSetting() === 'auto'}>${t('Automatic (Home Assistant or browser)')}</option>
+                    ${Object.entries(LANGUAGE_NAMES).map(([code, name]) => html`<option value=${code} ?selected=${loadLanguageSetting() === code}>${name}</option>`)}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-section">
+              <div class="card-title">${t('Quick reply')}</div>
+              <div class="section-row">
+                <div class="form-group-inline">
+                  <label class="form-label" for="chattx-heard-reply">${t('Reply text in the message dialog')}</label>
+                  <input id="chattx-heard-reply" class="form-input" type="text" .value=${loadHeardReply()} placeholder=${defaultHeardReply()} @change=${this._onHeardReplyChanged} />
+                  <div class="form-description">${t('{hops} is replaced with the hop count, for example 3 hops. The sender\'s name is added at the start. Leave empty for the default text.')}</div>
+                </div>
+              </div>
             </div>
 
             <!-- Quick messages for the chat composer -->
             <div class="device-section">
-              <div class="card-title">Quick messages</div>
+              <div class="card-title">${t('Quick messages')}</div>
               <chattx-quick-messages-editor .hass=${this.hass}></chattx-quick-messages-editor>
             </div>
 
@@ -805,18 +832,18 @@ export class SettingsPage extends LitElement {
              @pointerdown=${this._onOverlayPointerDown}
              @click=${this._closeContextMenu}>
           <div class="modal-card" data-a11y="tile-context"
-               role="dialog" aria-modal="true" aria-label="${this._contextMenu.label} actions"
+               role="dialog" aria-modal="true" aria-label=${t('{label} actions', { label: this._contextMenu.label })}
                @click=${(e: Event) => e.stopPropagation()}
                @pointerdown=${(e: Event) => e.stopPropagation()}>
             <div class="modal-header">
               <span class="modal-title">${this._contextMenu.label}</span>
-              <button class="modal-close" aria-label="Close" @click=${this._closeContextMenu}
+              <button class="modal-close" aria-label=${t('Close')} @click=${this._closeContextMenu}
                       @pointerdown=${(e: Event) => e.stopPropagation()}>&times;</button>
             </div>
             <div class="modal-body">
               <button class="modal-action danger" @click=${this._hideSensorFromContext}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg></span>
-                Hide Sensor
+                ${t('Hide Sensor')}
               </button>
             </div>
           </div>
@@ -827,11 +854,11 @@ export class SettingsPage extends LitElement {
       ${this._settingsModalOpen ? html`
         <div class="modal-overlay" @click=${this._closeSettingsModal}>
           <div class="modal-card" data-a11y="companion-settings"
-               role="dialog" aria-modal="true" aria-label="Companion settings"
+               role="dialog" aria-modal="true" aria-label=${t('Companion settings')}
                @click=${(e: Event) => e.stopPropagation()}>
             <div class="modal-header">
-              <span class="modal-title">Companion Settings</span>
-              <button class="modal-close" aria-label="Close" @click=${this._closeSettingsModal}>&times;</button>
+              <span class="modal-title">${t('Companion Settings')}</span>
+              <button class="modal-close" aria-label=${t('Close')} @click=${this._closeSettingsModal}>&times;</button>
             </div>
             <div class="modal-body">
               <button class="modal-action" @click=${this._openHiddenSensorsList}>
@@ -841,19 +868,19 @@ export class SettingsPage extends LitElement {
 
               <button class="modal-action" @click=${this._openCommandDialogForCompanion}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 19V7H4v12h16m0-16a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h16m-7 14v-2h5v2h-5m-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59l4-4z"/></svg></span>
-                Issue Command
+                ${t('Issue Command')}
               </button>
 
               <div class="modal-divider"></div>
 
               <button class="modal-action danger" @click=${this._handleRebootFromModal}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></span>
-                Reboot Device
+                ${t('Reboot Device')}
               </button>
 
               <button class="modal-action danger" @click=${this._openKeyManagementModal}>
                 <span class="modal-action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.65 10a6 6 0 110 4H10v2H8v-2H6v-2h6.65zM17 14a2 2 0 100-4 2 2 0 000 4z"/></svg></span>
-                Key Management
+                ${t('Key Management')}
               </button>
             </div>
           </div>
@@ -864,12 +891,12 @@ export class SettingsPage extends LitElement {
       ${this._keyManagementModalOpen ? html`
         <div class="modal-overlay" @click=${this._closeKeyManagementModal}>
           <div class="modal-card" data-a11y="key-management"
-               role="dialog" aria-modal="true" aria-label="Key management"
+               role="dialog" aria-modal="true" aria-label=${t('Key management')}
                style="max-width: 440px;"
                @click=${(e: Event) => e.stopPropagation()}>
             <div class="modal-header">
-              <span class="modal-title">Key Management</span>
-              <button class="modal-close" aria-label="Close" @click=${this._closeKeyManagementModal}>&times;</button>
+              <span class="modal-title">${t('Key Management')}</span>
+              <button class="modal-close" aria-label=${t('Close')} @click=${this._closeKeyManagementModal}>&times;</button>
             </div>
             <div class="modal-body" style="padding: 16px 20px;">
               ${this._renderIdentityManagement()}
@@ -946,22 +973,22 @@ export class SettingsPage extends LitElement {
             <div>
               <div class="device-name">${d.name}</div>
               <div class="device-meta">
-                <span>Companion</span>
-                <span>Firmware: ${d.firmware || 'unknown'}</span>
-                <span>Key: ${d.pubkey_prefix}</span>
+                <span>${t('Companion')}</span>
+                <span>${t('Firmware')}: ${d.firmware || t('unknown')}</span>
+                <span>${t('Key')}: ${d.pubkey_prefix}</span>
                 ${addedNodes !== undefined
-                  ? html`<span>Added nodes: ${addedNodes}</span>`
+                  ? html`<span>${t('Added nodes: {count}', { count: addedNodes })}</span>`
                   : nothing}
               </div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:4px;">
-            <button class="settings-btn" @click=${() => (this._settingsModalOpen = true)} title="Device settings" aria-label="Device settings">
+            <button class="settings-btn" @click=${() => (this._settingsModalOpen = true)} title=${t('Device settings')} aria-label=${t('Device settings')}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             </button>
             <div class="status-badge ${isOnline ? 'online' : 'offline'}">
               <span class="status-dot ${isOnline ? 'online' : 'offline'}"></span>
-              ${isOnline ? 'Connected' : 'Offline'}
+              ${isOnline ? t('Connected') : t('Offline')}
             </div>
           </div>
         </div>
@@ -978,10 +1005,10 @@ export class SettingsPage extends LitElement {
           : nothing}
 
         <div class="actions-row">
-          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeCompanionAction('send_advert', undefined, 'Local Advert')}>Local Advert</button>
-          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeCompanionAction('send_advert', {flood: true}, 'Flood Advert')}>Flood Advert</button>
-          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeCompanionAction('set_time', {val: Math.floor(Date.now() / 1000)}, 'Sync Clock')}>Sync Clock</button>
-          <button class="action-btn" ?disabled=${!isOnline} @click=${this._onCompanionTrace}>Trace</button>
+          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeCompanionAction('send_advert', undefined, 'Local Advert')}>${t('Local Advert')}</button>
+          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeCompanionAction('send_advert', {flood: true}, 'Flood Advert')}>${t('Flood Advert')}</button>
+          <button class="action-btn" ?disabled=${!isOnline} @click=${() => this._executeCompanionAction('set_time', {val: Math.floor(Date.now() / 1000)}, 'Sync Clock')}>${t('Sync Clock')}</button>
+          <button class="action-btn" ?disabled=${!isOnline} @click=${this._onCompanionTrace}>${t('Trace')}</button>
         </div>
       </div>
     `;
@@ -1006,22 +1033,22 @@ export class SettingsPage extends LitElement {
     return html`
       <div class="modal-overlay" @click=${this._closeHiddenSensorsModal}>
         <div class="modal-card" data-a11y="hidden-sensors"
-             role="dialog" aria-modal="true" aria-label="Hidden sensors"
+             role="dialog" aria-modal="true" aria-label=${t('Hidden sensors')}
              @click=${(e: Event) => e.stopPropagation()}>
           <div class="modal-header">
-            <span class="modal-title">Hidden Sensors</span>
-            <button class="modal-close" aria-label="Close" @click=${this._closeHiddenSensorsModal}>&times;</button>
+            <span class="modal-title">${t('Hidden Sensors')}</span>
+            <button class="modal-close" aria-label=${t('Close')} @click=${this._closeHiddenSensorsModal}>&times;</button>
           </div>
           <div class="modal-body">
             ${hiddenItems.length === 0
-              ? html`<div class="empty-hidden">No hidden sensors</div>`
+              ? html`<div class="empty-hidden">${t('No hidden sensors')}</div>`
               : hiddenItems.map(item => html`
                   <div class="hidden-sensor-item">
                     <div>
                       <div class="hidden-sensor-name">${item.label}</div>
                       <div class="hidden-sensor-id">${item.entityId}</div>
                     </div>
-                    <button class="unhide-btn" @click=${() => this._unhideSensor(deviceKey, item.entityId)}>Unhide</button>
+                    <button class="unhide-btn" @click=${() => this._unhideSensor(deviceKey, item.entityId)}>${t('Unhide')}</button>
                   </div>
                 `)}
           </div>
@@ -1030,7 +1057,7 @@ export class SettingsPage extends LitElement {
                 <div class="modal-footer">
                   <button class="action-btn" @click=${() => {
                     this._unhideAllSensors(deviceKey);
-                  }}>Unhide All</button>
+                  }}>${t('Unhide All')}</button>
                 </div>
               `
             : nothing}
@@ -1046,17 +1073,17 @@ export class SettingsPage extends LitElement {
 
     return html`
       <div class="info-row">
-        <span class="info-label">Hardware Model</span>
+        <span class="info-label">${t('Hardware Model')}</span>
         <span class="info-value">${this._deviceConfig.hardware_model}</span>
       </div>
 
       <div class="info-row">
-        <span class="info-label">Public Key</span>
+        <span class="info-label">${t('Public Key')}</span>
         <span class="info-value" style="display: flex; align-items: center; gap: 6px;">
           ${this._deviceConfig.pubkey}
           <button
             style="border: none; background: none; cursor: pointer; padding: 2px; color: var(--secondary-text-color); display: flex; align-items: center;"
-            title="Copy public key"
+            title=${t('Copy public key')}
             @click=${() => this._copyToClipboard(this._deviceConfig!.pubkey)}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
           </button>
@@ -1065,15 +1092,15 @@ export class SettingsPage extends LitElement {
 
       ${this._deviceConfig.connection_type ? html`
         <div class="info-row">
-          <span class="info-label">Connection</span>
+          <span class="info-label">${t('Connection')}</span>
           <span class="info-value">${this._deviceConfig.connection_type.toUpperCase()}${this._deviceConfig.connection_address ? html` — ${this._deviceConfig.connection_address}` : ''}</span>
         </div>
       ` : ''}
 
       <div class="danger-zone" style="margin-top: 16px;">
-        <div class="danger-zone-title">Rename Device</div>
+        <div class="danger-zone-title">${t('Rename Device')}</div>
         <div style="font-size: 12px; color: var(--secondary-text-color); margin-bottom: 8px;">
-          Changing the device name will change all entity IDs. Automations, scripts, and dashboards using current entity IDs will need to be updated.
+          ${t('Changing the device name will change all entity IDs. Automations, scripts, and dashboards using current entity IDs will need to be updated.')}
         </div>
         <div style="display: flex; gap: 8px;">
           <input
@@ -1088,7 +1115,7 @@ export class SettingsPage extends LitElement {
           <button class="danger-button"
             ?disabled=${!this._editValues['name'] || this._editValues['name'] === this._deviceConfig.name}
             @click=${this._handleNameSave}>
-            Rename
+            ${t('Rename')}
           </button>
         </div>
       </div>
@@ -1110,7 +1137,7 @@ export class SettingsPage extends LitElement {
     return html`
       <div class="section-row">
         <div class="form-group-inline">
-          <label class="form-label">TX Power (dBm)</label>
+          <label class="form-label">${t('TX Power (dBm)')}</label>
           <input
             type="number"
             class="form-input"
@@ -1123,7 +1150,7 @@ export class SettingsPage extends LitElement {
           />
         </div>
         <div class="form-group-inline">
-          <label class="form-label">Frequency (MHz)</label>
+          <label class="form-label">${t('Frequency (MHz)')}</label>
           <input
             type="number"
             class="form-input"
@@ -1138,7 +1165,7 @@ export class SettingsPage extends LitElement {
 
       <div class="section-row">
         <div class="form-group-inline">
-          <label class="form-label">Bandwidth (kHz)</label>
+          <label class="form-label">${t('Bandwidth (kHz)')}</label>
           <select
             class="form-select"
             @change=${(e: Event) => {
@@ -1151,7 +1178,7 @@ export class SettingsPage extends LitElement {
           </select>
         </div>
         <div class="form-group-inline">
-          <label class="form-label">Spreading Factor</label>
+          <label class="form-label">${t('Spreading Factor')}</label>
           <select
             class="form-select"
             @change=${(e: Event) => {
@@ -1167,7 +1194,7 @@ export class SettingsPage extends LitElement {
 
       <div class="section-row">
         <div class="form-group-inline">
-          <label class="form-label">Coding Rate</label>
+          <label class="form-label">${t('Coding Rate')}</label>
           <select
             class="form-select"
             @change=${(e: Event) => {
@@ -1180,15 +1207,18 @@ export class SettingsPage extends LitElement {
           </select>
         </div>
         <div class="form-group-inline">
-          <label class="form-label">Path Hash Mode</label>
+          <label class="form-label">${t('Path Hash Mode')}</label>
           <select
             class="form-select"
             @change=${(e: Event) => {
               this._editValues['path_hash_mode'] = Number((e.target as HTMLSelectElement).value);
             }}>
-            ${[[0, '0 - 1 byte'], [1, '1 - 2 byte'], [2, '2 - 3 byte']].map(([val, label]) => {
-              const current = this._editValues['path_hash_mode'] ?? this._deviceConfig!.path_hash_mode ?? 0;
-              return html`<option value=${val} ?selected=${Number(current) === val}>${label}</option>`;
+            ${this._editValues['path_hash_mode'] === undefined && this._deviceConfig!.path_hash_mode == null
+              ? html`<option selected disabled>${t('Unknown')}</option>`
+              : ''}
+            ${[0, 1, 2].map((mode) => {
+              const current = this._editValues['path_hash_mode'] ?? this._deviceConfig!.path_hash_mode;
+              return html`<option value=${mode} ?selected=${current != null && Number(current) === mode}>${mode} - ${tn('{n} byte', '{n} bytes', mode + 1)}</option>`;
             })}
           </select>
         </div>
@@ -1199,11 +1229,11 @@ export class SettingsPage extends LitElement {
         style="width: 100%; margin-top: 12px;"
         ?disabled=${!changed || this._saving}
         @click=${() => this._handleApply('radio-settings')}>
-        ${this._saving ? 'Applying...' : 'Apply Radio Settings'}
+        ${this._saving ? t('Applying...') : t('Apply Radio Settings')}
       </button>
 
       <div style="margin-top: 12px; padding: 8px; background: rgba(0, 0, 0, 0.02); border-radius: 6px; font-size: 12px; color: var(--secondary-text-color);">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>Radio changes require device reboot to take effect
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>${t('Radio changes require device reboot to take effect')}
       </div>
     `;
   }
@@ -1226,7 +1256,7 @@ export class SettingsPage extends LitElement {
     return html`
       <div class="section-row">
         <div class="form-group-inline">
-          <label class="form-label">Latitude</label>
+          <label class="form-label">${t('Latitude')}</label>
           <input
             type="number"
             class="form-input"
@@ -1241,7 +1271,7 @@ export class SettingsPage extends LitElement {
           />
         </div>
         <div class="form-group-inline">
-          <label class="form-label">Longitude</label>
+          <label class="form-label">${t('Longitude')}</label>
           <input
             type="number"
             class="form-input"
@@ -1258,25 +1288,25 @@ export class SettingsPage extends LitElement {
       </div>
       ${isHaLocation ? html`
         <div style="font-size: 11px; color: var(--secondary-text-color); margin-top: -8px; margin-bottom: 8px;">
-          Using coordinates from Home Assistant zone.home
+          ${t('Using coordinates from Home Assistant zone.home')}
         </div>
       ` : ''}
 
       <div class="section-row">
         <div class="form-group-inline">
-          <label class="form-label">Location Source</label>
+          <label class="form-label">${t('Location Source')}</label>
           <select
             class="form-select"
             .value=${this._locationSource}
             @change=${(e: Event) => {
               this._locationSource = (e.target as HTMLSelectElement).value as 'gps' | 'manual' | 'ha_location';
             }}>
-            <option value="manual">Manual (coordinates above)</option>
-            <option value="gps">GPS (device hardware)</option>
-            <option value="ha_location">Home Assistant Zone</option>
+            <option value="manual">${t('Manual (coordinates above)')}</option>
+            <option value="gps">${t('GPS (device hardware)')}</option>
+            <option value="ha_location">${t('Home Assistant Zone')}</option>
           </select>
           <div style="font-size: 11px; color: var(--secondary-text-color); margin-top: 4px;">
-            How the device determines its coordinates
+            ${t('How the device determines its coordinates')}
           </div>
         </div>
       </div>
@@ -1286,7 +1316,7 @@ export class SettingsPage extends LitElement {
         style="width: 100%; margin-top: 12px;"
         ?disabled=${!locationChanged || this._saving}
         @click=${this._applyLocation}>
-        ${this._saving ? 'Applying...' : 'Apply Location Settings'}
+        ${this._saving ? t('Applying...') : t('Apply Location Settings')}
       </button>
     `;
   }
@@ -1300,25 +1330,25 @@ export class SettingsPage extends LitElement {
     return html`
       <div style="display: flex; flex-direction: column; gap: 16px;">
         <div class="danger-zone" style="margin-top: 0;">
-          <div class="danger-zone-title">Regenerate Identity</div>
+          <div class="danger-zone-title">${t('Regenerate Identity')}</div>
           <div style="font-size: 12px; color: var(--secondary-text-color); margin-bottom: 8px;">
-            Creates a new key pair. All contacts will need to re-add you. This will change all entity IDs — automations, scripts, and dashboards using current entity IDs will need to be updated.
+            ${t('Creates a new key pair. All contacts will need to re-add you. This will change all entity IDs — automations, scripts, and dashboards using current entity IDs will need to be updated.')}
           </div>
           <button class="danger-button" @click=${this._showRegenIdentityConfirm}>
-            Regenerate Identity
+            ${t('Regenerate Identity')}
           </button>
         </div>
         <div class="danger-zone" style="margin-top: 0;">
-          <div class="danger-zone-title">Import Private Key</div>
+          <div class="danger-zone-title">${t('Import Private Key')}</div>
           <div style="font-size: 12px; color: var(--secondary-text-color); margin-bottom: 8px;">
-            Importing a key changes the device identity. This will change all entity IDs — automations, scripts, and dashboards using current entity IDs will need to be updated.
+            ${t('Importing a key changes the device identity. This will change all entity IDs — automations, scripts, and dashboards using current entity IDs will need to be updated.')}
           </div>
           <div style="display: flex; gap: 8px;">
             <input
               type="text"
               class="form-input"
               style="flex: 1; font-family: monospace;"
-              placeholder="Hex private key"
+              placeholder=${t('Hex private key')}
               .value=${this._importKeyValue}
               @input=${(e: Event) => { this._importKeyValue = (e.target as HTMLInputElement).value; }}
             />
@@ -1326,7 +1356,7 @@ export class SettingsPage extends LitElement {
               class="danger-button"
               ?disabled=${!this._importKeyValue.trim()}
               @click=${this._handleImportKeyConfirm}>
-              Import
+              ${t('Import')}
             </button>
           </div>
         </div>
@@ -1392,24 +1422,35 @@ export class SettingsPage extends LitElement {
           this._renameSuccess = result.rename;
         } else {
           // Non-rename saves keep the existing toast UX.
-          this._showStatusMessage(`Saved: ${keysToApply.join(', ')}`, 'success');
+          this._showStatusMessage(t('Saved: {join}', { join: keysToApply.join(', ') }), 'success');
         }
       } else {
-        this._showStatusMessage('Save failed', 'error');
+        this._showStatusMessage(t('Save failed'), 'error');
       }
     } catch (error) {
-      this._showStatusMessage(`Error: ${String(error)}`, 'error');
+      this._showStatusMessage(t('Error: {error}', { error: String(error) }), 'error');
     } finally {
       this._saving = false;
     }
   }
 
+  /** Texts in the panel are rendered once, so a new language needs a reload. */
+  private _onLanguageChanged(e: Event) {
+    saveLanguageSetting((e.target as HTMLSelectElement).value);
+    window.location.reload();
+  }
+
+  private _onHeardReplyChanged(e: Event) {
+    saveHeardReply((e.target as HTMLInputElement).value);
+    this.requestUpdate();
+  }
+
   private async _copyToClipboard(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      this._showStatusMessage('Copied to clipboard', 'success');
+      this._showStatusMessage(t('Copied to clipboard'), 'success');
     } catch {
-      this._showStatusMessage('Failed to copy', 'error');
+      this._showStatusMessage(t('Failed to copy'), 'error');
     }
   }
 
@@ -1437,7 +1478,7 @@ export class SettingsPage extends LitElement {
     const oldSuffix = sanitize(oldName ?? '');
     const newSuffix = sanitize(String(newName));
     this._confirmAction = {
-      title: 'Rename Device',
+      title: t('Rename Device'),
       message:
         `Renaming the device will rename all entity IDs ending in _${oldSuffix} to _${newSuffix}. ` +
         `Any automations, scripts, or dashboards referencing entity IDs by the old name will need updating. ` +
@@ -1452,8 +1493,8 @@ export class SettingsPage extends LitElement {
   private _handleRebootFromModal() {
     this._settingsModalOpen = false;
     this._confirmAction = {
-      title: 'Reboot Device',
-      message: 'Are you sure you want to reboot the device? The device will be temporarily unavailable.',
+      title: t('Reboot Device'),
+      message: t('Are you sure you want to reboot the device? The device will be temporarily unavailable.'),
       onConfirm: () => this._executeDeviceCommand('reboot'),
     };
     this._confirmDialogOpen = true;
@@ -1464,12 +1505,12 @@ export class SettingsPage extends LitElement {
     try {
       const result = await executeLocal(this.hass, command, undefined, this.config?.entry_id);
       if (!result.success) {
-        this._showStatusMessage(`Command failed: ${result.response}`, 'error');
+        this._showStatusMessage(t('Command failed: {response}', { response: result.response }), 'error');
       } else {
-        this._showStatusMessage(`Device ${command} initiated`, 'success');
+        this._showStatusMessage(t('Device {command} initiated', { command }), 'success');
       }
     } catch (error) {
-      this._showStatusMessage(`Error: ${String(error)}`, 'error');
+      this._showStatusMessage(t('Error: {error}', { error: String(error) }), 'error');
     }
   }
 
@@ -1486,7 +1527,7 @@ export class SettingsPage extends LitElement {
         // Fetch coordinates from HA zone.home
         const zoneHome = this.hass.states['zone.home'];
         if (!zoneHome || zoneHome.attributes.latitude == null || zoneHome.attributes.longitude == null) {
-          this._showStatusMessage('Could not read zone.home coordinates from Home Assistant', 'error');
+          this._showStatusMessage(t('Could not read zone.home coordinates from Home Assistant'), 'error');
           return;
         }
         settings['latitude'] = zoneHome.attributes.latitude;
@@ -1503,7 +1544,7 @@ export class SettingsPage extends LitElement {
       if (Object.keys(settings).length > 0) {
         const result = await setDeviceConfig(this.hass, settings, this.config?.entry_id);
         if (!result.success) {
-          this._showStatusMessage('Failed to save coordinates', 'error');
+          this._showStatusMessage(t('Failed to save coordinates'), 'error');
           return;
         }
         // Optimistically update local device config so fields reflect new values
@@ -1523,14 +1564,14 @@ export class SettingsPage extends LitElement {
       // Apply location source
       const sourceResult = await setLocationSource(this.hass, this._locationSource, this.config?.entry_id);
       if (!sourceResult.success) {
-        this._showStatusMessage('Failed to update location source', 'error');
+        this._showStatusMessage(t('Failed to update location source'), 'error');
         return;
       }
 
       await this._loadDeviceConfig();
-      this._showStatusMessage('Location settings applied', 'success');
+      this._showStatusMessage(t('Location settings applied'), 'success');
     } catch (error) {
-      this._showStatusMessage(`Error: ${String(error)}`, 'error');
+      this._showStatusMessage(t('Error: {error}', { error: String(error) }), 'error');
     } finally {
       this._saving = false;
     }
@@ -1538,8 +1579,8 @@ export class SettingsPage extends LitElement {
 
   private _showRegenIdentityConfirm() {
     this._confirmAction = {
-      title: 'Regenerate Identity',
-      message: 'This will create a new cryptographic identity, reboot the device, and migrate all entity IDs to the new key prefix. Existing automations referencing entity IDs by the old prefix will need updating. All contacts must re-add this device. This cannot be undone.',
+      title: t('Regenerate Identity'),
+      message: t('This will create a new cryptographic identity, reboot the device, and migrate all entity IDs to the new key prefix. Existing automations referencing entity IDs by the old prefix will need updating. All contacts must re-add this device. This cannot be undone.'),
       requireTyped: 'REGENERATE',
       onConfirm: async () => {
         if (!this.hass) return;
@@ -1562,16 +1603,16 @@ export class SettingsPage extends LitElement {
     const raw = this._importKeyValue.trim().replace(/\s+/g, '');
     if (!raw) return;
     if (raw.length !== 64 && raw.length !== 128) {
-      this._showStatusMessage('Private key must be 64 or 128 hex characters', 'error');
+      this._showStatusMessage(t('Private key must be 64 or 128 hex characters'), 'error');
       return;
     }
     if (!/^[0-9a-fA-F]+$/.test(raw)) {
-      this._showStatusMessage('Private key must be hex (0-9, a-f)', 'error');
+      this._showStatusMessage(t('Private key must be hex (0-9, a-f)'), 'error');
       return;
     }
     this._confirmAction = {
-      title: 'Import Private Key',
-      message: 'Importing a private key will replace the device identity, reboot the device, and migrate all entity IDs to the new key prefix. Existing automations referencing entity IDs by the old prefix will need updating. All contacts must re-add this device.',
+      title: t('Import Private Key'),
+      message: t('Importing a private key will replace the device identity, reboot the device, and migrate all entity IDs to the new key prefix. Existing automations referencing entity IDs by the old prefix will need updating. All contacts must re-add this device.'),
       requireTyped: 'IMPORT',
       onConfirm: () => this._importIdentityKey(),
     };
@@ -1672,10 +1713,10 @@ export class SettingsPage extends LitElement {
     const state = this._identityFlowState;
     if (state.kind === 'closed') return nothing;
 
-    const flowLabel = state.flow === 'regenerate' ? 'Regenerate Identity' : 'Import Private Key';
-    const inFlightTitle = state.flow === 'regenerate' ? 'Regenerating Identity' : 'Importing Identity';
-    const successTitle = state.flow === 'regenerate' ? 'Identity Regenerated' : 'Identity Imported';
-    const failureTitle = state.flow === 'regenerate' ? 'Identity Regeneration Failed' : 'Identity Import Failed';
+    const flowLabel = state.flow === 'regenerate' ? t('Regenerate Identity') : t('Import Private Key');
+    const inFlightTitle = state.flow === 'regenerate' ? t('Regenerating Identity') : t('Importing Identity');
+    const successTitle = state.flow === 'regenerate' ? t('Identity Regenerated') : t('Identity Imported');
+    const failureTitle = state.flow === 'regenerate' ? t('Identity Regeneration Failed') : t('Identity Import Failed');
 
     let body;
     let footer;
@@ -1683,7 +1724,7 @@ export class SettingsPage extends LitElement {
     if (state.kind === 'progress') {
       body = html`
         <div style="font-size: 13px; color: var(--secondary-text-color); margin-bottom: 16px;">
-          This typically takes 5–10 seconds. Please don't close this dialog.
+          ${t('This typically takes 5–10 seconds. Please don\'t close this dialog.')}
         </div>
         <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
           ${IDENTITY_FLOW_STEP_ORDER.map((entry) => {
@@ -1712,24 +1753,24 @@ export class SettingsPage extends LitElement {
       body = html`
         <div style="font-size: 32px; text-align: center; margin-bottom: 8px;">✅</div>
         <div style="font-size: 14px; margin-bottom: 16px;">
-          The device's identity has been replaced and verified.
+          ${t('The device\'s identity has been replaced and verified.')}
         </div>
         <div style="font-family: monospace; font-size: 12px; background: var(--card-background-color, #f5f5f5); padding: 8px 12px; border-radius: 4px; margin-bottom: 12px;">
-          <div><span style="color: var(--secondary-text-color);">Old key:</span> ${state.oldPubkey.slice(0, 12)}…</div>
-          <div><span style="color: var(--secondary-text-color);">New key:</span> ${state.newPubkey.slice(0, 12)}… <span style="color: var(--success-color, #28a745); font-size: 11px;">(verified after reload)</span></div>
+          <div><span style="color: var(--secondary-text-color);">${t('Old key:')}</span> ${state.oldPubkey.slice(0, 12)}…</div>
+          <div><span style="color: var(--secondary-text-color);">${t('New key:')}</span> ${state.newPubkey.slice(0, 12)}… <span style="color: var(--success-color, #28a745); font-size: 11px;">(verified after reload)</span></div>
         </div>
         ${state.warning ? html`
           <div style="font-size: 13px; color: var(--secondary-text-color); margin-top: 12px; padding: 8px 12px; border-left: 3px solid var(--warning-color, #f0ad4e); background: var(--warning-color-bg, rgba(240, 173, 78, 0.08));">
-            <strong>Follow-up:</strong>
+            <strong>${t('Follow-up:')}</strong>
             <ul style="margin: 4px 0 0 16px; padding: 0;">
               <li>${state.warning}</li>
-              <li>Check Settings → Repairs for the entity-ID migration list.</li>
+              <li>${t('Check Settings → Repairs for the entity-ID migration list.')}</li>
             </ul>
           </div>
         ` : nothing}
       `;
       footer = html`
-        <button class="modal-action" @click=${this._closeIdentityFlowModal}>Close</button>
+        <button class="modal-action" @click=${this._closeIdentityFlowModal}>${t('Close')}</button>
       `;
     } else {
       // failure
@@ -1737,16 +1778,16 @@ export class SettingsPage extends LitElement {
         <div style="font-size: 32px; text-align: center; margin-bottom: 8px;">❌</div>
         <div style="font-size: 14px; margin-bottom: 12px;">
           ${state.flow === 'regenerate'
-            ? 'The device firmware rejected the new key. Your device identity is unchanged.'
-            : 'The import did not take effect. Your device identity may be unchanged.'}
+            ? t('The device firmware rejected the new key. Your device identity is unchanged.')
+            : t('The import did not take effect. Your device identity may be unchanged.')}
         </div>
         <div style="font-family: monospace; font-size: 12px; background: var(--card-background-color, #f5f5f5); padding: 8px 12px; border-radius: 4px;">
-          <div><span style="color: var(--secondary-text-color);">Error code:</span> ${state.code}</div>
-          <div style="margin-top: 4px; word-break: break-word;"><span style="color: var(--secondary-text-color);">Message:</span> ${state.message}</div>
+          <div><span style="color: var(--secondary-text-color);">${t('Error code:')}</span> ${state.code}</div>
+          <div style="margin-top: 4px; word-break: break-word;"><span style="color: var(--secondary-text-color);">${t('Message:')}</span> ${state.message}</div>
         </div>
       `;
       footer = html`
-        <button class="modal-action" @click=${this._closeIdentityFlowModal}>Close</button>
+        <button class="modal-action" @click=${this._closeIdentityFlowModal}>${t('Close')}</button>
       `;
     }
 
@@ -1763,7 +1804,7 @@ export class SettingsPage extends LitElement {
           <div class="modal-header">
             <span class="modal-title">${headerTitle}</span>
             ${state.kind === 'progress' ? nothing : html`
-              <button class="modal-close" aria-label="Close" @click=${this._closeIdentityFlowModal}>&times;</button>
+              <button class="modal-close" aria-label=${t('Close')} @click=${this._closeIdentityFlowModal}>&times;</button>
             `}
           </div>
           <div class="modal-body" style="padding: 20px;">
@@ -1808,37 +1849,29 @@ export class SettingsPage extends LitElement {
     return html`
       <div class="dialog-overlay">
         <div class="dialog"
-             role="dialog" aria-modal="true" aria-label="Device renamed"
+             role="dialog" aria-modal="true" aria-label=${t('Device renamed')}
              data-a11y="rename-success"
              @click=${(e: Event) => e.stopPropagation()}>
           <div class="dialog-header">
-            <div class="dialog-header-title">Device renamed</div>
+            <div class="dialog-header-title">${t('Device renamed')}</div>
           </div>
           <div class="dialog-body">
             <p style="margin: 0 0 12px 0;">
-              The MeshCore device was renamed from
-              <code>${r.old_name}</code> to <code>${r.new_name}</code>.
+              ${t('The MeshCore device was renamed from {old} to {new}.', { old: r.old_name, new: r.new_name })}
             </p>
             <p style="margin: 0 0 12px 0;">
-              ${r.count}
-              ${r.count === 1 ? 'entity ID was' : 'entity IDs were'}
-              automatically migrated from the
-              <code>_${r.old_suffix}</code> suffix to
-              <code>_${r.new_suffix}</code>.
+              ${tn('{n} entity ID was automatically migrated from the {old} suffix to {new}.', '{n} entity IDs were automatically migrated from the {old} suffix to {new}.', r.count, { old: `_${r.old_suffix}`, new: `_${r.new_suffix}` })}
             </p>
             <p style="margin: 0 0 12px 0;">
-              If you have automations, scripts, or dashboards
-              referencing the old entity IDs, you will need to
-              update them manually to use the new suffix.
+              ${t('If you have automations, scripts, or dashboards referencing the old entity IDs, you will need to update them manually to use the new suffix.')}
             </p>
             <p style="margin: 0; color: var(--secondary-text-color); font-size: 13px;">
-              The full list of renamed entity IDs is available in
-              Settings → Repairs.
+              ${t('The full list of renamed entity IDs is available in Settings → Repairs.')}
             </p>
           </div>
           <div class="dialog-footer">
             <button class="dialog-button primary"
-                    @click=${this._closeRenameSuccessModal}>Close</button>
+                    @click=${this._closeRenameSuccessModal}>${t('Close')}</button>
           </div>
         </div>
       </div>
@@ -1851,7 +1884,7 @@ export class SettingsPage extends LitElement {
       try {
         await this._confirmAction.onConfirm();
       } catch (error) {
-        this._error = `Error: ${String(error)}`;
+        this._error = t('Error: {error}', { error: String(error) });
       }
     }
     this._confirmAction = null;
@@ -1989,9 +2022,9 @@ export class SettingsPage extends LitElement {
 
     try {
       const result = await executeLocal(this.hass, command, args, this.config?.entry_id);
-      this._showStatusMessage(`Companion: ${displayName} → ${result.response || 'OK'}`, 'success');
+      this._showStatusMessage(t('Companion: {displayName} → {OK}', { displayName, OK: result.response || 'OK' }), 'success');
     } catch (error) {
-      this._showStatusMessage(`Companion: ${displayName} failed — ${String(error)}`, 'error');
+      this._showStatusMessage(t('Companion: {displayName} failed — {error}', { displayName, error: String(error) }), 'error');
     }
   }
 
@@ -2028,7 +2061,7 @@ export class SettingsPage extends LitElement {
   private _hideSensorFromContext() {
     if (!this._contextMenu) return;
     this._hideSensor(this._contextMenu.deviceKey, this._contextMenu.entityId);
-    this._showStatusMessage(`Hidden: ${this._contextMenu.label}`, 'success');
+    this._showStatusMessage(t('Hidden: {label}', { label: this._contextMenu.label }), 'success');
     this._contextMenu = null;
   }
 

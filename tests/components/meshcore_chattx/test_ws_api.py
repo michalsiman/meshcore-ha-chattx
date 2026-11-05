@@ -3858,3 +3858,25 @@ async def test_ws_set_device_config_path_hash_mode_ok_counts_success(
     assert len(conn.results) == 1
     _, result = conn.results[0]
     assert "path_hash_mode" in result["changed"]
+
+
+# ─── _read_path_hash_mode ────────────────────────────────────────────────
+
+
+async def test_read_path_hash_mode_from_device_query() -> None:
+    """The mode comes from the device query reply."""
+    coordinator = MagicMock()
+    coordinator.api.mesh_core.commands.send_device_query = AsyncMock(
+        return_value=MagicMock(payload={"path_hash_mode": 1})
+    )
+    assert await ws_api._read_path_hash_mode(coordinator) == 1
+
+
+async def test_read_path_hash_mode_unknown() -> None:
+    """A failed query or a reply without the mode gives None, not a guess."""
+    coordinator = MagicMock()
+    commands = coordinator.api.mesh_core.commands
+    commands.send_device_query = AsyncMock(side_effect=RuntimeError("no device"))
+    assert await ws_api._read_path_hash_mode(coordinator) is None
+    commands.send_device_query = AsyncMock(return_value=MagicMock(payload={}))
+    assert await ws_api._read_path_hash_mode(coordinator) is None

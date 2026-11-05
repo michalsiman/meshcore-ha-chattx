@@ -1,8 +1,8 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { getQuickMessages, MAX_QUICK_MESSAGE_BYTES, MAX_QUICK_MESSAGES, saveQuickMessages } from '../api';
-import { isCzech } from '../utils/language';
 
 /** Settings card body: one quick message per line. */
 @customElement('chattx-quick-messages-editor')
@@ -55,21 +55,18 @@ export class QuickMessagesEditor extends LitElement {
 
   private async _save() {
     if (!this.hass) return;
-    const cs = isCzech();
     const messages = this._text.split('\n').map((line) => line.trim()).filter(Boolean);
     this._status = '';
     this._error = '';
     if (messages.length > MAX_QUICK_MESSAGES) {
-      this._error = cs ? `Nejvýše ${MAX_QUICK_MESSAGES} zpráv.` : `At most ${MAX_QUICK_MESSAGES} messages.`;
+      this._error = t('At most {MAX_QUICK_MESSAGES} messages.', { MAX_QUICK_MESSAGES });
       return;
     }
     const encoder = new TextEncoder();
     const tooLong = messages.find((message) => encoder.encode(message).length > MAX_QUICK_MESSAGE_BYTES);
     if (tooLong) {
       const start = tooLong.length > 30 ? `${tooLong.slice(0, 30)}…` : tooLong;
-      this._error = cs
-        ? `Zpráva může mít nejvýše ${MAX_QUICK_MESSAGE_BYTES} bajtů (písmeno s diakritikou zabírá 2): „${start}“`
-        : `A message can have at most ${MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): "${start}"`;
+      this._error = t('A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): "{start}"', { MAX_QUICK_MESSAGE_BYTES, start });
       return;
     }
     this._saving = true;
@@ -80,22 +77,21 @@ export class QuickMessagesEditor extends LitElement {
       return;
     }
     this._text = messages.join('\n');
-    this._status = cs ? 'Uloženo.' : 'Saved.';
+    this._status = t('Saved.');
   }
 
   render() {
-    const cs = isCzech();
     const canEdit = !!this.hass?.user?.is_admin;
     return html`
-      <p>${cs ? 'Každý řádek je jedna zpráva. Nabídnou se v chatu pod tlačítkem s bleskem.' : 'One message per line. They are offered in chat under the lightning button.'}</p>
+      <p>${t('One message per line. They are offered in chat under the lightning button.')}</p>
       <textarea
-        aria-label=${cs ? 'Předpřipravené zprávy' : 'Quick messages'}
+        aria-label=${t('Quick messages')}
         ?readonly=${!canEdit}
         .value=${this._text}
         @input=${(e: Event) => { this._text = (e.target as HTMLTextAreaElement).value; this._status = ''; }}></textarea>
       ${canEdit ? html`
         <div class="actions">
-          <button ?disabled=${this._saving} @click=${this._save}>${cs ? 'Uložit' : 'Save'}</button>
+          <button ?disabled=${this._saving} @click=${this._save}>${t('Save')}</button>
           ${this._status ? html`<span class="status" role="status">${this._status}</span>` : ''}
           ${this._error ? html`<span class="error" role="alert">${this._error}</span>` : ''}
         </div>

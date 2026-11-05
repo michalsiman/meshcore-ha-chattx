@@ -1,3 +1,4 @@
+import { N_ } from '../i18n';
 // Shared meshcore entity classifier used by both settings-page and devices-page.
 //
 // Strategy:
@@ -76,9 +77,9 @@ export function classifyEntity(entity: any): EntityInfo | null {
   // as OK/Detected rows (booleanProblem) and grouped under Status.
   if (eid.startsWith('binary_sensor.meshcore_')
       && /_err_(pool_full|cad_timeout|rx_timeout)_/.test(eid)) {
-    const label = eid.includes('err_pool_full') ? 'Radio Fault: Packet Pool'
-                : eid.includes('err_cad_timeout') ? 'Radio Fault: CAD Timeout'
-                : 'Radio Fault: RX-Start Timeout';
+    const label = eid.includes('err_pool_full') ? N_('Radio Fault: Packet Pool')
+                : eid.includes('err_cad_timeout') ? N_('Radio Fault: CAD Timeout')
+                : N_('Radio Fault: RX-Start Timeout');
     return { entity_id: eid, label, icon: 'alert',
              colorScheme: 'neutral', sortOrder: 13, booleanProblem: true };
   }
@@ -113,7 +114,7 @@ export function classifyEntity(entity: any): EntityInfo | null {
   //     original_device_class on the entity_registry/list response; the
   //     entity_id pattern is the project-specific fallback. ---
   if (dc === 'battery' || eid.includes('battery_percentage')) {
-    return { entity_id: eid, label: 'Battery', icon: 'battery',
+    return { entity_id: eid, label: N_('Battery'), icon: 'battery',
              colorScheme: 'battery', sortOrder: 1,
              metricKey: 'battery_pct' };
   }
@@ -121,7 +122,7 @@ export function classifyEntity(entity: any): EntityInfo | null {
       || eid.includes('_voltage') || eid.includes('cv_voltage')) {
     // Voltage is informational only. No metricKey — chemistry varies
     // per board and the integration doesn't expose chemistry per node.
-    return { entity_id: eid, label: 'Voltage', icon: 'power',
+    return { entity_id: eid, label: N_('Voltage'), icon: 'power',
              colorScheme: 'neutral', sortOrder: 2 };
   }
   if (dc === 'duration' || eid.includes('uptime')) {
@@ -129,24 +130,22 @@ export function classifyEntity(entity: any): EntityInfo | null {
     // between seconds/hours/days). node-summary._evaluateForRow reads the
     // unit_of_measurement state attribute to convert to hours before calling
     // evaluateSensor.
-    return { entity_id: eid, label: 'Uptime', icon: 'clock',
+    return { entity_id: eid, label: N_('Uptime'), icon: 'clock',
              colorScheme: 'neutral', sortOrder: 3,
              metricKey: 'uptime_hours' };
   }
   if (dc === 'signal_strength' || eid.includes('tx_power')) {
     // Currently only TX Power uses signal_strength in meshcore. TX Power
     // is informational (regulatory ceilings vary per region) — no metricKey.
-    return { entity_id: eid, label: 'TX Power', icon: 'power',
+    return { entity_id: eid, label: N_('TX Power'), icon: 'power',
              colorScheme: 'neutral', sortOrder: 6 };
   }
   if (dc === 'temperature' || eid.includes('_temperature')) {
-    return { entity_id: eid, label: 'Temperature', icon: 'thermometer',
+    return { entity_id: eid, label: N_('Temperature'), icon: 'thermometer',
              colorScheme: 'neutral', sortOrder: 7,
              metricKey: 'temperature',
              staticTooltip:
-               'Ambient temperature reported by the node. Informational; ' +
-               'no threshold band -- expected ranges depend heavily on ' +
-               'where the device is mounted.' };
+               'Ambient temperature reported by the node. Informational; no threshold band -- expected ranges depend heavily on where the device is mounted.' };
   }
 
   // --- Step 4: entity_id substring fallback (categories without a device_class
@@ -158,52 +157,52 @@ export function classifyEntity(entity: any): EntityInfo | null {
   // RX vs TX explicitly so the table shows distinct rows instead of four
   // "Airtime" lines.
   if (eid.includes('rx_airtime_utilization')) {
-    return { entity_id: eid, label: 'RX Airtime Util', icon: 'chart',
+    return { entity_id: eid, label: N_('RX Airtime Util'), icon: 'chart',
              colorScheme: 'neutral', sortOrder: 10,
              metricKey: 'rx_airtime_util' };
   }
   if (eid.includes('airtime_utilization')) {
-    return { entity_id: eid, label: 'TX Airtime Util', icon: 'chart',
+    return { entity_id: eid, label: N_('TX Airtime Util'), icon: 'chart',
              colorScheme: 'neutral', sortOrder: 10,
              metricKey: 'tx_airtime_util' };
   }
   if (eid.includes('rx_airtime')) {
     // Raw RX airtime (total seconds receiving). Informational — no band.
-    return { entity_id: eid, label: 'RX Airtime', icon: 'chart',
+    return { entity_id: eid, label: N_('RX Airtime'), icon: 'chart',
              colorScheme: 'neutral', sortOrder: 9 };
   }
   if (eid.includes('airtime')) {
     // Raw TX airtime (total seconds transmitting). Informational — no band.
-    return { entity_id: eid, label: 'Airtime', icon: 'chart',
+    return { entity_id: eid, label: N_('Airtime'), icon: 'chart',
              colorScheme: 'neutral', sortOrder: 9 };
   }
 
   if (eid.includes('snr') && !eid.includes('neighbor')) {
-    return { entity_id: eid, label: 'SNR', icon: 'signal',
+    return { entity_id: eid, label: N_('SNR'), icon: 'signal',
              colorScheme: 'signal', sortOrder: 4,
              metricKey: 'snr' };
   }
   if (eid.includes('rssi')) {
-    return { entity_id: eid, label: 'RSSI', icon: 'signal',
+    return { entity_id: eid, label: N_('RSSI'), icon: 'signal',
              colorScheme: 'signal', sortOrder: 5,
              metricKey: 'rssi' };
   }
   if (eid.includes('noise_floor')) {
-    return { entity_id: eid, label: 'Noise Floor', icon: 'signal',
+    return { entity_id: eid, label: N_('Noise Floor'), icon: 'signal',
              colorScheme: 'signal', sortOrder: 11,
              metricKey: 'noise_floor' };
   }
   if (eid.includes('tx_queue_len')) {
-    return { entity_id: eid, label: 'TX Queue Length', icon: 'counter',
+    return { entity_id: eid, label: N_('TX Queue Length'), icon: 'counter',
              colorScheme: 'neutral', sortOrder: 12,
              metricKey: 'tx_queue_len' };
   }
   if (eid.includes('contact_count')) {
-    return { entity_id: eid, label: 'Contacts', icon: 'counter',
+    return { entity_id: eid, label: N_('Contacts'), icon: 'counter',
              colorScheme: 'neutral', sortOrder: 8 };
   }
   if (eid.includes('channel_util')) {
-    return { entity_id: eid, label: 'Channel Util', icon: 'chart',
+    return { entity_id: eid, label: N_('Channel Util'), icon: 'chart',
              colorScheme: 'neutral', sortOrder: 10,
              metricKey: 'channel_util' };
   }

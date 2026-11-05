@@ -1,8 +1,8 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { sendRepeaterCommand } from '../api';
-import { isCzech } from '../utils/language';
 
 interface TerminalLine {
   kind: 'command' | 'reply' | 'note';
@@ -91,7 +91,6 @@ export class RepeaterTerminal extends LitElement {
     e.preventDefault();
     const command = this._input.trim();
     if (!this.hass || !command || this._busy || !this.canSend) return;
-    const cs = isCzech();
     const prefix = this.prefix;
     this._input = '';
     this._history = [...this._history, command];
@@ -104,11 +103,11 @@ export class RepeaterTerminal extends LitElement {
     if (result.success) {
       this._add({ kind: 'reply', text: result.reply ?? '' });
     } else if (result.reason === 'no_response') {
-      this._add({ kind: 'note', text: cs ? 'Bez odpovědi. Příkaz se mohl provést, neopakuje se automaticky.' : 'No reply. The command may still have run, and it is not repeated automatically.' });
+      this._add({ kind: 'note', text: t('No reply. The command may still have run, and it is not repeated automatically.') });
     } else if (result.reason === 'rate_limited') {
-      this._add({ kind: 'note', text: cs ? `Neodesláno, limit provozu sítě. Zkus to za ${result.retry_after} s.` : `Not sent because of the mesh traffic limit. Try again in ${result.retry_after} s.` });
+      this._add({ kind: 'note', text: t('Not sent because of the mesh traffic limit. Try again in {seconds} s.', { seconds: result.retry_after ?? 0 }) });
     } else {
-      this._add({ kind: 'note', text: result.message ?? (cs ? 'Odeslání selhalo.' : 'Sending failed.') });
+      this._add({ kind: 'note', text: result.message ?? (t('Sending failed.')) });
     }
     await this.updateComplete;
     this._inputEl?.focus();
@@ -123,17 +122,16 @@ export class RepeaterTerminal extends LitElement {
   }
 
   render() {
-    const cs = isCzech();
     const placeholder = this.canSend
-      ? (cs ? 'Příkaz, např. get tx' : 'Command, e.g. get tx')
-      : (cs ? 'Nejdřív se přihlas jako administrátor' : 'Log in as administrator first');
+      ? (t('Command, e.g. get tx'))
+      : (t('Log in as administrator first'));
     return html`
-      <div class="log" role="log" aria-label=${cs ? 'Odpovědi repeateru' : 'Repeater replies'}>${this._lines.map(
+      <div class="log" role="log" aria-label=${t('Repeater replies')}>${this._lines.map(
         (line) => html`<div class=${line.kind}>${line.text}</div>`,
-      )}${this._busy ? html`<div class="note">${cs ? 'Čekám na odpověď…' : 'Waiting for a reply…'}</div>` : ''}</div>
+      )}${this._busy ? html`<div class="note">${t('Waiting for a reply…')}</div>` : ''}</div>
       <form @submit=${this._submit}>
         <input
-          aria-label=${cs ? 'Příkaz pro repeater' : 'Repeater command'}
+          aria-label=${t('Repeater command')}
           autocomplete="off"
           autocapitalize="off"
           spellcheck="false"
@@ -143,7 +141,7 @@ export class RepeaterTerminal extends LitElement {
           ?disabled=${!this.canSend}
           @input=${(e: Event) => { this._input = (e.target as HTMLInputElement).value; }}
           @keydown=${this._onKeydown} />
-        <button type="submit" ?disabled=${!this.canSend || this._busy || !this._input.trim()}>${cs ? 'Odeslat' : 'Send'}</button>
+        <button type="submit" ?disabled=${!this.canSend || this._busy || !this._input.trim()}>${t('Send')}</button>
       </form>
     `;
   }

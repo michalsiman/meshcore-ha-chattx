@@ -1,3 +1,4 @@
+import { getLocale, t, tn } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
@@ -237,15 +238,15 @@ export class MessageSearch extends LitElement {
           <input
             class="search-input"
             type="text"
-            aria-label="Search messages"
-            placeholder="Search messages..."
+            aria-label=${t('Search messages')}
+            placeholder=${t('Search messages...')}
             .value=${this._query}
             @input=${this._onQueryInput}
           />
           <button
             class="filter-toggle ${this._showFilters ? 'active' : ''}"
             @click=${() => { this._showFilters = !this._showFilters; }}>
-            Filters
+            ${t('Filters')}
           </button>
         </div>
         ${this._showFilters
@@ -254,14 +255,14 @@ export class MessageSearch extends LitElement {
                 <input
                   class="filter-input"
                   type="date"
-                  placeholder="From"
+                  placeholder=${t('From')}
                   .value=${this._fromDate}
                   @change=${(e: Event) => { this._fromDate = (e.target as HTMLInputElement).value; this._doSearch(); }}
                 />
                 <input
                   class="filter-input"
                   type="date"
-                  placeholder="To"
+                  placeholder=${t('To')}
                   .value=${this._toDate}
                   @change=${(e: Event) => { this._toDate = (e.target as HTMLInputElement).value; this._doSearch(); }}
                 />
@@ -269,25 +270,25 @@ export class MessageSearch extends LitElement {
             `
           : ''}
         ${this._hasSearched
-          ? html`<div class="result-count">${this._totalCount} result${this._totalCount !== 1 ? 's' : ''}</div>`
+          ? html`<div class="result-count">${tn('{n} result', '{n} results', this._totalCount)}</div>`
           : ''}
       </div>
 
       <div class="results">
         ${this._searching
-          ? html`<div class="loading-state">Searching...</div>`
+          ? html`<div class="loading-state">${t('Searching...')}</div>`
           : !this._hasSearched
             ? html`
                 <div class="empty-state">
                   <div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.5"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
-                  <div class="empty-text">Search your message history</div>
+                  <div class="empty-text">${t('Search your message history')}</div>
                 </div>
               `
             : this._results.length === 0
               ? html`
                   <div class="empty-state">
                     <div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.5"><path d="M20 6H10v6H8V4h6V0H6v6H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 14H4V8h4v2c0 1.1.9 2 2 2h6v2h-2v2h2v2h-2v2h6V10h-4v10h2z"/></svg></div>
-                    <div class="empty-text">No messages found</div>
+                    <div class="empty-text">${t('No messages found')}</div>
                   </div>
                 `
               : this._results.map((r) => this._renderResult(r))}
@@ -297,8 +298,8 @@ export class MessageSearch extends LitElement {
 
   private _renderResult(result: SearchResult) {
     const date = new Date(result.timestamp);
-    const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    const dateStr = date.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
+    const timeStr = date.toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit' });
     const highlightedText = this._highlightQuery(result.text);
 
     return html`

@@ -21,6 +21,7 @@
 | **Emoji and quick messages** | – | ✅ **Pickers next to the message field** |
 | **Hop information** | In the message dialog | ✅ **Hop count and path size on each message** |
 | **Conversation list** | Contact ID or channel number | ✅ **Readable initials, newest first, age of the last message, IDs can be hidden** |
+| **Language** | English | ✅ **English and Czech, automatic or chosen in Settings** |
 | **On a phone** | Keyboard can push the top bar away | ✅ **Top bar stays reachable and the keyboard stays open** |
 | **Chat panel** | ✅ | ✅ |
 | **Message history, search, trace, node discovery** | ✅ | ✅ |
@@ -56,7 +57,7 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - Switch that sends text without diacritics, which leaves more room in a message
 - Emoji picker, inserting at the cursor
 - Quick messages, managed in Settings
-- One-tap "Slyším, N hops!" reply with the sender's name and the message's hop count (the text is Czech)
+- One-tap quick reply with the sender's name and the message's hop count, such as "Heard, 3 hops!" (the text can be changed in Settings)
 - The cursor moves to the message field when you pick a conversation
 
 **Conversation list**
@@ -75,7 +76,12 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - The keyboard stays open when you press a button next to the message field or send a message
 - Shorter title, `MC Chattx`, so the header stays on one line
 
-Parts of the new interface are in Czech when the browser language is Czech. The rest is in English.
+**Languages**
+
+- The whole panel is in English and Czech, except the descriptions in the command catalog
+- Follows your Home Assistant profile, then your browser, or pick a language in Settings
+- Terms from the MeshCore documentation, such as repeater, flood and hop, stay in English
+- Translations are plain text files in `frontend/src/i18n`, so corrections and new languages are welcome
 
 ### Screenshots of the new features
 
@@ -95,7 +101,7 @@ These use demo data, and the names and values are made up.
 <td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png" alt="Switch that hides contact IDs and channel numbers"></a></td>
 </tr>
 <tr>
-<td><b>Quick reply</b> — one tap puts "Slyším, N hops!" with the sender's name in the message field.</td>
+<td><b>Quick reply</b> — one tap puts a reply such as "Slyším, 4 hops!" with the sender's name in the message field.</td>
 <td><b>Cleaner list</b> — the gear menu hides contact IDs and channel numbers.</td>
 </tr>
 <tr>
@@ -170,7 +176,7 @@ The Chat images use demo data. The others come from the original MeshCore Chat, 
 <td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png" alt="Manage contacts and channels"></a></td>
 </tr>
 <tr>
-<td><b>Message popup</b> — click or tap any message for Copy, Reply or the one-tap "Slyším, N hops!" reply, plus the route metadata: hop sequence, SNR, RSSI, and exact receive timestamp.</td>
+<td><b>Message popup</b> — click or tap any message for Copy, Reply or the one-tap quick reply, plus the route metadata: hop sequence, SNR, RSSI, and exact receive timestamp.</td>
 <td><b>Manage contacts &amp; channels</b> — promote any discovered node to an Added contact, or remove it; channel list lives on the second tab. The switch at the top hides contact IDs and channel numbers in the chat list.</td>
 </tr>
 </table>

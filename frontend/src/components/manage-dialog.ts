@@ -1,10 +1,10 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, Contact, Channel } from '../types';
 import { getContacts, getChannels, getDeviceConfig, addContact, removeContact, removeChannel } from '../api';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import './channel-dialog';
-import { isCzech } from '../utils/language';
 import { avatarLabel } from '../utils/avatar-label';
 
 type ManageTab = 'contacts' | 'channels';
@@ -563,11 +563,11 @@ export class ManageDialog extends LitElement {
         class="dialog"
         role="dialog"
         aria-modal="true"
-        aria-label="Manage contacts and channels"
+        aria-label=${t('Manage contacts and channels')}
         @click=${(e: Event) => e.stopPropagation()}>
         <div class="dialog-header">
-          <span class="dialog-title">Manage</span>
-          <button class="close-btn" aria-label="Close" @click=${this._close}>✕</button>
+          <span class="dialog-title">${t('Manage')}</span>
+          <button class="close-btn" aria-label=${t('Close')} @click=${this._close}>✕</button>
         </div>
 
         <label class="list-option">
@@ -579,26 +579,26 @@ export class ManageDialog extends LitElement {
                 detail: { enabled: (e.target as HTMLInputElement).checked },
               }),
             )} />
-          ${isCzech() ? 'Zobrazovat ID kontaktů a čísla kanálů v seznamu chatů' : 'Show contact IDs and channel numbers in the chat list'}
+          ${t('Show contact IDs and channel numbers in the chat list')}
         </label>
 
         <div class="tab-bar">
           <button
             class=${this._activeTab === 'contacts' ? 'active' : ''}
             @click=${() => this._switchTab('contacts')}>
-            Contacts
+            ${t('Contacts')}
           </button>
           <button
             class=${this._activeTab === 'channels' ? 'active' : ''}
             @click=${() => this._switchTab('channels')}>
-            Channels
+            ${t('Channels')}
           </button>
         </div>
 
         ${this._activeTab === 'contacts'
           ? html`
               <div class="filter-bar">
-                <span class="filter-bar-label">Show</span>
+                <span class="filter-bar-label">${t('Show')}</span>
                 <div class="filter-bar-group">
                   ${(['all', 'added', 'discovered'] as const).map(
                     (c) => html`
@@ -606,20 +606,20 @@ export class ManageDialog extends LitElement {
                         class="filter-chip ${this._categoryFilter === c ? 'active' : ''}"
                         @click=${() => { this._categoryFilter = c; }}
                       >
-                        ${c === 'all' ? 'All' : c === 'added' ? 'Added' : 'Discovered'}
+                        ${c === 'all' ? t('All') : c === 'added' ? t('Added') : t('Discovered')}
                       </button>
                     `,
                   )}
                 </div>
-                <span class="filter-bar-label">Type</span>
+                <span class="filter-bar-label">${t('Type')}</span>
                 <div class="filter-bar-group">
                   ${(['all', 'clients', 'repeaters'] as const).map(
-                    (t) => html`
+                    (kind) => html`
                       <button
-                        class="filter-chip ${this._typeFilter === t ? 'active' : ''}"
-                        @click=${() => { this._typeFilter = t; }}
+                        class="filter-chip ${this._typeFilter === kind ? 'active' : ''}"
+                        @click=${() => { this._typeFilter = kind; }}
                       >
-                        ${t === 'all' ? 'All' : t === 'clients' ? 'Clients' : 'Repeaters'}
+                        ${kind === 'all' ? t('All') : kind === 'clients' ? t('Clients') : t('Repeaters')}
                       </button>
                     `,
                   )}
@@ -628,8 +628,8 @@ export class ManageDialog extends LitElement {
               <div class="search-bar">
                 <input
                   type="text"
-                  aria-label="Search contacts"
-                  placeholder="Search contacts..."
+                  aria-label=${t('Search contacts')}
+                  placeholder=${t('Search contacts...')}
                   .value=${this._searchQuery}
                   @input=${(e: Event) => {
                     this._searchQuery = (e.target as HTMLInputElement).value;
@@ -643,7 +643,7 @@ export class ManageDialog extends LitElement {
           ${this._loading
             ? html`<div class="loading-state">
                 <div class="loading-spinner"></div>
-                Loading...
+                ${t('Loading...')}
               </div>`
             : this._activeTab === 'contacts'
               ? this._renderContacts()
@@ -684,7 +684,7 @@ export class ManageDialog extends LitElement {
         <div class="empty-state">
           <div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.5"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
           <div class="empty-text">
-            ${isFiltered ? 'No contacts match' : 'No contacts discovered'}
+            ${isFiltered ? t('No contacts match') : t('No contacts discovered')}
           </div>
         </div>
       `;
@@ -715,16 +715,16 @@ export class ManageDialog extends LitElement {
           <div class="contact-meta">
             <span class="contact-prefix">${contact.pubkey_prefix}</span>
             <span class="badge ${isAdded ? 'added' : 'discovered'}">
-              ${isAdded ? html`<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" style="vertical-align: -1px; margin-right: 2px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>Added` : 'Discovered'}
+              ${isAdded ? html`<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" style="vertical-align: -1px; margin-right: 2px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>${t('Added')}` : t('Discovered')}
             </span>
           </div>
         </div>
         ${isConfirming
           ? html`
               <div class="confirm-inline">
-                <span class="confirm-text">Remove?</span>
-                <button class="confirm-btn yes" @click=${() => this._doRemoveContact(contact)}>Yes</button>
-                <button class="confirm-btn no" @click=${() => { this._confirmingRemoveContact = null; }}>No</button>
+                <span class="confirm-text">${t('Remove?')}</span>
+                <button class="confirm-btn yes" @click=${() => this._doRemoveContact(contact)}>${t('Yes')}</button>
+                <button class="confirm-btn no" @click=${() => { this._confirmingRemoveContact = null; }}>${t('No')}</button>
               </div>
             `
           : isAdded
@@ -733,7 +733,7 @@ export class ManageDialog extends LitElement {
                   class="action-btn remove"
                   ?disabled=${isActing}
                   @click=${() => { this._confirmingRemoveContact = contact.public_key; }}>
-                  ${isActing ? '...' : 'Remove'}
+                  ${isActing ? '...' : t('Remove')}
                 </button>
               `
             : html`
@@ -753,7 +753,7 @@ export class ManageDialog extends LitElement {
       return html`
         <div class="empty-state">
           <div class="empty-icon">#</div>
-          <div class="empty-text">No channels configured</div>
+          <div class="empty-text">${t('No channels configured')}</div>
         </div>
         <button class="add-channel-btn" @click=${this._openAddChannel}>
           + Add Channel
@@ -780,9 +780,9 @@ export class ManageDialog extends LitElement {
             ${confirming
               ? html`
                   <div class="confirm-inline">
-                    <span class="confirm-text">Remove?</span>
-                    <button class="confirm-btn yes" @click=${() => this._doRemoveChannel(channel)}>Yes</button>
-                    <button class="confirm-btn no" @click=${() => { this._confirmingRemoveChannel = null; }}>No</button>
+                    <span class="confirm-text">${t('Remove?')}</span>
+                    <button class="confirm-btn yes" @click=${() => this._doRemoveChannel(channel)}>${t('Yes')}</button>
+                    <button class="confirm-btn no" @click=${() => { this._confirmingRemoveChannel = null; }}>${t('No')}</button>
                   </div>
                 `
               : html`
@@ -791,13 +791,13 @@ export class ManageDialog extends LitElement {
                       class="action-btn"
                       ?disabled=${isActing}
                       @click=${() => this._openEditChannel(channel)}>
-                      Edit
+                      ${t('Edit')}
                     </button>
                     <button
                       class="action-btn remove"
                       ?disabled=${isActing}
                       @click=${() => { this._confirmingRemoveChannel = channel.channel_idx; }}>
-                      ${isActing ? '...' : 'Remove'}
+                      ${isActing ? '...' : t('Remove')}
                     </button>
                   </div>
                 `}

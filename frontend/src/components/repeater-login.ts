@@ -1,3 +1,4 @@
+import { getLocale, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
@@ -84,11 +85,11 @@ export class RepeaterLogin extends LitElement {
       this._loggedInAt = null;
       this._notifyLoggedIn();
     } else if (result.reason === 'rate_limited') {
-      this._error = `Too much mesh traffic right now. Try again in ${result.retry_after} seconds.`;
+      this._error = t('Too much mesh traffic right now. Try again in {retry_after} seconds.', { retry_after: result.retry_after ?? 0 });
     } else if (result.reason === 'no_response') {
-      this._error = 'The repeater did not confirm the login. The password may be wrong, or the repeater may be out of reach.';
+      this._error = t('The repeater did not confirm the login. The password may be wrong, or the repeater may be out of reach.');
     } else {
-      this._error = result.message ?? 'Login failed.';
+      this._error = result.message ?? t('Login failed.');
     }
   }
 
@@ -111,11 +112,11 @@ export class RepeaterLogin extends LitElement {
     return html`
       <form @submit=${this._submit}>
         <label>
-          Password
+          ${t('Password')}
           <input
             type="password"
             autocomplete="new-password"
-            placeholder=${this._hasSaved ? 'Saved password' : ''}
+            placeholder=${this._hasSaved ? t('Saved password') : ''}
             .value=${this._password}
             ?disabled=${this._busy}
             @input=${(e: Event) => { this._password = (e.target as HTMLInputElement).value; }}
@@ -128,25 +129,25 @@ export class RepeaterLogin extends LitElement {
             ?disabled=${this._busy}
             @change=${(e: Event) => { this._remember = (e.target as HTMLInputElement).checked; }}
           />
-          Remember password
+          ${t('Remember password')}
         </label>
         <div class="actions">
-          <button class="primary" type="submit" ?disabled=${this._busy}>${this._busy ? 'Logging in…' : 'Log in'}</button>
+          <button class="primary" type="submit" ?disabled=${this._busy}>${this._busy ? t('Logging in…') : t('Log in')}</button>
           ${this._hasSaved
-            ? html`<button class="link" type="button" ?disabled=${this._busy} @click=${this._forget}>Forget saved password</button>`
+            ? html`<button class="link" type="button" ?disabled=${this._busy} @click=${this._forget}>${t('Forget saved password')}</button>`
             : ''}
         </div>
-        ${this._busy ? html`<div class="note">This can take up to a minute over several hops.</div>` : ''}
+        ${this._busy ? html`<div class="note">${t('This can take up to a minute over several hops.')}</div>` : ''}
         ${this._error ? html`<div class="error" role="alert">${this._error}</div>` : ''}
         ${this._loggedInAs
           ? html`<div class="success" role="status">${
               this._loggedInAt
-                ? `Logged in as administrator since ${new Date(this._loggedInAt).toLocaleDateString()}. No need to log in again.`
+                ? t('Logged in as administrator since {date}. No need to log in again.', { date: new Date(this._loggedInAt).toLocaleDateString(getLocale()) })
                 : this._loggedInAs === 'admin'
-                ? 'Logged in as administrator.'
+                ? t('Logged in as administrator.')
                 : this._loggedInAs === 'guest'
-                  ? 'Logged in as guest. Changing settings requires the admin password.'
-                  : 'Logged in.'
+                  ? t('Logged in as guest. Changing settings requires the admin password.')
+                  : t('Logged in.')
             }</div>`
           : ''}
       </form>

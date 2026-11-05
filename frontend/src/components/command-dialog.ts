@@ -1,3 +1,4 @@
+import { getLocale, N_, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, CommandDef, CommandParam, HassEvent } from '../types';
@@ -147,13 +148,13 @@ export class CommandDialog extends LitElement {
           class="dialog"
           role="dialog"
           aria-modal="true"
-          aria-label="Issue command">
+          aria-label=${t('Issue command')}>
           <div class="dialog-header">
             <div style="flex: 1;">
-              <div class="dialog-header-title">Issue Command</div>
+              <div class="dialog-header-title">${t('Issue Command')}</div>
               ${this.targetPrefix
                 ? html`<div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 4px;">
-                    Target: ${this.targetPrefix}
+                    ${t('Target: {target}', { target: this.targetPrefix })}
                   </div>`
                 : ''}
             </div>
@@ -161,7 +162,7 @@ export class CommandDialog extends LitElement {
           <div class="dialog-body">
             <!-- Command Selection -->
             <div class="form-group">
-              <label class="form-label">Command</label>
+              <label class="form-label">${t('Command')}</label>
               <select
                 class="command-select"
                 @change=${this._onCommandSelected}>
@@ -191,7 +192,7 @@ export class CommandDialog extends LitElement {
                   ${this._selectedCommand.dangerous
                     ? html`<div class="danger-warning">
                         <span class="danger-warning-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg></span>
-                        <span>${this._selectedCommand.dangerMessage || 'This is a dangerous operation'}</span>
+                        <span>${this._selectedCommand.dangerMessage || t('This is a dangerous operation')}</span>
                       </div>`
                     : ''}
 
@@ -199,7 +200,7 @@ export class CommandDialog extends LitElement {
                   ${this._selectedCommand.params && this._selectedCommand.params.length > 0
                     ? html`
                         <div class="command-params">
-                          <label class="form-label">Parameters</label>
+                          <label class="form-label">${t('Parameters')}</label>
                           ${this._selectedCommand.params.map((param) =>
                             this._renderParamInput(param),
                           )}
@@ -210,7 +211,7 @@ export class CommandDialog extends LitElement {
                   <!-- Expected Response -->
                   ${this._selectedCommand.responseFormat
                     ? html`<div style="margin-top: 12px; font-size: 12px; color: var(--secondary-text-color); font-style: italic;">
-                        Expected: ${this._selectedCommand.responseFormat}
+                        ${t('Expected: {format}', { format: this._selectedCommand.responseFormat })}
                       </div>`
                     : ''}
 
@@ -220,14 +221,14 @@ export class CommandDialog extends LitElement {
                     style="width: 100%; margin-top: 12px;"
                     ?disabled=${this._executing}
                     @click=${this._executeCommand}>
-                    ${this._executing ? 'Executing...' : 'Execute'}
+                    ${this._executing ? t('Executing...') : t('Execute')}
                   </button>
 
                   <!-- Response Display -->
                   ${this._response || this._error
                     ? html`
                         <div class="form-group" style="margin-top: 16px;">
-                          <label class="form-label">Response</label>
+                          <label class="form-label">${t('Response')}</label>
                           <div
                             class="command-response"
                             style=${this._error ? 'color: var(--error-color, #db4437);' : ''}>
@@ -243,11 +244,11 @@ export class CommandDialog extends LitElement {
             ${!this.isLocal && this._deviceResponses.length > 0
               ? html`
                   <div class="form-group" style="margin-top: 16px;">
-                    <label class="form-label">Responses from device</label>
+                    <label class="form-label">${t('Responses from device')}</label>
                     <div class="device-response-feed">
                       ${this._deviceResponses.map(
                         (r) => html`<div class="device-response-row">
-                          <span class="drr-time">${new Date(r.ts).toLocaleTimeString()}</span><span class="drr-text">${r.text}</span>${r.snr !== undefined
+                          <span class="drr-time">${new Date(r.ts).toLocaleTimeString(getLocale())}</span><span class="drr-text">${r.text}</span>${r.snr !== undefined
                             ? html`<span class="drr-snr"> · SNR ${r.snr}</span>`
                             : ''}
                         </div>`,
@@ -261,7 +262,7 @@ export class CommandDialog extends LitElement {
             <button
               class="dialog-button"
               @click=${this._onClose}>
-              Close
+              ${t('Close')}
             </button>
           </div>
         </div>
@@ -392,34 +393,34 @@ export class CommandDialog extends LitElement {
 
   // Human-readable labels for known response keys
   private static _FRIENDLY_LABELS: Record<string, string> = {
-    adv_type: 'Device Type',
-    tx_power: 'TX Power (dBm)',
-    max_tx_power: 'Max TX Power (dBm)',
-    public_key: 'Public Key',
-    adv_lat: 'Latitude',
-    adv_lon: 'Longitude',
-    multi_acks: 'Multi-Acks',
-    adv_loc_policy: 'Location Ad Policy',
-    telemetry_mode_env: 'Telemetry: Environment',
-    telemetry_mode_loc: 'Telemetry: Location',
-    telemetry_mode_base: 'Telemetry: Base',
-    manual_add_contacts: 'Manual Add Contacts',
-    radio_freq: 'Frequency (MHz)',
-    radio_bw: 'Bandwidth (kHz)',
-    radio_sf: 'Spreading Factor',
-    radio_cr: 'Coding Rate',
-    name: 'Name',
-    path_hash_mode: 'Path Hash Mode',
-    firmware_ver: 'Firmware Version',
-    board_type: 'Board Type',
-    suggested_timeout: 'Suggested Timeout (ms)',
-    capabilities: 'Capabilities',
-    voltage: 'Voltage (mV)',
-    percentage: 'Battery (%)',
-    uptime: 'Uptime (s)',
-    temperature: 'Temperature',
-    max_hops: 'Max Hops (0 = unlimited)',
-    config: 'Auto-Add Config',
+    adv_type: N_('Device Type'),
+    tx_power: N_('TX Power (dBm)'),
+    max_tx_power: N_('Max TX Power (dBm)'),
+    public_key: N_('Public Key'),
+    adv_lat: N_('Latitude'),
+    adv_lon: N_('Longitude'),
+    multi_acks: N_('Multi-Acks'),
+    adv_loc_policy: N_('Location Ad Policy'),
+    telemetry_mode_env: N_('Telemetry: Environment'),
+    telemetry_mode_loc: N_('Telemetry: Location'),
+    telemetry_mode_base: N_('Telemetry: Base'),
+    manual_add_contacts: N_('Manual Add Contacts'),
+    radio_freq: N_('Frequency (MHz)'),
+    radio_bw: N_('Bandwidth (kHz)'),
+    radio_sf: N_('Spreading Factor'),
+    radio_cr: N_('Coding Rate'),
+    name: N_('Name'),
+    path_hash_mode: N_('Path Hash Mode'),
+    firmware_ver: N_('Firmware Version'),
+    board_type: N_('Board Type'),
+    suggested_timeout: N_('Suggested Timeout (ms)'),
+    capabilities: N_('Capabilities'),
+    voltage: N_('Voltage (mV)'),
+    percentage: N_('Battery (%)'),
+    uptime: N_('Uptime (s)'),
+    temperature: N_('Temperature'),
+    max_hops: N_('Max Hops (0 = unlimited)'),
+    config: N_('Auto-Add Config'),
   };
 
   // Value decoders for known response keys, parallel to _FRIENDLY_LABELS (which
@@ -440,15 +441,15 @@ export class CommandDialog extends LitElement {
     telemetry_mode_base: (v) => decodeEnum(v, ENUMS.TELEMETRY_MODE),
     // SDK emits this as a boolean (reader.py: `dbuf.read(1)[0] > 0`).
     manual_add_contacts: (v) => {
-      if (v === true) return 'Manual Mode';
-      if (v === false) return 'Auto-Add Enabled';
+      if (v === true) return t('Manual Mode');
+      if (v === false) return t('Auto-Add Enabled');
       const n = num(v);
-      if (n === undefined) return `Unknown (${v})`;
-      return n ? 'Manual Mode' : 'Auto-Add Enabled';
+      if (n === undefined) return t('Unknown ({v})', { v: String(v) });
+      return n ? t('Manual Mode') : t('Auto-Add Enabled');
     },
     multi_acks: (v) => {
       const n = num(v);
-      return n === undefined ? `Unknown (${v})` : n ? 'Yes' : 'No';
+      return n === undefined ? t('Unknown ({v})', { v: String(v) }) : n ? t('Yes') : t('No');
     },
     // Already decimal degrees from the SDK — append the unit, do not rescale.
     adv_lat: (v) => {
@@ -462,13 +463,13 @@ export class CommandDialog extends LitElement {
     // Auto-add config bitmask → checkmark sub-list of named flags.
     config: (v) => {
       const n = num(v);
-      return n === undefined ? `Unknown (${v})` : decodeBitmask(n, AUTOADD_BITS);
+      return n === undefined ? t('Unknown ({v})', { v: String(v) }) : decodeBitmask(n, AUTOADD_BITS);
     },
   };
 
   private _formatValue(value: unknown): string {
-    if (value === true) return 'Yes';
-    if (value === false) return 'No';
+    if (value === true) return t('Yes');
+    if (value === false) return t('No');
     if (value === null || value === undefined) return '—';
     if (typeof value === 'object') {
       // Nested object/array (e.g. telemetry LPP payload, frequency ranges):
@@ -496,7 +497,7 @@ export class CommandDialog extends LitElement {
           return html`
             <div style="display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px;">
               ${entries.map(([key, value]) => {
-                const label = CommandDialog._FRIENDLY_LABELS[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                const label = t(CommandDialog._FRIENDLY_LABELS[key] ?? '') || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
                 const formatter = CommandDialog._VALUE_FORMATTERS[key];
                 const formatted = formatter ? formatter(value) : undefined;
                 if (formatted && typeof formatted === 'object') {
@@ -567,7 +568,7 @@ export class CommandDialog extends LitElement {
         );
       } else {
         if (!this.targetPrefix) {
-          this._error = 'No target device specified';
+          this._error = t('No target device specified');
           return;
         }
         const args = this._paramValues;
@@ -584,10 +585,10 @@ export class CommandDialog extends LitElement {
       if (result.success) {
         this._response = result.response;
       } else {
-        this._error = result.response || 'Command execution failed';
+        this._error = result.response || t('Command execution failed');
       }
     } catch (error) {
-      this._error = `Error: ${String(error)}`;
+      this._error = t('Error: {error}', { error: String(error) });
     } finally {
       this._executing = false;
     }

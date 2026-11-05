@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { TraceResult } from '../api';
@@ -473,11 +474,11 @@ export class TraceDialog extends LitElement {
           class="dialog"
           role="dialog"
           aria-modal="true"
-          aria-label="Trace ${this.contactName}"
+          aria-label=${t('Trace {contactName}', { contactName: this.contactName })}
           @click=${(e: Event) => e.stopPropagation()}>
           <div class="dialog-header">
             <div class="dialog-title">Trace ${this.contactName}</div>
-            <button class="dialog-close" aria-label="Close" @click=${this._close}>✕</button>
+            <button class="dialog-close" aria-label=${t('Close')} @click=${this._close}>✕</button>
           </div>
           <div class="dialog-content">
             ${this._renderBody()}
@@ -491,7 +492,7 @@ export class TraceDialog extends LitElement {
     // error / result always take precedence if set, regardless of phase
     if (this.error) return html`<div class="error-box">${this.error}</div>`;
     if (this.result) return this._renderResult(this.result);
-    if (this._running) return html`<div class="info-value">Tracing…</div>`;
+    if (this._running) return html`<div class="info-value">${t('Tracing…')}</div>`;
     return this._renderInput();
   }
 
@@ -500,22 +501,21 @@ export class TraceDialog extends LitElement {
   private _renderInput() {
     return html`
       <div class="form-group">
-        <label class="form-label">Path Type</label>
+        <label class="form-label">${t('Path Type')}</label>
         <select
           class="form-select"
           .value=${this.pathMode}
           @change=${this._onPathModeChange}
         >
-          <option value="discovery">Path discovery (auto)</option>
-          <option value="select">Select repeaters</option>
-          <option value="explicit">Enter path</option>
+          <option value="discovery">${t('Path discovery (auto)')}</option>
+          <option value="select">${t('Select repeaters')}</option>
+          <option value="explicit">${t('Enter path')}</option>
         </select>
       </div>
 
       ${this.pathMode === 'discovery'
         ? html`<div class="info-item path-hint">
-            Flood path discovery will find a route automatically. May time
-            out if the target is many hops away or unreachable by flood.
+            ${t('Flood path discovery will find a route automatically. May time out if the target is many hops away or unreachable by flood.')}
           </div>`
         : this.pathMode === 'select'
           ? this._renderRepeaterPicker()
@@ -523,7 +523,7 @@ export class TraceDialog extends LitElement {
 
       ${this.pathMode !== 'discovery' && this._canRunTrace()
         ? html`<div class="info-item">
-            <div class="info-label">Resolved Path</div>
+            <div class="info-label">${t('Resolved Path')}</div>
             <div class="resolved-path">${this._buildPathString()}</div>
           </div>`
         : html``}
@@ -534,7 +534,7 @@ export class TraceDialog extends LitElement {
           ?disabled=${!this._canRunTrace()}
           @click=${this._onRunTrace}
         >
-          Run Trace
+          ${t('Run Trace')}
         </button>
       </div>
     `;
@@ -563,14 +563,14 @@ export class TraceDialog extends LitElement {
 
     return html`
       <div class="info-item">
-        <div class="info-label">Repeaters (in order, source → target)</div>
+        <div class="info-label">${t('Repeaters (in order, source → target)')}</div>
         <div class="repeater-picker">
           <div class="picker-column">
-            <div class="picker-column-label">Available</div>
+            <div class="picker-column-label">${t('Available')}</div>
             <input
               type="text"
               class="form-input picker-search"
-              placeholder="Filter by name or pubkey prefix…"
+              placeholder=${t('Filter by name or pubkey prefix…')}
               .value=${this._repeaterFilter}
               @input=${(e: Event) => { this._repeaterFilter = (e.target as HTMLInputElement).value; }}
               autocomplete="off"
@@ -584,7 +584,7 @@ export class TraceDialog extends LitElement {
                       <div
                         class="picker-item"
                         @click=${() => this._addRepeater(r)}
-                        title="Add ${r.adv_name}"
+                        title=${t('Add {adv_name}', { adv_name: r.adv_name })}
                       >
                         <span class="name">${r.adv_name || r.pubkey_prefix}</span>
                         <span class="hop-hex">${r.pubkey_prefix.substring(0, 2).toUpperCase()}</span>
@@ -594,10 +594,10 @@ export class TraceDialog extends LitElement {
             </div>
           </div>
           <div class="picker-column">
-            <div class="picker-column-label">Path</div>
+            <div class="picker-column-label">${t('Path')}</div>
             <div class="picker-list">
               ${this.pathHops.length === 0
-                ? html`<div class="picker-empty">Click a repeater to add (or leave empty for direct-neighbor)</div>`
+                ? html`<div class="picker-empty">${t('Click a repeater to add (or leave empty for direct-neighbor)')}</div>`
                 : this.pathHops.map(
                     (r, i) => html`
                       <div class="picker-item">
@@ -608,18 +608,18 @@ export class TraceDialog extends LitElement {
                           class="picker-item-btn"
                           ?disabled=${i === 0}
                           @click=${() => this._moveRepeater(i, -1)}
-                          title="Move up"
+                          title=${t('Move up')}
                         >▲</button>
                         <button
                           class="picker-item-btn"
                           ?disabled=${i === this.pathHops.length - 1}
                           @click=${() => this._moveRepeater(i, 1)}
-                          title="Move down"
+                          title=${t('Move down')}
                         >▼</button>
                         <button
                           class="picker-item-btn"
                           @click=${() => this._removeRepeater(i)}
-                          title="Remove"
+                          title=${t('Remove')}
                         >✕</button>
                       </div>
                     `,
@@ -630,7 +630,7 @@ export class TraceDialog extends LitElement {
       </div>
 
       <div class="info-item">
-        <div class="info-label">Target</div>
+        <div class="info-label">${t('Target')}</div>
         <div class="target-row">
           <span class="target-name">${targetName}</span>
           <span class="target-hex">${targetHex}</span>
@@ -647,11 +647,11 @@ export class TraceDialog extends LitElement {
       this.targetContact?.pubkey_prefix?.substring(0, 2).toUpperCase() || '--';
     return html`
       <div class="info-item">
-        <div class="info-label">Outbound Hops (comma-separated hex)</div>
+        <div class="info-label">${t('Outbound Hops (comma-separated hex)')}</div>
         <input
           type="text"
           class="form-input"
-          placeholder="AE  (or AE,CD for multiple hops, or empty for direct neighbor)"
+          placeholder=${t('AE  (or AE,CD for multiple hops, or empty for direct neighbor)')}
           .value=${this.enteredPath}
           @input=${this._onExplicitPathInput}
           autocomplete="off"
@@ -666,13 +666,12 @@ export class TraceDialog extends LitElement {
         </div>
         ${showError
           ? html`<div class="path-error">
-              Invalid format — hex pairs separated by commas, all
-              the same width (2, 4, or 8 chars).
+              ${t('Invalid format — hex pairs separated by commas, all the same width (2, 4, or 8 chars).')}
             </div>`
           : html``}
       </div>
       <div class="info-item">
-        <div class="info-label">Target</div>
+        <div class="info-label">${t('Target')}</div>
         <div class="target-row">
           <span class="target-name">${targetName}</span>
           <span class="target-hex">${targetHex}</span>
@@ -802,21 +801,21 @@ export class TraceDialog extends LitElement {
 
     return html`
       <div class="info-item">
-        <div class="info-label">Round Trip</div>
+        <div class="info-label">${t('Round Trip')}</div>
         <div class="info-value rtt-value">${result.response_time}</div>
       </div>
 
       <div class="info-item">
-        <div class="info-label">Hops</div>
+        <div class="info-label">${t('Hops')}</div>
         <div class="info-value">
-          ${result.hops === 0 ? 'Direct (0 hops)' : `${result.hops}`}
+          ${result.hops === 0 ? t('Direct (0 hops)') : `${result.hops}`}
         </div>
       </div>
 
       ${result.final_snr !== null && result.final_snr !== undefined
         ? html`
             <div class="info-item">
-              <div class="info-label">Final SNR (at this device)</div>
+              <div class="info-label">${t('Final SNR (at this device)')}</div>
               <div class="info-value">${result.final_snr.toFixed(2)} dB</div>
             </div>
           `
@@ -825,12 +824,12 @@ export class TraceDialog extends LitElement {
       ${intermediateHops.length > 0
         ? html`
             <div class="info-item">
-              <div class="info-label">Return Path (per-hop SNR)</div>
+              <div class="info-label">${t('Return Path (per-hop SNR)')}</div>
               <div class="hop-list">
                 ${intermediateHops.map(
                   (node, i) => html`
                     <div class="hop-row">
-                      <span>Hop ${i + 1}: ${node.hash}</span>
+                      <span>${t('Hop {number}: {hash}', { number: i + 1, hash: node.hash ?? '' })}</span>
                       <span>${node.snr.toFixed(2)} dB</span>
                     </div>
                   `,

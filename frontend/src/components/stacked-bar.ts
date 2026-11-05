@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
@@ -138,14 +139,14 @@ export class StackedBar extends LitElement {
     return html`
       <div class="stat-bar"
            role="img"
-           aria-label="${this.segments.map((s) => `${s.label} ${s.value}`).join(', ')}">
+           aria-label=${this.segments.map((s) => `${s.label} ${s.value}`).join(', ')}>
         ${this.segments.map((s) => {
           const v = Number.isFinite(s.value) ? Math.max(0, s.value) : 0;
           if (v === 0) return nothing;
           const pct = (v / denom) * 100;
           return html`<div class="stat-bar-segment ${s.kind}"
                            style="width: ${pct}%"
-                           title="${s.label}: ${s.value}"></div>`;
+                           title=${t('{label}: {value}', { label: s.label, value: s.value })}></div>`;
         })}
       </div>
       ${this.legend !== 'none'

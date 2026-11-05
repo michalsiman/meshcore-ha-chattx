@@ -1,6 +1,6 @@
+import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { isCzech } from '../utils/language';
 
 export const EMOJI = [
   '😀', '😁', '😂', '🤣', '😊', '😉', '😍', '😘', '😎', '🤔', '😅', '😇',
@@ -106,7 +106,7 @@ export class EmojiPicker extends LitElement {
   }
 
   render() {
-    const label = isCzech() ? 'Vložit smajlík' : 'Insert emoji';
+    const label = t('Insert emoji');
     return html`
       <button class="toggle" title=${label} aria-label=${label} aria-expanded=${this._open ? 'true' : 'false'} ?disabled=${this.disabled} @click=${this._toggle}>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M8.5,11A1.5,1.5 0 0,0 10,9.5A1.5,1.5 0 0,0 8.5,8A1.5,1.5 0 0,0 7,9.5A1.5,1.5 0 0,0 8.5,11M15.5,11A1.5,1.5 0 0,0 17,9.5A1.5,1.5 0 0,0 15.5,8A1.5,1.5 0 0,0 14,9.5A1.5,1.5 0 0,0 15.5,11M12,17.5C14.33,17.5 16.31,16.04 17.11,14H6.89C7.69,16.04 9.67,17.5 12,17.5Z"/></svg>

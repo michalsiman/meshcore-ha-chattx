@@ -943,14 +943,31 @@ def ws_get_managed_devices(hass, connection, msg):
 # Read companion device settings
 
 
+async def _read_path_hash_mode(coordinator) -> int | None:
+    """Ask the device for its path hash mode, or None if it does not say.
+
+    The mode is only in the device query reply, not in the self_info cache.
+    """
+    try:
+        result = await asyncio.wait_for(
+            coordinator.api.mesh_core.commands.send_device_query(), timeout=5
+        )
+    except Exception as ex:  # noqa: BLE001 - the rest of the config is still useful
+        _LOGGER.debug("Could not read path hash mode: %s", ex)
+        return None
+    payload = getattr(result, "payload", None)
+    mode = payload.get("path_hash_mode") if isinstance(payload, dict) else None
+    return mode if isinstance(mode, int) else None
+
+
 @websocket_api.websocket_command(
     {
         vol.Required("type"): "meshcore_chattx/get_device_config",
         vol.Optional("entry_id"): str,
     }
 )
-@callback
-def ws_get_device_config(hass, connection, msg):
+@websocket_api.async_response
+async def ws_get_device_config(hass, connection, msg):
     """Return companion device config."""
     coordinator = _get_coordinator(hass, msg.get("entry_id"))
     if not coordinator:
@@ -980,7 +997,7 @@ def ws_get_device_config(hass, connection, msg):
     config["altitude"] = None  # Not available in SDK - set_coords() hardcodes altitude to 0
 
     # Advanced settings
-    config["path_hash_mode"] = self_info.get("path_hash_mode")
+    config["path_hash_mode"] = await _read_path_hash_mode(coordinator)
 
     # Location source
     config["location_source"] = getattr(coordinator, "location_source", "manual")
