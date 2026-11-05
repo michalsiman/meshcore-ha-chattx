@@ -2,27 +2,40 @@
 
 # MeshCore Chattx for Home Assistant
 
-A sidebar chat panel and persistent message store for the [MeshCore](https://meshcore.io) mesh radio network.
+**MeshCore Chattx** is a fork of [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat) by Matt Wolter. It keeps the sidebar chat panel for the [MeshCore](https://meshcore.io) mesh radio network and adds repeater management, better message writing and proper phone support.
 
-Fork of [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat) by Matt Wolter (MIT). It uses its own domain, `meshcore_chattx`, so it can be installed next to the original; message history is not shared between them.
+> [!TIP]
+> **New in Chattx:** manage repeaters right from the chat, with login, settings, telemetry, neighbours, regions and a command terminal.
 
-Works as a **companion** to the [core meshcore integration](https://github.com/meshcore-dev/meshcore-ha) — install both. This integration does not drive the radio itself; it adds a chat UI, message persistence, and search on top of the events and services exposed by the core integration.
+## How it differs from the original
+
+| | MeshCore Chat | **MeshCore Chattx** |
+|---|---|---|
+| **Repeater login from the chat** | – | ✅ **With an optional saved password** |
+| **Repeater settings** | Single commands, for repeaters set up as devices | ✅ **All settings by group, from the repeater's conversation, with the age of each value** |
+| **Repeater telemetry and neighbours** | Devices tab, for repeaters set up as devices | ✅ **In the repeater's conversation, remembered with their age** |
+| **Repeater regions** | Single commands | ✅ **Region tree you can edit and save to the repeater** |
+| **Repeater commands** | Command catalog | ✅ **Terminal: type any command and read the reply** |
+| **Bytes left in a message** | – | ✅ **Counter that blocks messages that are too long** |
+| **Send without diacritics** | – | ✅ **One-tap switch** |
+| **Emoji and quick messages** | – | ✅ **Pickers next to the message field** |
+| **Hop information** | In the message dialog | ✅ **Hop count and path size on each message** |
+| **Conversation list** | Contact ID or channel number | ✅ **Readable initials, newest first, age of the last message, IDs can be hidden** |
+| **On a phone** | Keyboard can push the top bar away | ✅ **Top bar stays reachable and the keyboard stays open** |
+| **Chat panel** | ✅ | ✅ |
+| **Message history, search, trace, node discovery** | ✅ | ✅ |
+
+<p align="center"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png" alt="MeshCore Chattx chat with initials, message ages and hop counts" width="800"></a></p>
+
+<p align="center"><i>Demo data, with made-up names and values.</i></p>
+
+It works as a **companion** to the [core meshcore integration](https://github.com/meshcore-dev/meshcore-ha), so install both. This integration does not drive the radio itself. It uses its own domain, `meshcore_chattx`, so it can be installed next to the original, and message history is not shared between them.
 
 > **Status:** v0.1 in active development.
 
-## Features
-
-- Sidebar chat panel with channels, DMs, and contact list
-- Persistent message history (survives Home Assistant restarts)
-- Trace / path-discovery dialog with route visualization
-- Per-conversation search
-- Unread counts, delivery status
-- Live device telemetry, neighbor tables, and remote command issue from the same UI
-- Network-wide node discovery view (typically hundreds of nodes)
-
 ## What Chattx adds
 
-Everything below is new compared with the original MeshCore Chat.
+Everything below is new or reworked compared with the original MeshCore Chat.
 
 These features were built by [Michal Šiman](https://github.com/michalsiman) together with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant. Michal chose the features and tested them on his own MeshCore network, and Claude wrote most of the code.
 
@@ -113,6 +126,16 @@ These use demo data, and the names and values are made up.
 <td align="center"><b>Phone</b> — chat with the compact message bar.</td>
 </tr>
 </table>
+
+## Features from the original
+
+- Sidebar chat panel with channels, DMs, and contact list
+- Persistent message history (survives Home Assistant restarts)
+- Trace / path-discovery dialog with route visualization
+- Per-conversation search
+- Unread counts, delivery status
+- Live device telemetry, neighbor tables, and remote command issue from the same UI
+- Network-wide node discovery view (typically hundreds of nodes)
 
 ## More screenshots
 
