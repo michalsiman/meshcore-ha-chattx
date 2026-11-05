@@ -4,6 +4,19 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 ## [Unreleased]
 
+## [0.1.18] - Unreleased
+
+### Changed
+
+- Buttons next to the message field and sending a message no longer take the focus from it, so a phone's keyboard stays open.
+
+## [0.1.17] - Unreleased
+
+### Changed
+
+- The panel stays inside the visible part of the screen when the on-screen keyboard opens, so the top bar and back button stay reachable.
+- The title is shortened to "MC Chattx" on phones.
+
 ## [0.1.16] - Unreleased
 
 ### Added

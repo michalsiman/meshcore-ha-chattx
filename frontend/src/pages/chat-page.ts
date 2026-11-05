@@ -540,6 +540,16 @@ export class ChatPage extends LitElement {
     }
   `;
 
+  /** Keep the newest message in view when the on-screen keyboard shrinks the chat. */
+  private _onViewportResize = () => {
+    if (!this._messageStore?.userAtBottom || this._messageStore.hasNewerMessages) return;
+    requestAnimationFrame(() => {
+      if (this._isScrollGuarded()) return;
+      const container = this._getChatContainer();
+      if (container) container.scrollTop = container.scrollHeight;
+    });
+  };
+
   /** Treat as narrow when HA says narrow OR when the viewport is < 600px wide. */
   private get _isNarrow(): boolean {
     return this.narrow || this._viewportNarrow;
@@ -584,10 +594,12 @@ export class ChatPage extends LitElement {
       this._viewportNarrow = e.matches;
     };
     this._mediaQuery.addEventListener('change', this._mediaHandler);
+    window.visualViewport?.addEventListener('resize', this._onViewportResize);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    window.visualViewport?.removeEventListener('resize', this._onViewportResize);
     if (this._messageStore) {
       this._messageStore.destroy();
       this._messageStore = null;
@@ -938,7 +950,7 @@ export class ChatPage extends LitElement {
         ${this._renderItemsWithDivider(renderItems)}
         ${this._renderNewMessagesIndicator()}
       </div>
-      <div class="input-area">
+      <div class="input-area" @mousedown=${this._keepComposerFocus}>
         <div class="composer-tools">
           <chattx-quick-message-picker
             .hass=${this.hass}
@@ -965,7 +977,8 @@ export class ChatPage extends LitElement {
               this._sendMessage();
             }
           }}
-          ?disabled=${this._sending || !this.selectedId}></textarea>
+          ?readonly=${this._sending}
+          ?disabled=${!this.selectedId}></textarea>
         <div class="composer-counter">
           <chattx-emoji-picker
             ?disabled=${this._sending || !this.selectedId}
@@ -1227,6 +1240,11 @@ export class ChatPage extends LitElement {
     const current = this._inputText.trimEnd();
     this._inputText = current ? `${current} ${e.detail.message}` : e.detail.message;
     await this._focusInput();
+  }
+
+  /** Buttons next to the message field must not take its focus, which would close a phone's keyboard. */
+  private _keepComposerFocus(e: MouseEvent) {
+    if (!(e.target instanceof HTMLTextAreaElement)) e.preventDefault();
   }
 
   /** Put an emoji where the cursor was and return the focus to the message field. */

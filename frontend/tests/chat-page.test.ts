@@ -963,6 +963,44 @@ describe('reply', () => {
   });
 });
 
+describe('buttons next to the message field', () => {
+  const press = (target: Element) => {
+    const event = new MouseEvent('mousedown', { bubbles: true, composed: true, cancelable: true });
+    target.dispatchEvent(event);
+    return event;
+  };
+
+  it('do not take the focus', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    const root = page.shadowRoot!;
+    for (const selector of ['.diacritics-toggle', '.send-button', '.byte-counter', 'chattx-emoji-picker', 'chattx-quick-message-picker']) {
+      expect(press(root.querySelector(selector)!).defaultPrevented, selector).toBe(true);
+    }
+  });
+
+  it('leave the message field itself alone', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    expect(press(page.shadowRoot!.querySelector('textarea')!).defaultPrevented).toBe(false);
+  });
+
+  it('keep the focus while a message is sent', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    const area = page.shadowRoot!.querySelector('textarea')!;
+    area.focus();
+    area.value = 'ahoj';
+    area.dispatchEvent(new Event('input'));
+    await page.updateComplete;
+    page.shadowRoot!.querySelector<HTMLButtonElement>('.send-button')!.click();
+    await page.updateComplete;
+    expect(area.disabled).toBe(false);
+    expect(page.shadowRoot!.activeElement).toBe(area);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await page.updateComplete;
+    expect(area.value).toBe('');
+    expect(page.shadowRoot!.activeElement).toBe(area);
+  });
+});
+
 describe('picking an emoji', () => {
   async function pick(page: ChatPage, emoji: string) {
     page.shadowRoot!.querySelector('chattx-emoji-picker')!.dispatchEvent(

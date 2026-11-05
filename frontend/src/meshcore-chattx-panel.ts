@@ -5,6 +5,7 @@ import type { TraceResult } from './api';
 import { panelStyles } from './styles';
 import { MESHCORE_PRESET, DEFAULT_PANEL_CONFIG } from './constants';
 import { mergeActivity, sortByActivity, type ConversationActivity } from './utils/conversation-activity';
+import { keepAboveKeyboard } from './utils/keyboard-viewport';
 import { getConversationActivity, isRepeaterSettingsReply, getDevices, getContacts, getChannels, getUnreadAndLastRead, markConversationRead, removeContact, addContact, traceContact, type TracePathMode } from './api';
 import { UnreadController } from './chat/unread-controller';
 import './pages/chat-page';
@@ -26,6 +27,7 @@ export class MeshCorePanel extends LitElement {
   @state() private _devices: MeshCoreDevice[] = [];
   @state() private _contacts: Contact[] = [];
   @state() private _conversationActivity: ConversationActivity = {};
+  private _releaseKeyboardViewport: (() => void) | null = null;
   @state() private _channels: Channel[] = [];
   @state() private _selectedEntryId: string | null = null;
   @state() private _loading = true;
@@ -127,6 +129,17 @@ export class MeshCorePanel extends LitElement {
         font-size: 18px;
         font-weight: 500;
         color: var(--primary-text-color);
+        white-space: nowrap;
+      }
+
+      .title-short { display: none; }
+
+      :host([narrow]) .title-full { display: none; }
+      :host([narrow]) .title-short { display: inline; }
+
+      @media (max-width: 870px) {
+        .title-full { display: none; }
+        .title-short { display: inline; }
       }
 
       .device-info {
@@ -542,12 +555,15 @@ export class MeshCorePanel extends LitElement {
     super.connectedCallback();
     this._loadData();
     this._setupSubscriptions();
+    this._releaseKeyboardViewport = keepAboveKeyboard(this);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._teardownSubscriptions();
     this._closeDeviceDropdown();
+    this._releaseKeyboardViewport?.();
+    this._releaseKeyboardViewport = null;
   }
 
   private _toggleDeviceDropdown() {
@@ -744,7 +760,10 @@ export class MeshCorePanel extends LitElement {
                   <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
                 </button>`
               : html``}
-            <div class="panel-title">MeshCore Chattx</div>
+            <div class="panel-title">
+              <span class="title-full">MeshCore Chattx</span>
+              <span class="title-short">MC Chattx</span>
+            </div>
           </div>
           <div class="header-right">
             ${device && this._getNodeStatus(device) !== null

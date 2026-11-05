@@ -130,6 +130,10 @@ export class MessageStore {
    * with unloaded newer messages on disk is *not* the same as being
    * caught up.
    */
+  get userAtBottom(): boolean {
+    return this._userAtBottom;
+  }
+
   setUserAtBottom(value: boolean): void {
     if (this._userAtBottom === value) return;
     this._userAtBottom = value;
