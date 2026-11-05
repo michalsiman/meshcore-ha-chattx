@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.1.19] - 2026-11-05
+
+### Changed
+
+- New banner and integration icon with the Chattx name.
+- The README leads with how Chattx differs from MeshCore Chat, and has new screenshots and install steps for the Marketplace.
+
 ## [0.1.18] - 2026-11-05
 
 ### Changed
