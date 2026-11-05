@@ -92,13 +92,15 @@ Works as a **companion** to the [core meshcore integration](https://github.com/m
 
 ## Installation
 
-### HACS (custom repository)
+### Marketplace or HACS (custom repository)
+
+From Home Assistant 2026.11, HACS is built in as the Marketplace under Settings. Older versions use HACS.
 
 [![Open meshcore-ha-chattx in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=michalsiman&repository=meshcore-ha-chattx&category=integration)
 
-Click the badge above to open this repository in your HACS dashboard, or follow the manual steps:
+Click the badge above to open this repository, or follow the manual steps:
 
-1. In HACS → Integrations → ⋮ → Custom repositories
+1. Open the Marketplace or HACS and go to its custom repositories
 2. Add `https://github.com/michalsiman/meshcore-ha-chattx` as an "Integration"
 3. Install **MeshCore Chattx**
 4. Restart Home Assistant
