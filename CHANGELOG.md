@@ -1,42 +1,42 @@
 # Changelog
 
-All notable changes to **MeshCore Chat for Home Assistant** are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/) loosely; entries are most-recent-first.
+All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCore Chat, are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/) loosely; entries are most-recent-first.
 
 ## [Unreleased]
 
-## [0.1.18] - Unreleased
+## [0.1.18] - 2026-11-05
 
 ### Changed
 
 - Buttons next to the message field and sending a message no longer take the focus from it, so a phone's keyboard stays open.
 
-## [0.1.17] - Unreleased
+## [0.1.17] - not released separately
 
 ### Changed
 
 - The panel stays inside the visible part of the screen when the on-screen keyboard opens, so the top bar and back button stay reachable.
 - The title is shortened to "MC Chattx" on phones.
 
-## [0.1.16] - Unreleased
+## [0.1.16] - not released separately
 
 ### Added
 
 - Emoji button above the bytes left: the picked emoji goes in at the cursor and the focus returns to the message field.
 
-## [0.1.15] - Unreleased
+## [0.1.15] - not released separately
 
 ### Changed
 
 - The node dialog's header with the name stays in place while its content scrolls.
 
-## [0.1.14] - Unreleased
+## [0.1.14] - not released separately
 
 ### Changed
 
 - Picking a conversation puts the cursor in the message field.
 - Conversation circles show letters from the name instead of the ID or channel number: "Kamenny vrch" KV, "MBX-BASE" MB, "Public" PU, "Lx01 📟" L📟.
 
-## [0.1.13] - Unreleased
+## [0.1.13] - not released separately
 
 ### Changed
 
@@ -46,13 +46,13 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - Switch in the manage dialog to hide contact IDs and channel numbers in the chat list, remembered per browser.
 
-## [0.1.12] - Unreleased
+## [0.1.12] - not released separately
 
 ### Changed
 
 - Saved repeater data shows how long ago it was read instead of the date and time, which moved to the tooltip.
 
-## [0.1.11] - Unreleased
+## [0.1.11] - not released separately
 
 ### Added
 
@@ -63,7 +63,7 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - The quick messages and diacritics buttons are stacked to leave more width for the message text.
 
-## [0.1.10] - Unreleased
+## [0.1.10] - not released separately
 
 ### Added
 
@@ -73,20 +73,20 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - The message dialog's copy and reply buttons are in Czech for Czech browsers.
 
-## [0.1.9] - Unreleased
+## [0.1.9] - not released separately
 
 ### Changed
 
 - Repeater neighbours load ten at a time, with a button for the next ten.
 
-## [0.1.8] - Unreleased
+## [0.1.8] - not released separately
 
 ### Added
 
 - Neighbours block after repeater login: heard nodes with SNR and when they were last heard.
 - Regions block after repeater login: read the region tree, add and remove regions, set flood permission, home and default scope, and save to the repeater.
 
-## [0.1.7] - Unreleased
+## [0.1.7] - not released separately
 
 ### Changed
 
@@ -96,7 +96,7 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - Terminal block after repeater login: send any command and read the reply.
 
-## [0.1.6] - Unreleased
+## [0.1.6] - not released separately
 
 ### Fixed
 
@@ -106,14 +106,14 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - Telemetry block after repeater login: battery voltage, MCU temperature and any other sensors the repeater reports. Values are remembered with the time they were read.
 
-## [0.1.5] - Unreleased
+## [0.1.5] - not released separately
 
 ### Added
 
 - Bytes-left counter next to the chat input, red at the limit. Messages over the limit can't be sent.
 - Switch next to the chat input to send without diacritics. The browser remembers it.
 
-## [0.1.4] - Unreleased
+## [0.1.4] - not released separately
 
 ### Added
 
@@ -125,7 +125,7 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - Channels and contacts in the chat list are sorted by latest message.
 
-## [0.1.3] - Unreleased
+## [0.1.3] - not released separately
 
 ### Added
 
@@ -136,7 +136,7 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - Replies to commands typed in a repeater's chat conversation are stored again. Only replies to settings reads are left out of the chat.
 
-## [0.1.2] - Unreleased
+## [0.1.2] - not released separately
 
 ### Changed
 
@@ -148,7 +148,7 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - Frequency no longer shows floating-point noise.
 
-## [0.1.1] - Unreleased
+## [0.1.1] - not released separately
 
 ### Added
 
@@ -159,7 +159,7 @@ All notable changes to **MeshCore Chat for Home Assistant** are documented here.
 
 - Replies to repeater settings reads are not stored as chat messages.
 
-## [0.1.0] - Unreleased
+## [0.1.0] - not released separately
 
 First release of **MeshCore Chattx**, a fork of [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat) v0.3.1. Entries below this one are the upstream project's history; issue numbers in them refer to the upstream repository.
 
