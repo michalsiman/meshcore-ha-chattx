@@ -4,7 +4,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, Channel } from '../types';
 import type { UnreadController } from '../chat/unread-controller';
 import { formatLastActivity, lastActivityOf } from '../utils/conversation-activity';
-import { isCzech } from '../utils/language';
 import { avatarLabel } from '../utils/avatar-label';
 // manage-dialog is loaded by chat-page
 
@@ -378,7 +377,7 @@ export class ConversationList extends LitElement {
     const isContact = 'pubkey_prefix' in conv;
     const id = isContact ? (conv as Contact).pubkey_prefix : String((conv as Channel).channel_idx);
     const name = isContact ? (conv as Contact).adv_name : (conv as Channel).name;
-    const age = formatLastActivity(lastActivityOf(conv, this.activity, this.nodePrefix), Date.now(), isCzech());
+    const age = formatLastActivity(lastActivityOf(conv, this.activity, this.nodePrefix), Date.now());
     const idLabel = isContact ? (conv as Contact).pubkey_prefix : t('Channel {index}', { index: (conv as Channel).channel_idx });
     const label = this.showContactIds ? idLabel : '';
     const detail = [label, age].filter(Boolean).join(' · ');

@@ -6,13 +6,13 @@ import { getRememberedRepeaterSettings, readRepeaterNeighbours, type RepeaterNei
 import './read-age-note';
 
 export function formatHeardAgo(seconds: number): string {
-  if (seconds < 60) return t('{seconds} s ago', { seconds });
+  if (seconds < 60) return t('{amount} ago', { amount: `${seconds} s` });
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return t('{minutes} min ago', { minutes });
+  if (minutes < 60) return t('{amount} ago', { amount: `${minutes} min` });
   const hours = Math.round(minutes / 60);
-  if (hours < 48) return t('{hours} h ago', { hours });
+  if (hours < 48) return t('{amount} ago', { amount: `${hours} h` });
   const days = Math.round(hours / 24);
-  return t('{days} d ago', { days });
+  return t('{amount} ago', { amount: `${days} d` });
 }
 
 /** Nodes a repeater has heard directly, read ten at a time. */

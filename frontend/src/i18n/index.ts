@@ -1,17 +1,45 @@
-import { cs } from './cs';
-
 /**
  * Translations. English text in the source is the key, so a missing
- * translation falls back to English. To add a language, copy `cs.ts`, translate
- * the values and list it in TRANSLATIONS and LANGUAGE_NAMES.
+ * translation falls back to English. The texts live in
+ * custom_components/meshcore_chattx/panel_translations/<language>.json and are
+ * loaded when the panel starts, so a correction needs no rebuild. To add a
+ * language, add its file and list it in LANGUAGE_NAMES.
  *
  * Terms from the MeshCore documentation stay in English: repeater, advert,
  * flood, hop, path, SNR and similar.
  */
-const TRANSLATIONS: Record<string, Record<string, string>> = { cs };
+const TRANSLATIONS: Record<string, Record<string, string>> = {};
 
 /** Each language under its own name, for the language menu. */
-export const LANGUAGE_NAMES: Record<string, string> = { en: 'English', cs: 'Čeština' };
+export const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English',
+  cs: 'Čeština',
+  da: 'Dansk',
+  de: 'Deutsch',
+  fr: 'Français',
+  hr: 'Hrvatski',
+  pl: 'Polski',
+  sk: 'Slovenčina',
+  sl: 'Slovenščina',
+  sr: 'Srpski (latinica)',
+  fi: 'Suomi',
+  sv: 'Svenska',
+  uk: 'Українська',
+};
+
+/** Languages close enough to share a translation. */
+const ALIASES: Record<string, string> = { bs: 'sr', cnr: 'sr', me: 'sr' };
+
+/** Plural forms of a translation, in the order they are separated by "|". */
+const PLURAL_ORDER: Record<string, string[]> = {
+  cs: ['one', 'few', 'other'],
+  hr: ['one', 'few', 'other'],
+  pl: ['one', 'few', 'many'],
+  sk: ['one', 'few', 'other'],
+  sl: ['one', 'two', 'few', 'other'],
+  sr: ['one', 'few', 'other'],
+  uk: ['one', 'few', 'many'],
+};
 
 const STORAGE_KEY = 'chattx-language';
 let hassLanguage: string | undefined;
@@ -24,7 +52,8 @@ function primary(language: string | undefined): string | undefined {
 
 function supported(language: string | undefined): string | undefined {
   const code = primary(language);
-  return code && code in LANGUAGE_NAMES ? code : undefined;
+  const known = code ? ALIASES[code] ?? code : undefined;
+  return known && known in LANGUAGE_NAMES ? known : undefined;
 }
 
 function browserLanguage(): string | undefined {
@@ -67,7 +96,8 @@ export function getLanguage(): string {
  */
 export function getLocale(): string | undefined {
   const language = getLanguage();
-  return primary(browserLanguage()) === language ? undefined : language;
+  if (primary(browserLanguage()) === language) return undefined;
+  return language === 'sr' ? 'sr-Latn' : language;
 }
 
 function fill(text: string, params?: Params): string {
@@ -84,17 +114,35 @@ export function t(text: string, params?: Params): string {
 
 /**
  * Translate text that depends on a count. `{n}` is the count. A translation is
- * stored under the English plural, with its plural forms in Intl.PluralRules
- * order separated by "|", for Czech: one|few|other.
+ * stored under the English plural, with its forms separated by "|" in the order
+ * given by PLURAL_ORDER, for Czech: one|few|other. Other languages: one|other.
  */
 export function tn(one: string, other: string, n: number, params?: Params): string {
   const language = getLanguage();
   const all = { n, ...params };
   const forms = TRANSLATIONS[language]?.[other]?.split('|');
   if (!forms) return fill(n === 1 ? one : other, all);
-  const category = new Intl.PluralRules(language).select(n);
-  const index = category === 'one' ? 0 : category === 'few' ? 1 : forms.length - 1;
-  return fill(forms[Math.min(index, forms.length - 1)], all);
+  const order = PLURAL_ORDER[language] ?? ['one', 'other'];
+  const index = order.indexOf(new Intl.PluralRules(language).select(n));
+  return fill(forms[index >= 0 ? index : forms.length - 1] ?? forms[forms.length - 1], all);
+}
+
+/** Make a translation available, as the panel does after fetching its file. */
+export function registerTranslations(language: string, texts: Record<string, string>): void {
+  TRANSLATIONS[language] = texts;
+}
+
+/** Fetch the texts of the current language. Without them the panel stays in English. */
+export async function loadTranslations(): Promise<void> {
+  const language = getLanguage();
+  if (language === 'en' || TRANSLATIONS[language]) return;
+  try {
+    const version = new URL(import.meta.url).search;
+    const response = await fetch(`/meshcore_chattx_panel/i18n/${language}.json${version}`);
+    if (response.ok) registerTranslations(language, await response.json());
+  } catch {
+    // English stays as the fallback.
+  }
 }
 
 /** Mark English text for translation where it is defined; translate it with t() where it is shown. */

@@ -1,3 +1,5 @@
+import { t } from '../i18n';
+
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
 
@@ -14,11 +16,11 @@ export function readAtClass(readAt: string, now: number = Date.now()): string {
  * 12 hours, whole hours up to 48 hours, whole days beyond that. Empty for an
  * invalid time; a time in the future counts as just now.
  */
-export function formatReadAge(readAt: string, czech: boolean, now: number = Date.now()): string {
+export function formatReadAge(readAt: string, now: number = Date.now()): string {
   const read = Date.parse(readAt);
   if (Number.isNaN(read)) return '';
   const age = now - read;
-  if (age < MINUTE_MS) return czech ? 'právě teď' : 'just now';
+  if (age < MINUTE_MS) return t('just now');
   const minutes = Math.floor(age / MINUTE_MS);
   const hours = Math.floor(age / HOUR_MS);
   let amount: string;
@@ -26,5 +28,5 @@ export function formatReadAge(readAt: string, czech: boolean, now: number = Date
   else if (age <= 12 * HOUR_MS) amount = `${hours} h ${minutes % 60} min`;
   else if (age <= 48 * HOUR_MS) amount = `${hours} h`;
   else amount = `${Math.floor(age / (24 * HOUR_MS))} d`;
-  return czech ? `před ${amount}` : `${amount} ago`;
+  return t('{amount} ago', { amount });
 }

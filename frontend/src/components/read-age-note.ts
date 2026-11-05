@@ -1,7 +1,6 @@
 import { getLocale, t } from '../i18n';
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { isCzech } from '../utils/language';
 import { formatReadAge, readAtClass } from '../utils/read-age';
 
 const REFRESH_MS = 30_000;
@@ -33,8 +32,7 @@ export class ReadAgeNote extends LitElement {
   render() {
     this.className = readAtClass(this.readAt);
     this.title = new Date(this.readAt).toLocaleString(getLocale());
-    const czech = isCzech();
-    return html`${t('Loaded')} ${formatReadAge(this.readAt, czech)}`;
+    return html`${t('Loaded')} ${formatReadAge(this.readAt)}`;
   }
 }
 

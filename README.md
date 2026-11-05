@@ -21,7 +21,7 @@
 | **Emoji and quick messages** | – | ✅ **Pickers next to the message field** |
 | **Hop information** | In the message dialog | ✅ **Hop count and path size on each message** |
 | **Conversation list** | Contact ID or channel number | ✅ **Readable initials, newest first, age of the last message, IDs can be hidden** |
-| **Language** | English | ✅ **English and Czech, automatic or chosen in Settings** |
+| **Language** | English | ✅ **13 languages, automatic or chosen in Settings, easy to correct on GitHub** |
 | **On a phone** | Keyboard can push the top bar away | ✅ **Top bar stays reachable and the keyboard stays open** |
 | **Chat panel** | ✅ | ✅ |
 | **Message history, search, trace, node discovery** | ✅ | ✅ |
@@ -78,10 +78,10 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 
 **Languages**
 
-- The whole panel is in English and Czech, except the descriptions in the command catalog
+- English, Czech, Slovak, Polish, German, French, Ukrainian, Croatian, Serbian (Latin), Slovenian, Finnish, Swedish and Danish
 - Follows your Home Assistant profile, then your browser, or pick a language in Settings
 - Terms from the MeshCore documentation, such as repeater, flood and hop, stay in English
-- Translations are plain text files in `frontend/src/i18n`, so corrections and new languages are welcome
+- **Found a mistake?** Translations are plain text files you can fix right on GitHub. See [TRANSLATING.md](TRANSLATING.md)
 
 ### Screenshots of the new features
 

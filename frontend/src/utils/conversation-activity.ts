@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { Channel, Contact } from '../types';
 
 /** Time of the newest message per message entity_id. */
@@ -50,17 +51,17 @@ const HOUR_MS = 60 * MINUTE_MS;
  * hours, in whole days beyond that. Empty when there is no valid time; under a
  * minute or a time in the future counts as just now.
  */
-export function formatLastActivity(timestamp: string | undefined, now: number, czech: boolean): string {
+export function formatLastActivity(timestamp: string | undefined, now: number): string {
   const millis = toMillis(timestamp);
   if (millis === 0) return '';
   const age = now - millis;
-  if (age < MINUTE_MS) return czech ? 'právě teď' : 'just now';
+  if (age < MINUTE_MS) return t('just now');
   const amount = age < HOUR_MS
     ? `${Math.floor(age / MINUTE_MS)} min`
     : age > 48 * HOUR_MS
       ? `${Math.floor(age / (24 * HOUR_MS))} d`
       : `${Math.floor(age / HOUR_MS)} h`;
-  return czech ? `před ${amount}` : `${amount} ago`;
+  return t('{amount} ago', { amount });
 }
 
 /**

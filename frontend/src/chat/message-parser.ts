@@ -1,4 +1,4 @@
-import { getLanguage, getLocale, t } from '../i18n';
+import { getLocale, t, tn } from '../i18n';
 import type { PanelConfig, ChatMessage, StoredMessage, DeliveryStatus, MessageGroup, RenderItem } from '../types';
 import {
   MENTION_BRACKET_REGEX,
@@ -326,20 +326,12 @@ export function pathHashSize(rxLogData: Array<Record<string, unknown>> | undefin
  * path's bytes per hop when known, or '' when no copy reports a hop count.
  * In the panel language.
  */
-export function formatHopLabel(
-  rxLogData: Array<Record<string, unknown>> | undefined,
-  language: string = getLanguage(),
-): string {
+export function formatHopLabel(rxLogData: Array<Record<string, unknown>> | undefined): string {
   const hops = fewestHops(rxLogData);
   if (hops === null) return '';
+  if (hops === 0) return t('direct');
   const bytes = pathHashSize(rxLogData);
-  const size = bytes === null ? '' : ` (${bytes}B)`;
-  if (language.toLowerCase().startsWith('cs')) {
-    if (hops === 0) return 'přímo';
-    return `${hops} ${hops === 1 ? 'hop' : hops < 5 ? 'hopy' : 'hopů'}${size}`;
-  }
-  if (hops === 0) return 'direct';
-  return `${hops} ${hops === 1 ? 'hop' : 'hops'}${size}`;
+  return tn('{n} hop', '{n} hops', hops) + (bytes === null ? '' : ` (${bytes}B)`);
 }
 
 export function formatTimestamp(date: Date, format: 'relative' | 'time' | 'datetime'): string {

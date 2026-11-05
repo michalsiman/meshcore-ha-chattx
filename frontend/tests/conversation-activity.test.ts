@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { formatLastActivity, lastActivityOf, mergeActivity, sortByActivity } from '../src/utils/conversation-activity';
 import type { Channel, Contact } from '../src/types';
+import { inLanguage } from './helpers/language';
 
 const channel = (idx: number) => ({ channel_idx: idx, name: `c${idx}` }) as unknown as Channel;
 const contact = (prefix: string) => ({ pubkey_prefix: prefix, adv_name: prefix }) as unknown as Contact;
@@ -80,36 +81,36 @@ describe('formatLastActivity', () => {
   const ago = (hours: number) => new Date(now - hours * 3_600_000).toISOString();
 
   it('shows minutes under an hour', () => {
-    expect(formatLastActivity(ago(1 / 60), now, true)).toBe('před 1 min');
-    expect(formatLastActivity(ago(0.5), now, true)).toBe('před 30 min');
-    expect(formatLastActivity(ago(59.5 / 60), now, true)).toBe('před 59 min');
-    expect(formatLastActivity(ago(0.5), now, false)).toBe('30 min ago');
+    expect(inLanguage('cs', () => formatLastActivity(ago(1 / 60), now))).toBe('před 1 min');
+    expect(inLanguage('cs', () => formatLastActivity(ago(0.5), now))).toBe('před 30 min');
+    expect(inLanguage('cs', () => formatLastActivity(ago(59.5 / 60), now))).toBe('před 59 min');
+    expect(formatLastActivity(ago(0.5), now)).toBe('30 min ago');
   });
 
   it('says just now under a minute', () => {
-    expect(formatLastActivity(ago(0.5 / 60), now, true)).toBe('právě teď');
-    expect(formatLastActivity(ago(0.5 / 60), now, false)).toBe('just now');
+    expect(inLanguage('cs', () => formatLastActivity(ago(0.5 / 60), now))).toBe('právě teď');
+    expect(formatLastActivity(ago(0.5 / 60), now)).toBe('just now');
   });
 
   it('shows hours up to and including 48', () => {
-    expect(formatLastActivity(ago(1), now, true)).toBe('před 1 h');
-    expect(formatLastActivity(ago(47.9), now, true)).toBe('před 47 h');
-    expect(formatLastActivity(ago(48), now, true)).toBe('před 48 h');
+    expect(inLanguage('cs', () => formatLastActivity(ago(1), now))).toBe('před 1 h');
+    expect(inLanguage('cs', () => formatLastActivity(ago(47.9), now))).toBe('před 47 h');
+    expect(inLanguage('cs', () => formatLastActivity(ago(48), now))).toBe('před 48 h');
   });
 
   it('shows days above 48 hours', () => {
-    expect(formatLastActivity(ago(48.5), now, true)).toBe('před 2 d');
-    expect(formatLastActivity(ago(72), now, true)).toBe('před 3 d');
+    expect(inLanguage('cs', () => formatLastActivity(ago(48.5), now))).toBe('před 2 d');
+    expect(inLanguage('cs', () => formatLastActivity(ago(72), now))).toBe('před 3 d');
   });
 
   it('uses English otherwise', () => {
-    expect(formatLastActivity(ago(3), now, false)).toBe('3 h ago');
-    expect(formatLastActivity(ago(72), now, false)).toBe('3 d ago');
+    expect(formatLastActivity(ago(3), now)).toBe('3 h ago');
+    expect(formatLastActivity(ago(72), now)).toBe('3 d ago');
   });
 
   it('handles missing and future times', () => {
-    expect(formatLastActivity(undefined, now, true)).toBe('');
-    expect(formatLastActivity('nonsense', now, true)).toBe('');
-    expect(formatLastActivity(ago(-1), now, true)).toBe('právě teď');
+    expect(inLanguage('cs', () => formatLastActivity(undefined, now))).toBe('');
+    expect(inLanguage('cs', () => formatLastActivity('nonsense', now))).toBe('');
+    expect(inLanguage('cs', () => formatLastActivity(ago(-1), now))).toBe('právě teď');
   });
 });

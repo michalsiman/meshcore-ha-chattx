@@ -4,6 +4,17 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-05
+
+### Added
+
+- Panel languages: Slovak, Polish, German, French, Ukrainian, Croatian, Serbian (Latin, also for Bosnian and Montenegrin browsers), Slovenian, Finnish, Swedish and Danish. The longest technical tooltips are still in English in these languages, and so are the command catalog and the window for adding the integration.
+- Translations are plain JSON files in `panel_translations`, loaded when the panel starts, so they can be corrected on GitHub without a rebuild. See TRANSLATING.md.
+
+### Changed
+
+- The panel file is smaller, because translations are no longer part of it.
+
 ## [0.2.0] - 2026-11-05
 
 ### Added

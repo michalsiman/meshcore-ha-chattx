@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { formatReadAge, readAtClass } from '../src/utils/read-age';
+import { inLanguage } from './helpers/language';
 
 const NOW = Date.parse('2026-11-04T12:00:00+00:00');
 const ago = (minutes: number) => new Date(NOW - minutes * 60000).toISOString();
@@ -23,7 +24,7 @@ describe('readAtClass', () => {
 });
 
 describe('formatReadAge', () => {
-  const cs = (minutes: number) => formatReadAge(ago(minutes), true, NOW);
+  const cs = (minutes: number) => inLanguage('cs', () => formatReadAge(ago(minutes), NOW));
 
   it('says just now under a minute and for a future time', () => {
     expect(cs(0.5)).toBe('právě teď');
@@ -53,8 +54,8 @@ describe('formatReadAge', () => {
   });
 
   it('uses English otherwise and is empty for an invalid time', () => {
-    expect(formatReadAge(ago(90), false, NOW)).toBe('1 h 30 min ago');
-    expect(formatReadAge(ago(0), false, NOW)).toBe('just now');
-    expect(formatReadAge('nonsense', true, NOW)).toBe('');
+    expect(formatReadAge(ago(90), NOW)).toBe('1 h 30 min ago');
+    expect(formatReadAge(ago(0), NOW)).toBe('just now');
+    expect(formatReadAge('nonsense', NOW)).toBe('');
   });
 });

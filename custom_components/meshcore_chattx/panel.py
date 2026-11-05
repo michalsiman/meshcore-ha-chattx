@@ -52,6 +52,10 @@ PANEL_FRONTEND_PATH = str(Path(__file__).parent / "meshcore-chattx-panel.js")
 ICONS_URL = "/meshcore_chattx_panel/chattx-icons.js"
 ICONS_FRONTEND_PATH = str(Path(__file__).parent / "chattx-icons.js")
 
+# Panel texts, one JSON file per language, fetched by the panel at startup.
+TRANSLATIONS_URL = "/meshcore_chattx_panel/i18n"
+TRANSLATIONS_PATH = str(Path(__file__).parent / "panel_translations")
+
 PANEL_ICON = "chattx:radio-handheld-x"
 PANEL_TITLE = "MeshCore Chattx"
 
@@ -76,6 +80,7 @@ async def async_register_panel(hass: HomeAssistant) -> None:
             [
                 StaticPathConfig(PANEL_URL, PANEL_FRONTEND_PATH, cache_headers=False),
                 StaticPathConfig(ICONS_URL, ICONS_FRONTEND_PATH, cache_headers=False),
+                StaticPathConfig(TRANSLATIONS_URL, TRANSLATIONS_PATH, cache_headers=False),
             ]
         )
         add_extra_js_url(hass, f"{ICONS_URL}?v={integration.version}")

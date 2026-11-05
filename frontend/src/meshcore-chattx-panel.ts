@@ -1,4 +1,4 @@
-import { t, setHassLanguage } from './i18n';
+import { t, setHassLanguage, loadTranslations } from './i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice } from './types';
@@ -981,6 +981,8 @@ export class MeshCorePanel extends LitElement {
     this._error = null;
 
     try {
+      setHassLanguage(this.hass.language);
+      await loadTranslations();
       const devices = await getDevices(this.hass);
       this._devices = devices;
 

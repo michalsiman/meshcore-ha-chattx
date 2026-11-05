@@ -764,7 +764,7 @@ export class ChatPage extends LitElement {
           <div class="chat-layout">
             <div class="chat-main narrow-full">
               <div class="narrow-header">
-                <button class="back-button" @click=${() => (this._narrowShowMessages = false)}>← Back</button>
+                <button class="back-button" @click=${() => (this._narrowShowMessages = false)}>← ${t('Back')}</button>
                 <span class="narrow-conv-name">${this._getConversationName()}${this._renderScopeChip()}</span>
                 <div class="chat-header-actions">
                   ${this._renderRepeaterButton()}

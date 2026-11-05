@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import '../src/components/message-bubble';
 import type { MessageBubble } from '../src/components/message-bubble';
 import type { ChatMessage } from '../src/types';
+import { registerTranslations } from '../src/i18n';
+import { readLanguage } from './helpers/language';
 
 function makeMessage(overrides: Partial<ChatMessage> = {}): ChatMessage {
   return {
@@ -70,6 +72,7 @@ describe('message dialog reply actions', () => {
   });
 
   it('translates the buttons for Czech browsers only', async () => {
+    registerTranslations('cs', readLanguage('cs'));
     vi.stubGlobal('navigator', { language: 'cs-CZ' });
     const cs = await openDialog(makeMessage());
     const csLabels = cs.actions().map((b) => b.textContent!.trim());

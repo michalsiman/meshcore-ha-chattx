@@ -6,9 +6,10 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
-  getLanguage, getLocale, loadLanguageSetting, saveLanguageSetting, setHassLanguage, t, tn,
+  getLanguage, getLocale, LANGUAGE_NAMES, loadLanguageSetting, registerTranslations,
+  saveLanguageSetting, setHassLanguage, t, tn,
 } from '../src/i18n';
-import { cs } from '../src/i18n/cs';
+import { readLanguage } from './helpers/language';
 import { formatHeardReply, saveHeardReply } from '../src/utils/heard-reply';
 
 const NAMES_ONLY = new Set(['MeshCore Chattx', 'MC Chattx', '']);
@@ -24,6 +25,9 @@ function sources(dir: string): string[] {
 function unescape(text: string): string {
   return text.replace(/\\n/g, '\n').replace(/\\(['\\])/g, '$1');
 }
+
+const cs = readLanguage('cs');
+registerTranslations('cs', cs);
 
 describe('language choice', () => {
   afterEach(() => {
@@ -125,7 +129,7 @@ describe('quick reply text', () => {
   });
 });
 
-describe('Czech dictionary', () => {
+describe('language files', () => {
   // @ts-ignore: node types are not installed
   const root = join(process.cwd(), 'src');
   const keys = new Set<string>();
@@ -134,15 +138,23 @@ describe('Czech dictionary', () => {
     for (const match of text.matchAll(/\b(?:t|N_)\(\s*'((?:[^'\\]|\\.)*)'/g)) keys.add(unescape(match[1]));
     for (const match of text.matchAll(/\btn\(\s*'(?:[^'\\]|\\.)*',\s*'((?:[^'\\]|\\.)*)'/g)) keys.add(unescape(match[1]));
   }
+  const languages = Object.keys(LANGUAGE_NAMES).filter((code) => code !== 'en');
 
-  it('covers every text in the panel', () => {
+  it('Czech covers every text in the panel', () => {
     expect([...keys].filter((key) => !NAMES_ONLY.has(key) && !(key in cs))).toEqual([]);
   });
 
-  it('keeps the placeholders of each text', () => {
-    const names = (text: string) => [...new Set(text.match(/\{\w+\}/g) ?? [])].sort();
-    const broken = Object.entries(cs).filter(([key, value]) =>
-      value.split('|').some((form) => names(form).join() !== names(key).join()));
+  it.each(languages)('%s keeps the placeholders of each text', (language) => {
+    const names = (text: string) => [...new Set(text.match(/\{\w+\}/g) ?? [])].sort().join();
+    const broken = Object.entries(readLanguage(language)).filter(([key, value]) =>
+      value.split('|').some((form) => names(form) !== names(key)));
     expect(broken).toEqual([]);
+  });
+
+  it.each(languages)('%s has no empty text and uses known keys', (language) => {
+    const entries = Object.entries(readLanguage(language));
+    expect(entries.filter(([, value]) => !value.trim())).toEqual([]);
+    const known = new Set([...keys, ...Object.keys(cs)]);
+    expect(entries.filter(([key]) => !known.has(key)).map(([key]) => key)).toEqual([]);
   });
 });
