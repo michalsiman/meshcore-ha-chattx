@@ -14,6 +14,8 @@ on the upstream module.
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
+from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.util import slugify
@@ -145,6 +147,20 @@ def parse_flood_scope_allowlist(raw: object) -> tuple[list[str], bool]:
     return scopes, has_global
 
 
+def flood_scope_allowlist(config_entry: Any) -> str:
+    """The upstream meshcore flood-scope allowlist, read options first.
+
+    meshcore-ha 3.x saves its settings in the entry's options, older
+    versions in its data. A key present in the options wins even when
+    empty, so clearing the list there is respected.
+    """
+    for source in (getattr(config_entry, "options", None), getattr(config_entry, "data", None)):
+        if isinstance(source, Mapping) and CONF_FLOOD_SCOPES_UPSTREAM in source:
+            value = source[CONF_FLOOD_SCOPES_UPSTREAM]
+            return value if isinstance(value, str) else ""
+    return ""
+
+
 def wildcard_global_allowlisted(hass: HomeAssistant) -> bool:
     """True when the upstream meshcore flood-scope allowlist contains ``'*'``.
 
@@ -165,9 +181,7 @@ def wildcard_global_allowlisted(hass: HomeAssistant) -> bool:
         config_entry = getattr(coord, "config_entry", None)
         if config_entry is None:
             continue
-        _, has_global = parse_flood_scope_allowlist(
-            config_entry.data.get(CONF_FLOOD_SCOPES_UPSTREAM, "")
-        )
+        _, has_global = parse_flood_scope_allowlist(flood_scope_allowlist(config_entry))
         return has_global
     return False
 

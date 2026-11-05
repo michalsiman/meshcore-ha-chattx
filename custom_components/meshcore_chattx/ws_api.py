@@ -36,7 +36,12 @@ from .const import (
     MESHCORE_DOMAIN,
 )
 from .message_store import MessageStore
-from .utils import format_entity_id, parse_flood_scope_allowlist, sanitize_name
+from .utils import (
+    flood_scope_allowlist,
+    format_entity_id,
+    parse_flood_scope_allowlist,
+    sanitize_name,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -828,9 +833,22 @@ def ws_get_flood_scopes(hass, connection, msg):
     # global flood" flag (kept out of the named-region list) so the dialog
     # renders one canonical global option.
     scopes, has_global = parse_flood_scope_allowlist(
-        coordinator.config_entry.data.get(CONF_FLOOD_SCOPES_UPSTREAM, "")
+        flood_scope_allowlist(coordinator.config_entry)
     )
     connection.send_result(msg["id"], {"scopes": scopes, "global": has_global})
+
+
+def _find_meshcore_device(dev_reg: dr.DeviceRegistry, entry_id: str, identifier: str):
+    """The meshcore entry's device with this identifier.
+
+    Home Assistant 2026.11 keys identifiers per config entry and deprecates
+    the lookup that ignores the entry (it stops working in 2027.8); older
+    releases only have that lookup. Mirrors meshcore-ha's own find_device.
+    """
+    lookup = getattr(dev_reg, "async_get_device_by_identifier", None)
+    if lookup is not None:
+        return lookup((MESHCORE_DOMAIN, identifier), entry_id)
+    return dev_reg.async_get_device(identifiers={(MESHCORE_DOMAIN, identifier)})
 
 
 # ─── meshcore/get_managed_devices ───────────────────────────────────────
@@ -877,17 +895,17 @@ def ws_get_managed_devices(hass, connection, msg):
     for repeater_config in coordinator._tracked_repeaters:
         pubkey_prefix = repeater_config.get("pubkey_prefix", "")
         repeater_name = repeater_config.get("name", "")
-        stats = coordinator._repeater_stats.get(pubkey_prefix, {})
+        # meshcore-ha 3.x dropped coordinator._repeater_stats (it was always
+        # empty), so the firmware version comes from the device registry only.
+        stats: dict = {}
         update_interval = repeater_config.get("update_interval", 0)
 
-        # Look up firmware version from HA device registry
-        fw_version = stats.get("firmware_version")
-        if not fw_version:
-            device = dev_reg.async_get_device(
-                identifiers={(MESHCORE_DOMAIN, f"{entry_id}_repeater_{pubkey_prefix}")}
-            )
-            if device:
-                fw_version = device.sw_version
+        fw_version = None
+        device = _find_meshcore_device(
+            dev_reg, entry_id, f"{entry_id}_repeater_{pubkey_prefix}"
+        )
+        if device:
+            fw_version = device.sw_version
 
         repeaters.append(
             {

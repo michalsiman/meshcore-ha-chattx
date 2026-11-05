@@ -28,6 +28,7 @@ from custom_components.meshcore_chattx.const import (
 )
 from custom_components.meshcore_chattx.utils import (
     derive_flood_scope,
+    flood_scope_allowlist,
     hoist_flood_scope,
     parse_flood_scope_allowlist,
     wildcard_global_allowlisted,
@@ -183,3 +184,34 @@ def test_wildcard_allowlisted_absent_key() -> None:
 def test_wildcard_allowlisted_no_coordinator() -> None:
     """No upstream coordinator registered → False (not an error)."""
     assert wildcard_global_allowlisted(SimpleNamespace(data={})) is False
+
+
+# ─── flood_scope_allowlist ──────────────────────────────────────────────
+
+
+def test_allowlist_prefers_options() -> None:
+    """meshcore-ha 3.x keeps the allowlist in the entry options."""
+    entry = SimpleNamespace(options={CONF_FLOOD_SCOPES_UPSTREAM: "de, *"}, data={CONF_FLOOD_SCOPES_UPSTREAM: "old"})
+    assert flood_scope_allowlist(entry) == "de, *"
+
+
+def test_allowlist_falls_back_to_data() -> None:
+    """Older meshcore-ha keeps it in the entry data."""
+    entry = SimpleNamespace(options={}, data={CONF_FLOOD_SCOPES_UPSTREAM: "pl-mz"})
+    assert flood_scope_allowlist(entry) == "pl-mz"
+
+
+def test_allowlist_respects_an_emptied_option() -> None:
+    entry = SimpleNamespace(options={CONF_FLOOD_SCOPES_UPSTREAM: ""}, data={CONF_FLOOD_SCOPES_UPSTREAM: "old"})
+    assert flood_scope_allowlist(entry) == ""
+
+
+def test_allowlist_missing_or_odd_values() -> None:
+    assert flood_scope_allowlist(SimpleNamespace()) == ""
+    assert flood_scope_allowlist(SimpleNamespace(options=None, data={CONF_FLOOD_SCOPES_UPSTREAM: None})) == ""
+
+
+def test_wildcard_allowlisted_reads_options() -> None:
+    coord = SimpleNamespace(config_entry=SimpleNamespace(options={CONF_FLOOD_SCOPES_UPSTREAM: "*"}, data={}))
+    assert wildcard_global_allowlisted(SimpleNamespace(data={MESHCORE_DOMAIN: {"entry1": coord}})) is True
+

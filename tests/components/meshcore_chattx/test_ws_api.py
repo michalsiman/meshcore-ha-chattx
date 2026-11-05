@@ -593,6 +593,17 @@ async def test_ws_get_flood_scopes_parses_allowlist(
     assert conn.results[0][1] == {"scopes": ["waw", "pl-mz"], "global": True}
 
 
+async def test_ws_get_flood_scopes_reads_options(
+    hass: HomeAssistant, coordinator: MagicMock
+) -> None:
+    """meshcore-ha 3.x keeps the allowlist in the options (upstream #50, #53)."""
+    coordinator.config_entry.options = {"flood_scopes": "de-be, de"}
+    coordinator.config_entry.data = {"flood_scopes": ""}
+    conn = _Connection()
+    await _call_ws(ws_api.ws_get_flood_scopes, hass, conn, {"id": 1})
+    assert conn.results[0][1] == {"scopes": ["de-be", "de"], "global": False}
+
+
 async def test_ws_get_flood_scopes_global_flag_set(
     hass: HomeAssistant, coordinator: MagicMock
 ) -> None:

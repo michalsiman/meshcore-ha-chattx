@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-11-05
+
+### Fixed
+
+- The region scope picker read the flood scope allowlist only where meshcore-ha 2.x keeps it, so with meshcore-ha 3.x it stayed empty. It now reads the 3.x location first (upstream issues #50 and #53, pull request #54).
+- No more deprecation warnings for `coordinator._repeater_stats`, which meshcore-ha 3.x dropped, and for `device_registry.async_get_device`, which stops working in Home Assistant 2027.8 (upstream issue #45).
+
 ## [0.3.1] - 2026-11-05
 
 ### Added
