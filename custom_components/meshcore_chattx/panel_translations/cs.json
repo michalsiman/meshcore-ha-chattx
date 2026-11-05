@@ -1,6 +1,7 @@
 {
   "32 hex characters (a-f, 0-9)": "32 hex znaků (a-f, 0-9)",
   "A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): \"{start}\"": "Zpráva může mít nejvýše {MAX_QUICK_MESSAGE_BYTES} bajtů (písmeno s diakritikou zabírá 2): „{start}“",
+  "A new version of MeshCore Chattx is installed. Reload the page to use it.": "Je nainstalovaná nová verze MeshCore Chattx. Načti stránku znovu, ať se použije.",
   "A region name cannot contain spaces.": "Název regionu nesmí obsahovat mezery.",
   "Accelerometer": "Akcelerometr",
   "ACK received": "ACK přijat",
@@ -386,6 +387,7 @@
   "Region {name} already exists.": "Region {name} už existuje.",
   "Regions": "Regiony",
   "Reload": "Přenačíst",
+  "Reload page": "Načíst stránku znovu",
   "Reloading MeshCore integration": "Znovu načítám integraci MeshCore",
   "Remember password": "Zapamatovat heslo",
   "Remove": "Odebrat",

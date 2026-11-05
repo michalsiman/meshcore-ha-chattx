@@ -1,5 +1,6 @@
 {
   "A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): \"{start}\"": "En besked må højst have {MAX_QUICK_MESSAGE_BYTES} byte (et bogstav med diakritisk tegn fylder 2): \"{start}\"",
+  "A new version of MeshCore Chattx is installed. Reload the page to use it.": "En ny version af MeshCore Chattx er installeret. Genindlæs siden for at bruge den.",
   "A region name cannot contain spaces.": "Et regionsnavn må ikke indeholde mellemrum.",
   "Accelerometer": "Accelerometer",
   "ACK received": "ACK modtaget",
@@ -338,6 +339,7 @@
   "Region {name} already exists.": "Regionen {name} findes allerede.",
   "Regions": "Regioner",
   "Reload": "Genindlæs",
+  "Reload page": "Genindlæs siden",
   "Reloading MeshCore integration": "Genindlæser MeshCore-integrationen",
   "Remember password": "Husk adgangskode",
   "Remove": "Fjern",

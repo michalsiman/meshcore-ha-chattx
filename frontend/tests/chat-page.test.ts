@@ -1001,6 +1001,27 @@ describe('buttons next to the message field', () => {
   });
 });
 
+describe('opening a conversation with nothing unread', () => {
+  it('goes to the newest message at once instead of waiting for a divider', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    const internals = page as unknown as {
+      _dividerShown: boolean;
+      _doScrollWithRetry: (mode: 'bottom' | 'last-read', attempt: number) => void;
+    };
+    const container = page.shadowRoot!.querySelector<HTMLElement>('.chat-container')!;
+    Object.defineProperty(container, 'scrollHeight', { configurable: true, value: 900 });
+    const timers = vi.spyOn(window, 'setTimeout');
+    internals._dividerShown = false;
+    internals._doScrollWithRetry('last-read', 0);
+    await page.updateComplete;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(container.scrollTop).toBe(900);
+    expect(timers.mock.calls.filter(([, delay]) => delay === 50)).toEqual([]);
+    timers.mockRestore();
+  });
+});
+
 describe('picking an emoji', () => {
   async function pick(page: ChatPage, emoji: string) {
     page.shadowRoot!.querySelector('chattx-emoji-picker')!.dispatchEvent(

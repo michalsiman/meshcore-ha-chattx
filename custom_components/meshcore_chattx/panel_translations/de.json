@@ -1,5 +1,6 @@
 {
   "A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): \"{start}\"": "Eine Nachricht darf höchstens {MAX_QUICK_MESSAGE_BYTES} Bytes haben (ein Umlaut belegt 2): \"{start}\"",
+  "A new version of MeshCore Chattx is installed. Reload the page to use it.": "Eine neue Version von MeshCore Chattx ist installiert. Lade die Seite neu, um sie zu verwenden.",
   "A region name cannot contain spaces.": "Ein Regionsname darf keine Leerzeichen enthalten.",
   "Accelerometer": "Beschleunigungssensor",
   "ACK received": "ACK empfangen",
@@ -338,6 +339,7 @@
   "Region {name} already exists.": "Region {name} existiert bereits.",
   "Regions": "Regionen",
   "Reload": "Neu laden",
+  "Reload page": "Seite neu laden",
   "Reloading MeshCore integration": "MeshCore-Integration wird neu geladen",
   "Remember password": "Passwort merken",
   "Remove": "Entfernen",

@@ -1,5 +1,6 @@
 {
   "A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): \"{start}\"": "Ett meddelande får ha högst {MAX_QUICK_MESSAGE_BYTES} byte (en bokstav med diakrit tar 2): \"{start}\"",
+  "A new version of MeshCore Chattx is installed. Reload the page to use it.": "En ny version av MeshCore Chattx är installerad. Ladda om sidan för att använda den.",
   "A region name cannot contain spaces.": "Ett regionnamn får inte innehålla mellanslag.",
   "Accelerometer": "Accelerometer",
   "ACK received": "ACK mottagen",
@@ -338,6 +339,7 @@
   "Region {name} already exists.": "Regionen {name} finns redan.",
   "Regions": "Regioner",
   "Reload": "Ladda om",
+  "Reload page": "Ladda om sidan",
   "Reloading MeshCore integration": "Laddar om MeshCore-integrationen",
   "Remember password": "Kom ihåg lösenord",
   "Remove": "Ta bort",

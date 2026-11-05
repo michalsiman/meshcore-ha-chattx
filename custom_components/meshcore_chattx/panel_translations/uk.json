@@ -1,5 +1,6 @@
 {
   "A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): \"{start}\"": "Повідомлення може мати щонайбільше {MAX_QUICK_MESSAGE_BYTES} байтів (літера не з латиниці займає 2): \"{start}\"",
+  "A new version of MeshCore Chattx is installed. Reload the page to use it.": "Встановлено нову версію MeshCore Chattx. Перезавантажте сторінку, щоб нею скористатися.",
   "A region name cannot contain spaces.": "Назва регіону не може містити пробілів.",
   "Accelerometer": "Акселерометр",
   "ACK received": "ACK отримано",
@@ -338,6 +339,7 @@
   "Region {name} already exists.": "Регіон {name} уже існує.",
   "Regions": "Регіони",
   "Reload": "Перезавантажити",
+  "Reload page": "Перезавантажити сторінку",
   "Reloading MeshCore integration": "Перезавантаження інтеграції MeshCore",
   "Remember password": "Запам'ятати пароль",
   "Remove": "Вилучити",

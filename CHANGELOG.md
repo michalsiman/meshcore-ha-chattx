@@ -4,6 +4,17 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-05
+
+### Added
+
+- After an update, the panel shows a bar with a button to reload the page, instead of running the old version until the user reloads by hand.
+- A page that still runs the old panel no longer logs errors when Home Assistant loads the new one into it.
+
+### Fixed
+
+- Opening a conversation with nothing new showed the top of the list for about a second before jumping to the newest message. It now opens at the newest message right away.
+
 ## [0.3.0] - 2026-11-05
 
 ### Added

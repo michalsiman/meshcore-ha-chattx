@@ -81,6 +81,8 @@ export class ChatPage extends LitElement {
   @state() private _conversationResolved = false;
   @state() private _pendingScroll: 'bottom' | 'last-read' | null = null;
   private _scrollInFlight = false;
+  /** Whether the last render placed an unread divider, so a last-read scroll knows to wait for it. */
+  private _dividerShown = false;
   private _scrollGuardUntil = 0;
   private _lastMessageCount = 0;
   /**
@@ -1012,6 +1014,7 @@ export class ChatPage extends LitElement {
     // count-based fallback for an absent / pruned anchor. chat-page
     // just consumes the resulting group index.
     const dividerAtMessageIdx = this.unread.dividerAfterGroupIdx(renderItems);
+    this._dividerShown = dividerAtMessageIdx !== null;
 
     for (const item of renderItems) {
       if (item.type === 'date-separator') {
@@ -1517,6 +1520,12 @@ export class ChatPage extends LitElement {
             const containerRect = container.getBoundingClientRect();
             const dividerRect = divider.getBoundingClientRect();
             container.scrollTop += dividerRect.top - containerRect.top;
+            this._scrollInFlight = false;
+          } else if (!this._dividerShown) {
+            // Nothing unread after the last-read message, so no divider
+            // will come: go to the newest message right away instead of
+            // showing the top of the list while retrying.
+            container.scrollTop = container.scrollHeight;
             this._scrollInFlight = false;
           } else if (attempt < 10) {
             // Divider not rendered yet — retry (up to ~500ms total)

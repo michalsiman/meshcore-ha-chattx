@@ -1,5 +1,6 @@
 {
   "A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): \"{start}\"": "Wiadomość może mieć najwyżej {MAX_QUICK_MESSAGE_BYTES} bajtów (litera ze znakiem diakrytycznym zajmuje 2): \"{start}\"",
+  "A new version of MeshCore Chattx is installed. Reload the page to use it.": "Zainstalowano nową wersję MeshCore Chattx. Odśwież stronę, aby jej użyć.",
   "A region name cannot contain spaces.": "Nazwa regionu nie może zawierać spacji.",
   "Accelerometer": "Akcelerometr",
   "ACK received": "ACK odebrany",
@@ -338,6 +339,7 @@
   "Region {name} already exists.": "Region {name} już istnieje.",
   "Regions": "Regiony",
   "Reload": "Wczytaj ponownie",
+  "Reload page": "Odśwież stronę",
   "Reloading MeshCore integration": "Ponowne wczytywanie integracji MeshCore",
   "Remember password": "Zapamiętaj hasło",
   "Remove": "Usuń",

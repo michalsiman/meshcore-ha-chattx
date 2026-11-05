@@ -1,5 +1,6 @@
 {
   "A message can have at most {MAX_QUICK_MESSAGE_BYTES} bytes (a letter with diacritics takes 2): \"{start}\"": "Viestissä voi olla enintään {MAX_QUICK_MESSAGE_BYTES} tavua (ä ja ö vievät 2): \"{start}\"",
+  "A new version of MeshCore Chattx is installed. Reload the page to use it.": "MeshCore Chattxin uusi versio on asennettu. Lataa sivu uudelleen, niin se otetaan käyttöön.",
   "A region name cannot contain spaces.": "Alueen nimessä ei saa olla välilyöntejä.",
   "Accelerometer": "Kiihtyvyysanturi",
   "ACK received": "ACK vastaanotettu",
@@ -338,6 +339,7 @@
   "Region {name} already exists.": "Alue {name} on jo olemassa.",
   "Regions": "Alueet",
   "Reload": "Lataa uudelleen",
+  "Reload page": "Lataa sivu uudelleen",
   "Reloading MeshCore integration": "Ladataan MeshCore-integraatiota uudelleen",
   "Remember password": "Muista salasana",
   "Remove": "Poista",

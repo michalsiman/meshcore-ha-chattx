@@ -1,4 +1,6 @@
+import './define-guard';
 import { t, setHassLanguage, loadTranslations } from './i18n';
+import { isOutdated, panelModuleUrl } from './utils/update-check';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice } from './types';
@@ -21,6 +23,9 @@ export class MeshCorePanel extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: Boolean, reflect: true }) narrow = false;
   @property({ type: Object }) panel?: Record<string, unknown>;
+  /** Set when Home Assistant serves a newer panel than the one running here. */
+  @state() private _updateAvailable = false;
+  private _onReconnect = () => void this._checkForUpdate();
 
   @state() private _config: PanelConfig | null = null;
   @state() private _activeTab: 'chat' | 'devices' | 'nodes' | 'settings' = 'chat';
@@ -113,6 +118,29 @@ export class MeshCorePanel extends LitElement {
         flex-direction: column;
         height: 100%;
         background: var(--primary-background-color, #fafafa);
+      }
+
+      .update-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        background: var(--warning-color, #ff9800);
+        color: #000;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .update-banner span { flex: 1; }
+
+      .update-banner button {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
       }
 
       .panel-header {
@@ -557,12 +585,36 @@ export class MeshCorePanel extends LitElement {
     this._loadData();
     this._setupSubscriptions();
     this._releaseKeyboardViewport = keepAboveKeyboard(this);
+    (this.hass?.connection as unknown as EventTarget | undefined)?.addEventListener?.('ready', this._onReconnect);
+    void this._checkForUpdate();
+  }
+
+  /** Compare the running bundle with the one Home Assistant serves now, after a restart for example. */
+  private async _checkForUpdate() {
+    if (!this.hass) return;
+    let served = panelModuleUrl(this.panel);
+    try {
+      const panels = await this.hass.callWS<Record<string, unknown>>({ type: 'get_panels' });
+      served = panelModuleUrl(panels?.['meshcore-chattx']) ?? served;
+    } catch {
+      // Keep the panel info Home Assistant handed over.
+    }
+    this._updateAvailable = isOutdated(import.meta.url, served);
+  }
+
+  private _renderUpdateBanner() {
+    if (!this._updateAvailable) return '';
+    return html`<div class="update-banner" role="status">
+      <span>${t('A new version of MeshCore Chattx is installed. Reload the page to use it.')}</span>
+      <button @click=${() => window.location.reload()}>${t('Reload page')}</button>
+    </div>`;
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._teardownSubscriptions();
     this._closeDeviceDropdown();
+    (this.hass?.connection as unknown as EventTarget | undefined)?.removeEventListener?.('ready', this._onReconnect);
     this._releaseKeyboardViewport?.();
     this._releaseKeyboardViewport = null;
   }
@@ -758,6 +810,7 @@ export class MeshCorePanel extends LitElement {
 
     return html`
       <div class="panel">
+        ${this._renderUpdateBanner()}
         <div class="panel-header">
           <div class="header-left">
             ${this.narrow || this.hass?.dockedSidebar === 'always_hidden'
