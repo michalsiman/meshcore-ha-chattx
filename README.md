@@ -31,7 +31,7 @@
 
 It works as a **companion** to the [core meshcore integration](https://github.com/meshcore-dev/meshcore-ha), so install both. This integration does not drive the radio itself. It uses its own domain, `meshcore_chattx`, so it can be installed next to the original, and message history is not shared between them.
 
-> **Status:** v0.1 in active development.
+> **Status:** in active development. See the [latest release](https://github.com/michalsiman/meshcore-ha-chattx/releases/latest) and the [changelog](CHANGELOG.md).
 
 ## What Chattx adds
 
