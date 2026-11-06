@@ -4,6 +4,19 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-06
+
+### Added
+
+- Received channel messages show the region they were sent in after the time, as `#name`. A message sent in a region that is not in core meshcore's Flood Scope Allowlist shows "unknown region", because a region can only be recognised by its name. The message dialog always names the region, or says the message was a plain global flood.
+- Settings → Region sets the companion's default region for sending (firmware v1.15.0 or newer). Channel messages without their own region go out in it; a region set on the channel still wins. The radio keeps the setting, so it also applies to other clients such as the phone app. Chattx reads the region back from the radio after saving it.
+- The Chat tab shows how many messages are unread, so new messages are visible while another conversation or tab is open.
+
+### Fixed
+
+- Conversations showed no unread badge while Home Assistant's sidebar did. Chattx loaded the counts only when the panel opened for the first time, and missed messages that came in while another Home Assistant page was open or the phone was asleep. It now fetches them again when the panel comes back, when the connection is back and when the page becomes visible.
+- "No region" could not be set as the default region: meshcore_py sends a frame that the firmware refuses with `ERR_CODE_ILLEGAL_ARG`. Chattx now sends the short command the firmware accepts.
+
 ## [0.3.4] - 2026-11-05
 
 ### Fixed
