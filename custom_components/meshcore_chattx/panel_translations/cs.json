@@ -553,5 +553,22 @@
   "{n} hops": "{n} hop|{n} hopy|{n} hopů",
   "{n} repeaters responded": "Odpověděl {n} repeater|Odpověděly {n} repeatery|Odpovědělo {n} repeaterů",
   "{n} results": "{n} výsledek|{n} výsledky|{n} výsledků",
-  "{sensor}, channel {channel}": "{sensor}, kanál {channel}"
+  "{sensor}, channel {channel}": "{sensor}, kanál {channel}",
+  "Region": "Region",
+  "Could not set the region: {error}": "Region se nepodařilo nastavit: {error}",
+  "Default region set to #{name}": "Výchozí region nastaven na #{name}",
+  "Default region cleared": "Výchozí region zrušen",
+  "A default region needs companion firmware v1.15.0 or newer.": "Výchozí region vyžaduje firmware companionu v1.15.0 nebo novější.",
+  "Default region for sending": "Výchozí region pro odesílání",
+  "No region (global flood)": "Bez regionu (globální flood)",
+  "Other region…": "Jiný region…",
+  "Region name": "Název regionu",
+  "for example cz-pl": "například cz-pl",
+  "Channel messages without their own region go out in this region. A region set on the channel still wins. The radio keeps the setting, so it also applies to other clients, such as the phone app.": "Zprávy do kanálů bez vlastního regionu odejdou v tomto regionu. Region nastavený u kanálu má přednost. Nastavení si drží rádio, takže platí i pro ostatní klienty, třeba aplikaci v telefonu.",
+  "Apply": "Použít",
+  "Region: #{name}": "Region: #{name}",
+  "unknown region": "neznámý region",
+  "Region: unknown. Add its name to the Flood Scope Allowlist in the MeshCore integration options to see it.": "Region: neznámý. Aby se zobrazil, přidej jeho název do Flood Scope Allowlist v nastavení integrace MeshCore.",
+  "Region: none (global flood)": "Region: žádný (globální flood)",
+  "all regions": "všechny regiony"
 }

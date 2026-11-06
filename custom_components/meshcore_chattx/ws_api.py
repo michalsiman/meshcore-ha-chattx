@@ -428,6 +428,8 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_get_contacts)
     websocket_api.async_register_command(hass, ws_get_channels)
     websocket_api.async_register_command(hass, ws_get_flood_scopes)
+    websocket_api.async_register_command(hass, ws_get_default_flood_scope)
+    websocket_api.async_register_command(hass, ws_set_default_flood_scope)
 
     # Device config and command-execution commands
     websocket_api.async_register_command(hass, ws_get_managed_devices)
@@ -1456,6 +1458,93 @@ def _format_event_response(result) -> str:
     if isinstance(payload, dict):
         return json.dumps(payload, default=_json_safe)
     return str(payload)
+
+
+# ─── meshcore/default_flood_scope ──────────────────────────────────
+# The companion's persistent default region (firmware v1.15.0+). Floods sent
+# without their own scope, such as channel messages without a channel scope,
+# go out in this region. A per-channel scope still wins: meshcore-ha sets it
+# for one send and then reverts the radio to this default.
+
+
+def _default_scope_name(payload) -> str:
+    """Region name from a DEFAULT_FLOOD_SCOPE payload; '' when none is set."""
+    if not isinstance(payload, dict):
+        return ""
+    return str(payload.get("scope_name") or "").strip()
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/get_default_flood_scope",
+        vol.Optional("entry_id"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_get_default_flood_scope(hass, connection, msg):
+    """Return ``{"supported": bool, "scope": str}``; scope '' means no region."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+    if not has_command(coordinator.api, "get_default_flood_scope"):
+        connection.send_result(msg["id"], {"supported": False, "scope": ""})
+        return
+    try:
+        result = await radio_command(coordinator.api, "get_default_flood_scope")
+        reason = _device_config_failure_reason(result)
+        if reason is not None:
+            # Firmware older than v1.15.0 answers the unknown command with an error.
+            connection.send_result(
+                msg["id"], {"supported": False, "scope": "", "reason": str(reason)}
+            )
+            return
+        connection.send_result(
+            msg["id"],
+            {"supported": True, "scope": _default_scope_name(getattr(result, "payload", None))},
+        )
+    except Exception as ex:
+        _ws_send_error_safe(connection, msg["id"], ex, handler="ws_get_default_flood_scope")
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/set_default_flood_scope",
+        vol.Optional("entry_id"): str,
+        # Region name with or without '#'; '' (or '*') clears the default.
+        vol.Required("scope"): vol.All(str, vol.Length(max=30)),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_set_default_flood_scope(hass, connection, msg):
+    """Store the companion's default region and read it back."""
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "No MeshCore coordinator found")
+        return
+    if not has_command(coordinator.api, "set_default_flood_scope"):
+        connection.send_error(
+            msg["id"], "not_supported", "This meshcore version cannot set a default region"
+        )
+        return
+    scope = msg["scope"].strip()
+    if scope in ("*", "#"):
+        scope = ""
+    if any(ch.isspace() or ch == "," for ch in scope):
+        connection.send_error(msg["id"], "invalid", "A region name has no spaces or commas")
+        return
+    try:
+        result = await radio_command(coordinator.api, "set_default_flood_scope", scope)
+        reason = _device_config_failure_reason(result)
+        if reason is not None:
+            connection.send_error(msg["id"], "failed", f"The radio refused the region: {reason}")
+            return
+        check = await radio_command(coordinator.api, "get_default_flood_scope")
+        stored = _default_scope_name(getattr(check, "payload", None))
+        connection.send_result(msg["id"], {"success": True, "scope": stored})
+    except Exception as ex:
+        _ws_send_error_safe(connection, msg["id"], ex, handler="ws_set_default_flood_scope")
 
 
 # ─── meshcore/execute_local ─────────────────────────────────────────────

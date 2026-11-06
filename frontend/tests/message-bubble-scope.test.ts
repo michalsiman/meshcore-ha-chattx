@@ -6,11 +6,11 @@ import '../src/components/message-bubble';
 import type { ChatMessage, MessageGroup } from '../src/types';
 
 // Change 6 — inbound region scope in the bubble timestamp line.
-// "*" renders as "🌐 all regions", a region name verbatim, nothing when
-// absent. Incoming bubbles only — the outbound scope is shown by the
+// "*" renders as "🌐 all regions", a region name as "#name", a scoped flood
+// with an unlisted region as "unknown region", nothing for a plain flood. Incoming bubbles only — the outbound scope is shown by the
 // thread-header chip, so outgoing bubbles are unaffected.
 
-function makeGroup(opts: { floodScope?: string; isOutgoing?: boolean }): MessageGroup {
+function makeGroup(opts: { floodScope?: string; regionScope?: boolean; isOutgoing?: boolean }): MessageGroup {
   const isOutgoing = opts.isOutgoing ?? false;
   const msg: ChatMessage = {
     id: 'scope-msg-1',
@@ -22,6 +22,7 @@ function makeGroup(opts: { floodScope?: string; isOutgoing?: boolean }): Message
     raw: 'hello mesh',
     mentions: [],
     floodScope: opts.floodScope,
+    regionScope: opts.regionScope,
   };
   return {
     sender: msg.sender,
@@ -59,7 +60,22 @@ describe('message-bubble inbound scope label', () => {
     const bubble = await mountBubble(makeGroup({ floodScope: 'pl-mz' }));
     const scope = bubble.shadowRoot!.querySelector('.flood-scope');
     expect(scope).not.toBeNull();
-    expect(scope!.textContent).toBe('pl-mz');
+    expect(scope!.textContent).toBe('#pl-mz');
+  });
+
+  it('shows the hash prefix only once for a region stored with "#"', async () => {
+    const bubble = await mountBubble(makeGroup({ floodScope: '#cz-pl', regionScope: true }));
+    expect(bubble.shadowRoot!.querySelector('.flood-scope')!.textContent).toBe('#cz-pl');
+  });
+
+  it('flags a scoped flood whose region is not in the allowlist', async () => {
+    const bubble = await mountBubble(makeGroup({ regionScope: true }));
+    expect(bubble.shadowRoot!.querySelector('.flood-scope')!.textContent).toBe('unknown region');
+  });
+
+  it('renders no label for a plain global flood', async () => {
+    const bubble = await mountBubble(makeGroup({ regionScope: false }));
+    expect(bubble.shadowRoot!.querySelector('.flood-scope')).toBeNull();
   });
 
   it('renders no scope label when floodScope is absent', async () => {

@@ -1235,3 +1235,39 @@ export async function searchStoredMessages(
     return { results: [], count: 0 };
   }
 }
+
+/**
+ * The companion's persistent default region (firmware v1.15.0+). Floods
+ * without their own scope go out in it. `scope` is '' when no default is
+ * set; `supported` is false on older firmware or meshcore.
+ */
+export async function getDefaultFloodScope(
+  hass: HomeAssistant,
+  entryId?: string,
+): Promise<{ supported: boolean; scope: string }> {
+  try {
+    const msg: Record<string, unknown> = { type: 'meshcore_chattx/get_default_flood_scope' };
+    if (entryId) msg.entry_id = entryId;
+    const result = await hass.callWS<{ supported?: boolean; scope?: string }>(msg);
+    return { supported: !!result.supported, scope: result.scope || '' };
+  } catch {
+    return { supported: false, scope: '' };
+  }
+}
+
+/** Store the default region; '' clears it. Returns the region the radio now holds. */
+export async function setDefaultFloodScope(
+  hass: HomeAssistant,
+  scope: string,
+  entryId?: string,
+): Promise<{ success: boolean; scope?: string; error?: string }> {
+  try {
+    const msg: Record<string, unknown> = { type: 'meshcore_chattx/set_default_flood_scope', scope };
+    if (entryId) msg.entry_id = entryId;
+    const result = await hass.callWS<{ success: boolean; scope?: string }>(msg);
+    return { success: !!result.success, scope: result.scope ?? '' };
+  } catch (error) {
+    const e = error as { message?: string };
+    return { success: false, error: e?.message || String(error) };
+  }
+}

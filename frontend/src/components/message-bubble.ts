@@ -1,4 +1,5 @@
 import { getLocale, t, tn } from '../i18n';
+import { regionInfo } from '../utils/region-label';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { ChatMessage, MessageGroup, DeliveryStatus } from '../types';
@@ -334,12 +335,7 @@ export class MessageBubble extends LitElement {
     // Inbound region scope — incoming bubbles only. "*" → "🌐 all regions",
     // a region name renders verbatim, absent renders nothing. The outbound
     // scope is shown by the thread-header chip, so outgoing is unaffected.
-    const scopeLabel =
-      !msg.isOutgoing && !msg.isSystem && msg.floodScope
-        ? msg.floodScope === '*'
-          ? '🌐 all regions'
-          : msg.floodScope
-        : '';
+    const scopeLabel = !msg.isOutgoing && !msg.isSystem ? regionInfo(msg.floodScope, msg.regionScope).short : '';
 
     return html`
       <div class=${this._classMap(bubbleClasses)} data-msg-id=${msg.id} @click=${(e: Event) => { e.stopPropagation(); this._selectedMessage = msg; }}>
@@ -478,6 +474,9 @@ export class MessageBubble extends LitElement {
           <div style=${footerStyle}>
             ${msg.isOutgoing ? t('Sent') : t('Received')}: ${fullDateTime}
           </div>
+          ${!msg.isOutgoing && !msg.isSystem && regionInfo(msg.floodScope, msg.regionScope).long
+            ? html`<div style=${footerStyle}>${regionInfo(msg.floodScope, msg.regionScope).long}</div>`
+            : html``}
           ${msg.isOutgoing && msg.deliveryStatus
             ? html`
                 <div style=${footerStyle}>

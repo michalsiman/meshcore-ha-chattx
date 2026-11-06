@@ -9,6 +9,9 @@ import {
   executeLocal,
   subscribeIdentityChange,
   setLocationSource,
+  getFloodScopes,
+  getDefaultFloodScope,
+  setDefaultFloodScope,
 } from '../api';
 import type { IdentityFlowStep, SetDeviceConfigRenameResult } from '../api';
 import '../components/confirm-dialog';
@@ -135,6 +138,14 @@ export class SettingsPage extends LitElement {
 
   // Status toast
   @state() private _statusMessage: { text: string; type: 'success' | 'error' } | null = null;
+  /** Companion's default region: null while loading, '' when none is set. */
+  @state() private _defaultScope: string | null = null;
+  @state() private _defaultScopeSupported = true;
+  @state() private _scopeChoices: string[] = [];
+  /** Value picked in the region select; '__custom' shows the text field. */
+  @state() private _scopeEdit: string | null = null;
+  @state() private _scopeCustom = '';
+  @state() private _scopeSaving = false;
   private _statusMessageTimeout: number | null = null;
 
   constructor() {
@@ -694,6 +705,7 @@ export class SettingsPage extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this._loadDeviceConfig();
+    void this._loadDefaultScope();
     this._loadHiddenSensors();
   }
 
@@ -708,6 +720,7 @@ export class SettingsPage extends LitElement {
   updated(changedProperties: Map<string, unknown>) {
     if (changedProperties.has('config')) {
       this._loadDeviceConfig();
+      if (changedProperties.get('config') !== undefined) void this._loadDefaultScope();
     }
     // Load entity registry once hass is available
     if (changedProperties.has('hass') && this.hass && !this._entityRegistryLoaded) {
@@ -780,6 +793,12 @@ export class SettingsPage extends LitElement {
             <div class="device-section">
               <div class="card-title">${t('Radio')}</div>
               ${this._renderRadioSettings()}
+            </div>
+
+            <!-- Default region for floods sent from this companion -->
+            <div class="device-section">
+              <div class="card-title">${t('Region')}</div>
+              ${this._renderDefaultScope()}
             </div>
 
             <!-- Location -->
@@ -1119,6 +1138,90 @@ export class SettingsPage extends LitElement {
           </button>
         </div>
       </div>
+    `;
+  }
+
+  private async _loadDefaultScope() {
+    if (!this.hass) return;
+    const entryId = this.config?.entry_id;
+    const [current, allow] = await Promise.all([
+      getDefaultFloodScope(this.hass, entryId),
+      getFloodScopes(this.hass, entryId),
+    ]);
+    this._defaultScopeSupported = current.supported;
+    this._defaultScope = current.scope.replace(/^#/, '');
+    this._scopeChoices = allow.scopes.map((x) => x.replace(/^#/, '')).filter(Boolean);
+    this._scopeEdit = null;
+    this._scopeCustom = '';
+  }
+
+  private _pendingScope(): string | null {
+    const pick = this._scopeEdit;
+    if (pick === null) return null;
+    const value = (pick === '__custom' ? this._scopeCustom : pick).trim().replace(/^#/, '');
+    return pick === '__custom' && !value ? null : value;
+  }
+
+  private async _applyDefaultScope() {
+    const value = this._pendingScope();
+    if (value === null || !this.hass) return;
+    this._scopeSaving = true;
+    const result = await setDefaultFloodScope(this.hass, value, this.config?.entry_id);
+    this._scopeSaving = false;
+    if (!result.success) {
+      this._showStatusMessage(t('Could not set the region: {error}', { error: result.error || '' }), 'error');
+      return;
+    }
+    this._defaultScope = (result.scope || '').replace(/^#/, '');
+    this._scopeEdit = null;
+    this._scopeCustom = '';
+    this._showStatusMessage(
+      this._defaultScope ? t('Default region set to #{name}', { name: this._defaultScope }) : t('Default region cleared'),
+      'success',
+    );
+  }
+
+  private _renderDefaultScope() {
+    if (this._defaultScope === null) {
+      return html`<div class="form-description">${t('Loading settings...')}</div>`;
+    }
+    if (!this._defaultScopeSupported) {
+      return html`<div class="form-description">${t('A default region needs companion firmware v1.15.0 or newer.')}</div>`;
+    }
+    const current = this._defaultScope;
+    const choices = [...this._scopeChoices];
+    if (current && !choices.includes(current)) choices.unshift(current);
+    const selected = this._scopeEdit ?? current;
+    const pending = this._pendingScope();
+    const changed = pending !== null && pending !== current;
+    return html`
+      <div class="section-row">
+        <div class="form-group-inline">
+          <label class="form-label" for="chattx-default-scope">${t('Default region for sending')}</label>
+          <select id="chattx-default-scope" class="form-select" ?disabled=${this._scopeSaving}
+            @change=${(e: Event) => { this._scopeEdit = (e.target as HTMLSelectElement).value; }}>
+            <option value="" ?selected=${selected === ''}>${t('No region (global flood)')}</option>
+            ${choices.map((c) => html`<option value=${c} ?selected=${selected === c}>#${c}</option>`)}
+            <option value="__custom" ?selected=${selected === '__custom'}>${t('Other region…')}</option>
+          </select>
+        </div>
+      </div>
+      ${selected === '__custom'
+        ? html`<div class="section-row">
+            <div class="form-group-inline">
+              <label class="form-label" for="chattx-default-scope-name">${t('Region name')}</label>
+              <input id="chattx-default-scope-name" class="form-input" type="text" maxlength="30"
+                placeholder=${t('for example cz-pl')} .value=${this._scopeCustom}
+                @input=${(e: Event) => { this._scopeCustom = (e.target as HTMLInputElement).value.replace(/[\s,]/g, ''); }} />
+            </div>
+          </div>`
+        : nothing}
+      <div class="form-description">
+        ${t('Channel messages without their own region go out in this region. A region set on the channel still wins. The radio keeps the setting, so it also applies to other clients, such as the phone app.')}
+      </div>
+      <button class="apply-button" ?disabled=${!changed || this._scopeSaving} @click=${this._applyDefaultScope}>
+        ${this._scopeSaving ? t('Saving...') : t('Apply')}
+      </button>
     `;
   }
 
