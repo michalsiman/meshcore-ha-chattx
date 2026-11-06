@@ -25,7 +25,15 @@ export class MeshCorePanel extends LitElement {
   @property({ type: Object }) panel?: Record<string, unknown>;
   /** Set when Home Assistant serves a newer panel than the one running here. */
   @state() private _updateAvailable = false;
-  private _onReconnect = () => void this._checkForUpdate();
+  private _onReconnect = () => {
+    void this._checkForUpdate();
+    // Events sent while the connection was down are lost; fetch the counts again.
+    this._refreshAfterAbsence();
+  };
+  /** A tab or the phone app coming back to the foreground may have missed events. */
+  private _onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') this._refreshAfterAbsence();
+  };
 
   @state() private _config: PanelConfig | null = null;
   @state() private _activeTab: 'chat' | 'devices' | 'nodes' | 'settings' = 'chat';
@@ -582,8 +590,13 @@ export class MeshCorePanel extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    // Home Assistant detaches the panel when another page is opened. Its
+    // subscriptions stop meanwhile, so on return the counts are fetched again
+    // (the first load below runs only once).
+    if (this._loadingStarted) this._refreshAfterAbsence();
     this._loadData();
     this._setupSubscriptions();
+    document.addEventListener('visibilitychange', this._onVisibilityChange);
     this._releaseKeyboardViewport = keepAboveKeyboard(this);
     (this.hass?.connection as unknown as EventTarget | undefined)?.addEventListener?.('ready', this._onReconnect);
     void this._checkForUpdate();
@@ -613,6 +626,7 @@ export class MeshCorePanel extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._teardownSubscriptions();
+    document.removeEventListener('visibilitychange', this._onVisibilityChange);
     this._closeDeviceDropdown();
     (this.hass?.connection as unknown as EventTarget | undefined)?.removeEventListener?.('ready', this._onReconnect);
     this._releaseKeyboardViewport?.();
@@ -1126,6 +1140,13 @@ export class MeshCorePanel extends LitElement {
     } catch (err) {
       console.error('Failed to refresh devices after rename:', err);
     }
+  }
+
+  /** Fetch unread counts and conversations after the panel may have missed events. */
+  private _refreshAfterAbsence() {
+    if (!this.hass || this._loading || !this._loadingStarted) return;
+    void this._loadUnreadCounts();
+    void this._loadDeviceData();
   }
 
   private async _loadUnreadCounts() {
