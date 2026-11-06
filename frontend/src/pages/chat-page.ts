@@ -553,6 +553,34 @@ export class ChatPage extends LitElement {
   };
 
   /** Treat as narrow when HA says narrow OR when the viewport is < 600px wide. */
+  /**
+   * On a phone the open conversation gets its own history entry, so the
+   * system back gesture returns to the conversation list instead of leaving
+   * the panel for the previous Home Assistant page. The URL stays the same,
+   * so Home Assistant's router keeps showing this panel.
+   */
+  private _openNarrowConversation() {
+    if (!this._narrowShowMessages && !(history.state as { chattxConversation?: boolean } | null)?.chattxConversation) {
+      history.pushState({ ...(history.state ?? {}), chattxConversation: true }, '');
+    }
+    this._narrowShowMessages = true;
+  }
+
+  /** The in-panel back button: go back through history when the entry is ours. */
+  private _closeNarrowConversation() {
+    if ((history.state as { chattxConversation?: boolean } | null)?.chattxConversation) {
+      history.back(); // _onPopState closes the conversation
+    } else {
+      this._narrowShowMessages = false;
+    }
+  }
+
+  private _onPopState = () => {
+    if (this._narrowShowMessages && !(history.state as { chattxConversation?: boolean } | null)?.chattxConversation) {
+      this._narrowShowMessages = false;
+    }
+  };
+
   private get _isNarrow(): boolean {
     return this.narrow || this._viewportNarrow;
   }
@@ -597,10 +625,12 @@ export class ChatPage extends LitElement {
     };
     this._mediaQuery.addEventListener('change', this._mediaHandler);
     window.visualViewport?.addEventListener('resize', this._onViewportResize);
+    window.addEventListener('popstate', this._onPopState);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    window.removeEventListener('popstate', this._onPopState);
     window.visualViewport?.removeEventListener('resize', this._onViewportResize);
     if (this._messageStore) {
       this._messageStore.destroy();
@@ -766,7 +796,7 @@ export class ChatPage extends LitElement {
           <div class="chat-layout">
             <div class="chat-main narrow-full">
               <div class="narrow-header">
-                <button class="back-button" @click=${() => (this._narrowShowMessages = false)}>← ${t('Back')}</button>
+                <button class="back-button" @click=${() => this._closeNarrowConversation()}>← ${t('Back')}</button>
                 <span class="narrow-conv-name">${this._getConversationName()}${this._renderScopeChip()}</span>
                 <div class="chat-header-actions">
                   ${this._renderRepeaterButton()}
@@ -797,7 +827,7 @@ export class ChatPage extends LitElement {
                   this._pendingScroll = 'bottom';
                 }
                 this.selectedId = newId;
-                this._narrowShowMessages = true;
+                this._openNarrowConversation();
                 this._focusAfterSelect = true;
                 this.requestUpdate();
               }}
