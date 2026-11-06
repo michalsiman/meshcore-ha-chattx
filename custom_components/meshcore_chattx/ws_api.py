@@ -1474,6 +1474,25 @@ def _default_scope_name(payload) -> str:
     return str(payload.get("scope_name") or "").strip()
 
 
+# CMD_SET_DEFAULT_FLOOD_SCOPE in the companion firmware (v1.15.0+).
+_CMD_SET_DEFAULT_FLOOD_SCOPE = 63
+
+
+async def _clear_default_flood_scope(api):
+    """Clear the default region.
+
+    The firmware clears it only for the bare one-byte command; a full frame
+    with an empty name is refused with ERR_CODE_ILLEGAL_ARG. meshcore_py's
+    ``set_default_flood_scope(None)`` sends the full frame, so the bare
+    command goes out through the SDK's generic ``send`` instead.
+    """
+    from meshcore.events import EventType
+
+    return await radio_command(
+        api, "send", bytes([_CMD_SET_DEFAULT_FLOOD_SCOPE]), [EventType.OK, EventType.ERROR]
+    )
+
+
 @websocket_api.websocket_command(
     {
         vol.Required("type"): "meshcore_chattx/get_default_flood_scope",
@@ -1535,7 +1554,10 @@ async def ws_set_default_flood_scope(hass, connection, msg):
         connection.send_error(msg["id"], "invalid", "A region name has no spaces or commas")
         return
     try:
-        result = await radio_command(coordinator.api, "set_default_flood_scope", scope)
+        if scope:
+            result = await radio_command(coordinator.api, "set_default_flood_scope", scope)
+        else:
+            result = await _clear_default_flood_scope(coordinator.api)
         reason = _device_config_failure_reason(result)
         if reason is not None:
             connection.send_error(msg["id"], "failed", f"The radio refused the region: {reason}")
