@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-06
+
+### Fixed
+
+- On a phone the system back gesture in an open conversation left Chattx for the previous Home Assistant page. It now returns to the conversation list, like the back button in the conversation header; the next back gesture leaves Chattx.
+
 ## [0.4.0] - 2026-11-06
 
 ### Added
