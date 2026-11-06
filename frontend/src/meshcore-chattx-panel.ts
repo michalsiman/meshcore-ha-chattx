@@ -1,5 +1,5 @@
 import './define-guard';
-import { t, setHassLanguage, loadTranslations } from './i18n';
+import { t, tn, setHassLanguage, loadTranslations } from './i18n';
 import { isOutdated, panelModuleUrl } from './utils/update-check';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -63,6 +63,8 @@ export class MeshCorePanel extends LitElement {
    * `<chat-page>` is deliberately stable).
    */
   private _unread = new UnreadController();
+  /** Re-renders the Chat tab's unread total when the counts change. */
+  private _unsubscribeTabBadge: (() => void) | null = null;
   @state() private _pendingChatTarget: string | null = null;
   /** Entity ID of the conversation currently being viewed in chat. */
   private _activeChatEntityId: string | null = null;
@@ -597,6 +599,7 @@ export class MeshCorePanel extends LitElement {
     this._loadData();
     this._setupSubscriptions();
     document.addEventListener('visibilitychange', this._onVisibilityChange);
+    this._unsubscribeTabBadge ??= this._unread.subscribe(() => this.requestUpdate());
     this._releaseKeyboardViewport = keepAboveKeyboard(this);
     (this.hass?.connection as unknown as EventTarget | undefined)?.addEventListener?.('ready', this._onReconnect);
     void this._checkForUpdate();
@@ -627,6 +630,8 @@ export class MeshCorePanel extends LitElement {
     super.disconnectedCallback();
     this._teardownSubscriptions();
     document.removeEventListener('visibilitychange', this._onVisibilityChange);
+    this._unsubscribeTabBadge?.();
+    this._unsubscribeTabBadge = null;
     this._closeDeviceDropdown();
     (this.hass?.connection as unknown as EventTarget | undefined)?.removeEventListener?.('ready', this._onReconnect);
     this._releaseKeyboardViewport?.();
@@ -911,7 +916,7 @@ export class MeshCorePanel extends LitElement {
           <button
             class=${this._activeTab === 'chat' ? 'active' : ''}
             @click=${() => (this._activeTab = 'chat')}>
-            ${t('Chat')}
+            ${t('Chat')}${this._renderChatTabBadge()}
           </button>
           <button
             class=${this._activeTab === 'devices' ? 'active' : ''}
@@ -953,6 +958,17 @@ export class MeshCorePanel extends LitElement {
         </chattx-target-picker>
       </div>
     `;
+  }
+
+  /** Unread messages across all conversations of the selected companion. */
+  private _unreadTotal(): number {
+    return Object.values(this._unread.counts).reduce((sum, n) => sum + (n > 0 ? n : 0), 0);
+  }
+
+  private _renderChatTabBadge() {
+    const total = this._unreadTotal();
+    if (total <= 0) return '';
+    return html`<span class="tab-badge" aria-label=${tn('{n} unread message', '{n} unread messages', total)}>${total > 99 ? '99+' : total}</span>`;
   }
 
   private _renderActivePage() {

@@ -570,5 +570,6 @@
   "unknown region": "neznámý region",
   "Region: unknown. Add its name to the Flood Scope Allowlist in the MeshCore integration options to see it.": "Region: neznámý. Aby se zobrazil, přidej jeho název do Flood Scope Allowlist v nastavení integrace MeshCore.",
   "Region: none (global flood)": "Region: žádný (globální flood)",
-  "all regions": "všechny regiony"
+  "all regions": "všechny regiony",
+  "{n} unread messages": "{n} nepřečtená zpráva|{n} nepřečtené zprávy|{n} nepřečtených zpráv"
 }

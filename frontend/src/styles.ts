@@ -130,6 +130,24 @@ export const panelStyles = css`
     border-bottom-color: var(--primary-color, #03a9f4);
   }
 
+  .tab-badge {
+    display: inline-block;
+    min-width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--unread-badge-bg, var(--primary-color, #03a9f4));
+    color: var(--text-primary-color, #fff);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    vertical-align: 1px;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
+  }
+
   /* === Page Container === */
   .page-container {
     flex: 1;
