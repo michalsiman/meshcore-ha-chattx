@@ -72,5 +72,12 @@
     "verify_failed": {
       "message": "The new identity did not take effect on the device. The device's identity may be unchanged."
     }
+  },
+  "entity": {
+    "sensor": {
+      "unread_messages": {
+        "name": "Unread messages"
+      }
+    }
   }
 }

@@ -54,5 +54,10 @@
     "invalid_key_hex": { "message": "Private key smí obsahovat jen hex znaky (0-9, a-f)" },
     "import_rejected": { "message": "Firmware zařízení novou identitu odmítl. Identita zařízení se nezměnila." },
     "verify_failed": { "message": "Nová identita se v zařízení neprojevila. Identita zařízení se možná nezměnila." }
+  },
+  "entity": {
+    "sensor": {
+      "unread_messages": { "name": "Nepřečtené zprávy" }
+    }
   }
 }

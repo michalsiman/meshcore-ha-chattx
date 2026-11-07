@@ -662,6 +662,7 @@ export class ManageDialog extends LitElement {
               .initialChannelIdx=${this._editingChannel?.channel_idx ?? 0}
               .initialChannelName=${this._editingChannel?.name ?? ''}
               .initialScope=${this._editingChannel?.scope ?? ''}
+              .initialExcludeFromTotal=${!!this._editingChannel?.exclude_from_total}
               .initialKey=${(this._editingChannel?.settings?.channel_secret as string | undefined) ?? ''}
               .availableIndices=${this._getAvailableIndices()}
               @channel-saved=${this._onChannelSaved}

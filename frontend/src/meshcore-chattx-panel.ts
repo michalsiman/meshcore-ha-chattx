@@ -960,9 +960,18 @@ export class MeshCorePanel extends LitElement {
     `;
   }
 
-  /** Unread messages across all conversations of the selected companion. */
+  /**
+   * Unread messages across all conversations of the selected companion,
+   * except channels the user left out of the tab total in the channel
+   * settings (their own conversation badges still count them).
+   */
   private _unreadTotal(): number {
-    return Object.values(this._unread.counts).reduce((sum, n) => sum + (n > 0 ? n : 0), 0);
+    const all = Object.values(this._unread.counts).reduce((sum, n) => sum + (n > 0 ? n : 0), 0);
+    const nodePrefix = this._config?.node_prefix ?? null;
+    const left = this._channels
+      .filter((ch) => ch.exclude_from_total)
+      .reduce((sum, ch) => sum + this._unread.badgeCount(String(ch.channel_idx), nodePrefix), 0);
+    return Math.max(0, all - left);
   }
 
   private _renderChatTabBadge() {

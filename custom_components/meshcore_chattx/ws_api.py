@@ -25,6 +25,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
 
 from . import MeshCoreChattxRuntimeData, _sync_upstream_repair_issue
@@ -36,6 +37,7 @@ from .const import (
     MESHCORE_DOMAIN,
 )
 from .message_store import MessageStore
+from .sensor import SIGNAL_TOTAL_EXCLUSIONS_CHANGED
 from .radio_compat import (
     cache_self_info,
     contact_by_prefix,
@@ -411,6 +413,11 @@ def _get_store(
     return None
 
 
+def _get_channel_total_exclusions(hass: HomeAssistant):
+    """Return the ChannelTotalExclusionStore (None before setup)."""
+    return hass.data.get(DOMAIN, {}).get("channel_total_exclusions")
+
+
 def _get_channel_scopes(hass: HomeAssistant):
     """Return the process-wide ChannelScopeStore (None before setup).
 
@@ -770,6 +777,7 @@ def ws_get_channels(hass, connection, msg):
 
     scope_store = _get_channel_scopes(hass)
     upstream_entry_id = coordinator.config_entry.entry_id
+    exclusion_store = _get_channel_total_exclusions(hass)
 
     channels = []
     for idx in range(coordinator.max_channels):
@@ -802,6 +810,8 @@ def ws_get_channels(hass, connection, msg):
         scope = scope_store.get(upstream_entry_id, idx) if scope_store else None
         if scope:
             channel_entry["scope"] = scope
+        if exclusion_store and exclusion_store.is_excluded(upstream_entry_id, idx):
+            channel_entry["exclude_from_total"] = True
         channels.append(channel_entry)
     connection.send_result(msg["id"], {"channels": channels})
 
@@ -2454,6 +2464,7 @@ async def ws_repeater_read(hass, connection, msg):
         vol.Required("name"): str,
         vol.Optional("key"): str,
         vol.Optional("scope"): str,
+        vol.Optional("exclude_from_total"): bool,
     }
 )
 @websocket_api.require_admin
@@ -2500,6 +2511,18 @@ async def ws_set_channel(hass, connection, msg):
                 await scope_store.async_set(
                     coordinator.config_entry.entry_id, channel_idx, msg["scope"]
                 )
+
+        # Leave the channel out of the Chat tab's unread total, or count it
+        # again. An absent key leaves the choice untouched.
+        if "exclude_from_total" in msg:
+            exclusion_store = _get_channel_total_exclusions(hass)
+            if exclusion_store:
+                await exclusion_store.async_set(
+                    coordinator.config_entry.entry_id,
+                    channel_idx,
+                    msg["exclude_from_total"],
+                )
+                async_dispatcher_send(hass, SIGNAL_TOTAL_EXCLUSIONS_CHANGED)
 
         # Re-fetch channel info so coordinator state matches the device
         await coordinator.fetch_all_channel_info()
@@ -2560,6 +2583,12 @@ async def ws_remove_channel(hass, connection, msg):
             await scope_store.async_set(
                 coordinator.config_entry.entry_id, channel_idx, None
             )
+        exclusion_store = _get_channel_total_exclusions(hass)
+        if exclusion_store:
+            await exclusion_store.async_set(
+                coordinator.config_entry.entry_id, channel_idx, False
+            )
+            async_dispatcher_send(hass, SIGNAL_TOTAL_EXCLUSIONS_CHANGED)
 
         # Re-fetch channel info so coordinator state matches the device
         await coordinator.fetch_all_channel_info()

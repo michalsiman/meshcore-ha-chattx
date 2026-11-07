@@ -34,6 +34,7 @@ async function mountDialog(opts: {
   initialScope?: string;
   initialChannelName?: string;
   initialKey?: string;
+  initialExcludeFromTotal?: boolean;
 } = {}): Promise<ChannelDialog> {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -50,6 +51,7 @@ async function mountDialog(opts: {
         .initialChannelName=${opts.initialChannelName ?? ''}
         .initialScope=${opts.initialScope ?? ''}
         .initialKey=${opts.initialKey ?? ''}
+        .initialExcludeFromTotal=${opts.initialExcludeFromTotal ?? false}
         .availableIndices=${[0, 1, 2]}
       ></chattx-channel-dialog>
     `,
@@ -161,7 +163,7 @@ describe('channel-dialog region scope field', () => {
     await dialog.updateComplete;
 
     expect(mockSetChannel).toHaveBeenCalledWith(
-      fakeHass, 0, 'general', undefined, 'test-entry', 'waw',
+      fakeHass, 0, 'general', undefined, 'test-entry', 'waw', false,
     );
   });
 
@@ -183,7 +185,7 @@ describe('channel-dialog region scope field', () => {
     await dialog.updateComplete;
 
     expect(mockSetChannel).toHaveBeenCalledWith(
-      fakeHass, 0, 'general', undefined, 'test-entry', '',
+      fakeHass, 0, 'general', undefined, 'test-entry', '', false,
     );
   });
 
@@ -214,7 +216,7 @@ describe('channel-dialog region scope field', () => {
     await dialog.updateComplete;
 
     expect(mockSetChannel).toHaveBeenCalledWith(
-      fakeHass, 0, 'general', undefined, 'test-entry', '*',
+      fakeHass, 0, 'general', undefined, 'test-entry', '*', false,
     );
   });
 
@@ -275,7 +277,7 @@ describe('channel-dialog region scope field', () => {
     await dialog.updateComplete;
 
     expect(mockSetChannel).toHaveBeenCalledWith(
-      fakeHass, 0, 'general', customKey, 'test-entry', 'waw',
+      fakeHass, 0, 'general', customKey, 'test-entry', 'waw', false,
     );
   });
 
@@ -298,7 +300,55 @@ describe('channel-dialog region scope field', () => {
 
     // Auto-keyed → key arg undefined, so the backend re-derives the same key.
     expect(mockSetChannel).toHaveBeenCalledWith(
-      fakeHass, 0, 'general', undefined, 'test-entry', 'waw',
+      fakeHass, 0, 'general', undefined, 'test-entry', 'waw', false,
     );
+  });
+});
+
+describe('channel-dialog Chat tab total option', () => {
+  function totalToggle(dialog: ChannelDialog): HTMLInputElement {
+    const boxes = Array.from(
+      dialog.shadowRoot!.querySelectorAll<HTMLInputElement>('.form-toggle input[type="checkbox"]'),
+    );
+    const box = boxes.find((b) =>
+      b.closest('label')?.textContent?.includes('Leave out of the Chat tab total'),
+    );
+    expect(box, 'total toggle should render').toBeDefined();
+    return box!;
+  }
+
+  async function save(dialog: ChannelDialog) {
+    const button = dialog.shadowRoot!.querySelector<HTMLButtonElement>('.dialog-button.primary')!;
+    button.click();
+    await Promise.resolve();
+    await dialog.updateComplete;
+  }
+
+  it('shows the stored choice and sends it back on save', async () => {
+    const dialog = await mountDialog({
+      editMode: true,
+      initialChannelName: 'test',
+      initialExcludeFromTotal: true,
+    });
+    expect(totalToggle(dialog).checked).toBe(true);
+
+    await save(dialog);
+    expect(mockSetChannel).toHaveBeenCalledTimes(1);
+    expect(mockSetChannel.mock.calls[0][6]).toBe(true);
+  });
+
+  it('sends false after the box is cleared', async () => {
+    const dialog = await mountDialog({
+      editMode: true,
+      initialChannelName: 'test',
+      initialExcludeFromTotal: true,
+    });
+    const box = totalToggle(dialog);
+    box.checked = false;
+    box.dispatchEvent(new Event('change'));
+    await dialog.updateComplete;
+
+    await save(dialog);
+    expect(mockSetChannel.mock.calls[0][6]).toBe(false);
   });
 });

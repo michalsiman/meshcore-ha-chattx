@@ -48,14 +48,14 @@ rules:
     status: done
     comment: README "## Removal" documents config-entry deletion and optional message-archive cleanup.
   entity-event-setup:
-    status: exempt
-    comment: Integration creates no entities.
+    status: done
+    comment: The unread sensor subscribes to its events in async_added_to_hass and unsubscribes through async_on_remove.
   entity-unique-id:
-    status: exempt
-    comment: Integration creates no entities.
+    status: done
+    comment: The unread sensor uses "<entry_id>_unread".
   has-entity-name:
-    status: exempt
-    comment: Integration creates no entities.
+    status: done
+    comment: The unread sensor has has_entity_name and a translated name.
   runtime-data:
     status: done
     comment: Per-entry state lives on entry.runtime_data via the MeshCoreChattxRuntimeData dataclass (__init__.py); process-global state stays on hass.data[DOMAIN].
@@ -89,7 +89,7 @@ rules:
     comment: Single-step config flow; INSTRUCTIONS.md covers what little there is.
   entity-unavailable:
     status: exempt
-    comment: No entities.
+    comment: The unread sensor is computed in Home Assistant from stored messages and is always available.
   integration-owner:
     status: done
     comment: codeowners ["@michalsiman"] in manifest.json.
@@ -114,8 +114,8 @@ rules:
 
   # ─── Gold ────────────────────────────────────────────────────────────
   devices:
-    status: exempt
-    comment: Integration creates no devices; consumes upstream's.
+    status: done
+    comment: One service device, "MeshCore Chattx", carries the unread sensor; radio devices stay upstream's.
   diagnostics:
     status: done
     comment: diagnostics.py implements async_get_config_entry_diagnostics with entity-id redaction.
@@ -148,19 +148,19 @@ rules:
     comment: README "## Use cases".
   dynamic-devices:
     status: exempt
-    comment: No devices.
+    comment: One fixed service device per config entry.
   entity-category:
     status: exempt
-    comment: No entities.
+    comment: The unread sensor is a primary entity.
   entity-device-class:
     status: exempt
-    comment: No entities.
+    comment: No device class fits a message count.
   entity-disabled-by-default:
     status: exempt
-    comment: No entities.
+    comment: The only entity, the unread sensor, is the reason to have it.
   entity-translations:
-    status: exempt
-    comment: No entities.
+    status: done
+    comment: strings.json entity.sensor.unread_messages.
   exception-translations:
     status: done
     comment: |
@@ -168,8 +168,8 @@ rules:
       and translations/en.json carry an "exceptions" block, surfaced via
       _ws_send_error_safe / _t.
   icon-translations:
-    status: exempt
-    comment: No entities.
+    status: done
+    comment: icons.json entity.sensor.unread_messages.
   reconfiguration-flow:
     status: partial
     comment: OptionsFlow handles runtime tunables. No separate reconfigure flow because there's nothing to reconfigure beyond the retention options.
@@ -178,7 +178,7 @@ rules:
     comment: repairs.py (UpstreamMeshcoreUnavailableRepairFlow) with ir.async_create_issue call sites in __init__.py and ws_api.py.
   stale-devices:
     status: exempt
-    comment: No devices.
+    comment: The single service device goes away with its config entry.
 
   # ─── Platinum ────────────────────────────────────────────────────────
   async-dependency:

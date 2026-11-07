@@ -537,7 +537,8 @@ export async function forgetRepeaterPassword(
  * `scope` is the per-channel region scope. It is sent whenever defined
  * — including as an empty string, which clears any persisted scope —
  * and omitted only when the caller leaves it `undefined` (existing
- * scope untouched).
+ * scope untouched). `excludeFromTotal` works the same way for leaving
+ * the channel out of the Chat tab's unread total.
  */
 export async function setChannel(
   hass: HomeAssistant,
@@ -546,6 +547,7 @@ export async function setChannel(
   key?: string,
   entryId?: string,
   scope?: string,
+  excludeFromTotal?: boolean,
 ): Promise<{ success: boolean }> {
   try {
     const msg: Record<string, unknown> = {
@@ -556,6 +558,7 @@ export async function setChannel(
     if (key) msg.key = key;
     if (entryId) msg.entry_id = entryId;
     if (scope !== undefined) msg.scope = scope;
+    if (excludeFromTotal !== undefined) msg.exclude_from_total = excludeFromTotal;
     const result = await hass.callWS<{ success: boolean }>(msg);
     return result;
   } catch {

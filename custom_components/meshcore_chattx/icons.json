@@ -1,0 +1,9 @@
+{
+  "entity": {
+    "sensor": {
+      "unread_messages": {
+        "default": "mdi:message-badge"
+      }
+    }
+  }
+}

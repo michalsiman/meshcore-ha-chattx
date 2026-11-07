@@ -24,6 +24,7 @@ export class ChannelDialog extends LitElement {
   @property({ type: Number }) initialChannelIdx = 0;
   @property({ type: String }) initialChannelName = '';
   @property({ type: String }) initialScope = '';
+  @property({ type: Boolean }) initialExcludeFromTotal = false;
   // The channel's current 16-byte key as 32 hex chars (from get_channels'
   // `channel_secret`), passed in edit mode so the dialog can preserve a
   // custom key instead of silently regenerating it on save.
@@ -35,6 +36,7 @@ export class ChannelDialog extends LitElement {
   @state() private _customKey = '';
   @state() private _autoKey = true;
   @state() private _scope = '';
+  @state() private _excludeFromTotal = false;
   // Region-scope allowlist from the upstream integration's Global
   // Settings. null = fetch in flight; [] = none configured (the
   // empty-state hint renders). Re-fetched on every dialog open so a
@@ -93,6 +95,7 @@ export class ChannelDialog extends LitElement {
         this._channelIdx = this.initialChannelIdx;
         this._channelName = this.initialChannelName;
         this._scope = this.initialScope;
+        this._excludeFromTotal = this.initialExcludeFromTotal;
         // Preserve the channel's existing key. Auto-key derivation is
         // SHA256(name)[:16] (matches the SDK's set_channel); if the stored
         // secret equals that, the channel is auto-keyed and re-deriving on
@@ -242,6 +245,23 @@ export class ChannelDialog extends LitElement {
                   </div>
                 `
               : ''}
+
+            <!-- Chat tab total -->
+            <div class="form-group">
+              <label class="form-toggle">
+                <input
+                  type="checkbox"
+                  ?checked=${this._excludeFromTotal}
+                  @change=${(e: Event) => {
+                    this._excludeFromTotal = (e.target as HTMLInputElement).checked;
+                  }}
+                />
+                <span class="form-toggle-label">${t('Leave out of the Chat tab total')}</span>
+              </label>
+              <div class="form-description">
+                ${t('New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.')}
+              </div>
+            </div>
           </div>
           <div class="dialog-footer">
             <button
@@ -354,6 +374,7 @@ export class ChannelDialog extends LitElement {
         this.entryId,
         // Always sent: '' clears a previously persisted scope.
         this._scope,
+        this._excludeFromTotal,
       );
 
       if (result.success) {
@@ -395,6 +416,7 @@ export class ChannelDialog extends LitElement {
     this._customKey = '';
     this._autoKey = true;
     this._scope = '';
+    this._excludeFromTotal = false;
     this._availableScopes = null;
     this._globalAllowed = false;
     this._error = null;

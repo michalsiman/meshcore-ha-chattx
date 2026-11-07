@@ -32,7 +32,7 @@ Not comfortable with this? [Open an issue](https://github.com/michalsiman/meshco
   | Slovenian | one\|two\|few\|other | 1 / 2 / 3–4 / 5+ |
   | Other languages | one\|other | 1 / 2+ |
 
-- **A text that is missing** from the file appears in English, so it is fine to translate only part of a file. The longest technical tooltips are still missing in most languages, and are a good place to help.
+- **A text that is missing** from the file appears in English, so it is fine to translate only part of a file. Every language now has every text, but only Czech has been checked by a native speaker, so corrections to the others are very welcome, above all to the long technical tooltips.
 
 ## Add a language
 

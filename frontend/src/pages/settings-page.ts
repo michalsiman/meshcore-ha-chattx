@@ -1,5 +1,6 @@
 import { N_, t, tn, LANGUAGE_NAMES, loadLanguageSetting, saveLanguageSetting } from '../i18n';
 import { defaultHeardReply, loadHeardReply, saveHeardReply } from '../utils/heard-reply';
+import { loadTabBadge, saveTabBadge } from '../utils/tab-badge';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, DeviceConfig, MeshCoreDevice } from '../types';
@@ -832,6 +833,20 @@ export class SettingsPage extends LitElement {
               </div>
             </div>
 
+            <!-- Unread total in the browser tab title, per browser -->
+            <div class="device-section">
+              <div class="card-title">${t('Browser tab')}</div>
+              <div class="section-row">
+                <div class="form-group-inline">
+                  <label class="form-toggle">
+                    <input type="checkbox" .checked=${loadTabBadge()} @change=${this._onTabBadgeChanged} />
+                    <span class="form-toggle-label">${t('Show unread messages in the browser tab title')}</span>
+                  </label>
+                  <div class="form-description">${t('On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).')}</div>
+                </div>
+              </div>
+            </div>
+
             <!-- Quick messages for the chat composer -->
             <div class="device-section">
               <div class="card-title">${t('Quick messages')}</div>
@@ -1541,6 +1556,10 @@ export class SettingsPage extends LitElement {
   private _onLanguageChanged(e: Event) {
     saveLanguageSetting((e.target as HTMLSelectElement).value);
     window.location.reload();
+  }
+
+  private _onTabBadgeChanged(e: Event) {
+    saveTabBadge((e.target as HTMLInputElement).checked);
   }
 
   private _onHeardReplyChanged(e: Event) {

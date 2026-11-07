@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import issue_registry as ir
@@ -41,6 +42,7 @@ from .const import (
     MESHCORE_DOMAIN,
 )
 from .channel_scopes import ChannelScopeStore
+from .channel_total_exclusions import ChannelTotalExclusionStore
 from .message_store import MessageStore
 from .panel import async_register_panel, async_remove_panel
 from .quick_messages import QuickMessageStore
@@ -80,6 +82,8 @@ type MeshCoreChattxConfigEntry = ConfigEntry[MeshCoreChattxRuntimeData]
 
 # ─── Upstream-presence helpers ───────────────────────────────────────────
 #
+PLATFORMS: list[Platform] = [Platform.SENSOR]
+
 # ``_upstream_meshcore_present`` and ``_sync_upstream_repair_issue`` are
 # the canonical readiness/repair surface for the upstream ``meshcore``
 # integration. They are intentionally module-level (not nested inside
@@ -216,6 +220,12 @@ async def async_setup_entry(
         await scopes.async_load()
         bucket["channel_scopes"] = scopes
 
+    # Channels the Chat tab's unread total leaves out, keyed the same way.
+    if "channel_total_exclusions" not in bucket:
+        exclusions = ChannelTotalExclusionStore(hass)
+        await exclusions.async_load()
+        bucket["channel_total_exclusions"] = exclusions
+
     if "repeater_credentials" not in bucket:
         credentials = RepeaterCredentialStore(hass)
         await credentials.async_load()
@@ -282,6 +292,9 @@ async def async_setup_entry(
     # do because the prune pass only runs at startup otherwise).
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
 
+    # The unread total as a sensor, for the sidebar or the browser tab.
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
     _LOGGER.info(
         "MeshCore Chattx configured for entry %s (%d conversations indexed)",
         entry.entry_id,
@@ -318,6 +331,9 @@ async def async_unload_entry(
     HA invokes their unsub callbacks itself as part of the unload pipeline,
     so no manual listener loop is required here.
     """
+    if not await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        return False
+
     runtime = entry.runtime_data
     if isinstance(runtime, MeshCoreChattxRuntimeData):
         await runtime.store.async_unload()

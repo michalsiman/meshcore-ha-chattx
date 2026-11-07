@@ -255,6 +255,11 @@ export interface Channel {
    * region. Absent = no scope (legacy global flood).
    */
   scope?: string;
+  /**
+   * True when the Chat tab's unread total leaves this channel out. The
+   * channel's own conversation badge still counts its new messages.
+   */
+  exclude_from_total?: boolean;
 }
 
 /**

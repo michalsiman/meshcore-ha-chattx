@@ -65,6 +65,12 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - Sorted by the newest message, with its age in minutes, hours or days
 - Readable initials in the circles: `Forest Hill Relay` is FH, `#hiking` is HI, `Anna K. 📟` is A📟
 - Switch in the gear menu that hides contact IDs and channel numbers
+- Unread total on the Chat tab; busy channels such as #test can be left out of it in the channel settings, while their own badges still count
+
+**Unread messages outside the panel**
+
+- Sensor `sensor.meshcore_chattx_unread` with the same total as the Chat tab, for a sidebar badge, a dashboard or an automation
+- The browser tab title starts with the unread count, such as `(3) Home Assistant`, on every Home Assistant page (can be switched off per browser in Settings)
 
 **Messages**
 

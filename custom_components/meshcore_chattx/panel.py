@@ -52,6 +52,9 @@ PANEL_FRONTEND_PATH = str(Path(__file__).parent / "meshcore-chattx-panel.js")
 # separate script that the frontend loads at startup.
 ICONS_URL = "/meshcore_chattx_panel/chattx-icons.js"
 ICONS_FRONTEND_PATH = str(Path(__file__).parent / "chattx-icons.js")
+# Unread total in the browser tab title, on every Home Assistant page.
+TAB_BADGE_URL = "/meshcore_chattx_panel/chattx-tab-badge.js"
+TAB_BADGE_FRONTEND_PATH = str(Path(__file__).parent / "chattx-tab-badge.js")
 
 # Panel texts, one JSON file per language, fetched by the panel at startup.
 TRANSLATIONS_URL = "/meshcore_chattx_panel/i18n"
@@ -89,10 +92,12 @@ async def async_register_panel(hass: HomeAssistant) -> None:
             [
                 StaticPathConfig(PANEL_URL, PANEL_FRONTEND_PATH, cache_headers=False),
                 StaticPathConfig(ICONS_URL, ICONS_FRONTEND_PATH, cache_headers=False),
+                StaticPathConfig(TAB_BADGE_URL, TAB_BADGE_FRONTEND_PATH, cache_headers=False),
                 StaticPathConfig(TRANSLATIONS_URL, TRANSLATIONS_PATH, cache_headers=False),
             ]
         )
         add_extra_js_url(hass, f"{ICONS_URL}?v={integration.version}")
+        add_extra_js_url(hass, f"{TAB_BADGE_URL}?v={integration.version}")
         _static_path_registered = True
         _LOGGER.debug("Registered MeshCore Chattx panel static path %s", PANEL_URL)
     # The version alone stays the same while a build is being tested, so a
