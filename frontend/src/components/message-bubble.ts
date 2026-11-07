@@ -2,7 +2,7 @@ import { getLocale, t, tn } from '../i18n';
 import { regionInfo } from '../utils/region-label';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { ChatMessage, MessageGroup, DeliveryStatus } from '../types';
+import type { ChatMessage, MessageGroup, DeliveryStatus, LateEcho } from '../types';
 import { fewestHops, formatHopLabel, formatTimestamp } from '../chat/message-parser';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
@@ -486,6 +486,13 @@ export class MessageBubble extends LitElement {
                 </div>
               `
             : html``}
+          ${msg.isOutgoing && msg.lateEchoes
+            ? msg.lateEchoes.map((echo) => html`
+                <div class="message-dialog-route" @click=${() => this._copyText(lateEchoText(msg, echo))}>
+                  ${lateEchoText(msg, echo)}
+                </div>
+              `)
+            : html``}
         </div>
       </div>
     `;
@@ -532,4 +539,19 @@ declare global {
   interface HTMLElementTagNameMap {
     'chattx-message-bubble': MessageBubble;
   }
+}
+
+/**
+ * One line for a late copy of an own message: after how long it came back
+ * and through which repeaters. It is the same packet looping through the
+ * mesh, not a new message.
+ */
+export function lateEchoText(msg: ChatMessage, echo: LateEcho): string {
+  const received = new Date(echo.received_at);
+  const minutes = Math.max(0, Math.round((received.getTime() - msg.timestamp.getTime()) / 60000));
+  const head = typeof echo.hop_count === 'number'
+    ? t('Came back through the mesh after {minutes} min, {hops} hops', { minutes, hops: echo.hop_count })
+    : t('Came back through the mesh after {minutes} min', { minutes });
+  const path = echo.path_nodes?.length ? ` · ${echo.path_nodes.map((n) => n.substring(0, 4).toUpperCase()).join(' > ')}` : '';
+  return head + path;
 }

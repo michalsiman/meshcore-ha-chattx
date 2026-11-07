@@ -163,6 +163,7 @@ export function toClientMessage(stored: StoredMessage): ChatMessage {
         }
       : undefined,
     repeaterCount: stored.repeater_count,
+    lateEchoes: stored.late_echoes && stored.late_echoes.length > 0 ? stored.late_echoes : undefined,
     floodScope: stored.flood_scope ?? derived.floodScope,
     regionScope: stored.region_scope ?? derived.regionScope,
   };

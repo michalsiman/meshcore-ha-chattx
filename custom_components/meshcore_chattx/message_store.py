@@ -26,7 +26,7 @@ import asyncio
 import bisect
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -148,6 +148,100 @@ def _coerce_message_list(stored: Any, entity_id: str) -> list[dict]:
     return stored
 
 
+
+# A copy of our own message comes back at most this long after sending.
+ECHO_MAX_AGE = timedelta(hours=24)
+# The packet's send time and our send time differ by the radio's clock.
+ECHO_SEND_TIME_TOLERANCE = timedelta(minutes=2)
+
+
+def _parse_time(value: Any) -> datetime | None:
+    """ISO timestamp as an aware datetime, or None."""
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
+def _packet_send_time(rx_log_data: Any) -> datetime | None:
+    """Send time carried in the packet (rx_log_data ``timestamp``, epoch seconds)."""
+    for entry in rx_log_data or []:
+        ts = entry.get("timestamp") if isinstance(entry, dict) else None
+        if isinstance(ts, (int, float)) and ts > 0:
+            return datetime.fromtimestamp(ts, timezone.utc)
+    return None
+
+
+def _find_echo_original(messages: list[dict], record: dict) -> dict | None:
+    """The message we sent that ``record`` is a late copy of, or None.
+
+    ``record`` must be a received channel message whose sender and text
+    equal those of an outgoing message sent before it, within
+    ``ECHO_MAX_AGE``. When the copy carries the packet's send time (in
+    its rx_log_data), the original must have been sent within
+    ``ECHO_SEND_TIME_TOLERANCE`` of it; without one, the newest match is
+    taken. Our own node name as the sender is what makes this safe: no
+    one else's message is received under it.
+    """
+    if record.get("outgoing") or record.get("message_type") != "channel":
+        return None
+    sender = record.get("sender") or ""
+    text = record.get("text") or ""
+    received = _parse_time(record.get("timestamp"))
+    if not sender or not text or received is None:
+        return None
+    sent_at = _packet_send_time(record.get("rx_log_data"))
+    for m in reversed(messages):
+        if m is record or not m.get("outgoing") or m.get("sender") != sender or m.get("text") != text:
+            continue
+        original_time = _parse_time(m.get("timestamp"))
+        if original_time is None or original_time > received:
+            continue
+        if received - original_time > ECHO_MAX_AGE:
+            return None  # the rest is older still
+        if sent_at is not None:
+            own_sent = _packet_send_time(m.get("rx_log_data")) or original_time
+            if abs((own_sent - sent_at).total_seconds()) > ECHO_SEND_TIME_TOLERANCE.total_seconds():
+                continue
+        return m
+    return None
+
+
+def _fold_late_echoes(messages: list[dict]) -> bool:
+    """Move late copies of our own messages, stored before Chattx knew them, onto the originals."""
+    own = {(m.get("sender"), m.get("text")) for m in messages if m.get("outgoing")}
+    if not own:
+        return False
+    keep: list[dict] = []
+    changed = False
+    for m in messages:
+        if not m.get("outgoing") and (m.get("sender"), m.get("text")) in own:
+            original = _find_echo_original(messages, m)
+            received = _parse_time(m.get("timestamp"))
+            if original is not None and received is not None:
+                original.setdefault("late_echoes", []).append(_echo_entry(m, received))
+                changed = True
+                continue
+        keep.append(m)
+    if changed:
+        messages[:] = keep
+    return changed
+
+
+def _echo_entry(record: dict, received: datetime) -> dict:
+    """What a late echo keeps: when, how far and how strong."""
+    entry: dict[str, Any] = {"received_at": received.isoformat()}
+    rx = next((e for e in record.get("rx_log_data") or [] if isinstance(e, dict)), {})
+    for key in ("hop_count", "snr", "rssi", "path_nodes", "path_hash_size"):
+        value = rx.get(key, record.get(key))
+        if value is not None:
+            entry[key] = value
+    return entry
+
+
 class MessageStore:
     """Per-conversation persistent message storage with lazy loading and idle eviction.
 
@@ -252,6 +346,19 @@ class MessageStore:
             )
             self._conversation_dirty.add(entity_id)
             self._schedule_conversation_save(entity_id)
+        if messages and _fold_late_echoes(messages):
+            _LOGGER.debug("Moved late copies of own messages onto the originals in %s", entity_id)
+            self._conversation_dirty.add(entity_id)
+            self._schedule_conversation_save(entity_id)
+            if entity_id in self._message_index and messages:
+                newest = messages[-1]
+                self._message_index[entity_id] = {
+                    "message_count": len(messages),
+                    "last_message_ts": newest.get("timestamp", ""),
+                    "last_sender": newest.get("sender", ""),
+                    "last_preview": (newest.get("text", "") or "")[:50],
+                }
+                self._schedule_index_save()
         self._loaded_conversations[entity_id] = messages
         self._conversation_last_access[entity_id] = time.time()
         self._schedule_eviction()
@@ -347,6 +454,28 @@ class MessageStore:
                 self._conversation_dirty.add(entity_id)
                 self._schedule_conversation_save(entity_id)
                 return
+
+    async def attach_late_echo(self, entity_id: str, record: dict) -> bool:
+        """Keep a late copy of our own channel message on the original.
+
+        A flood can loop through the mesh, or be sent again by a repeater
+        that has forgotten it, and come back long after the repeats
+        correlated at send time. It then arrives as an ordinary received
+        message whose sender is our own node. When ``_find_echo_original``
+        finds the message we sent, the copy goes to its ``late_echoes``
+        and True is returned, so the caller does not store it as a new
+        message.
+        """
+        messages = await self._ensure_loaded(entity_id)
+        original = _find_echo_original(messages, record)
+        if original is None:
+            return False
+        original.setdefault("late_echoes", []).append(
+            _echo_entry(record, _parse_time(record.get("timestamp")))
+        )
+        self._conversation_dirty.add(entity_id)
+        self._schedule_conversation_save(entity_id)
+        return True
 
     async def update_message_delivery(
         self, entity_id: str, message_id: str, status: str, **kwargs: Any

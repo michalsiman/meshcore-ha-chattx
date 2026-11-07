@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nova sporočila v tem kanalu še vedno kaže njegova lastna značka, število na zavihku Chat pa jih ne šteje. Uporabno za živahne kanale, na primer testne ali kanale z boti.",
   "Browser tab": "Zavihek brskalnika",
   "Show unread messages in the browser tab title": "Prikaži neprebrana sporočila v naslovu zavihka brskalnika",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na vsaki strani Home Assistanta v tem brskalniku se naslov zavihka začne s številom z zavihka Chat, na primer (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na vsaki strani Home Assistanta v tem brskalniku se naslov zavihka začne s številom z zavihka Chat, na primer (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Vrnilo se je skozi omrežje po {minutes} min, {hops} hops",
+  "Came back through the mesh after {minutes} min": "Vrnilo se je skozi omrežje po {minutes} min"
 }

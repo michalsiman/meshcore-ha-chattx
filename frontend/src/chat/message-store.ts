@@ -680,8 +680,11 @@ export class MessageStore {
 
     // Skip outgoing messages — they are already shown via the optimistic path.
     // Update delivery status on the existing optimistic message instead.
+    // A received copy of our own message (outgoing false) is a late echo
+    // the backend keeps on the original; it must not change the optimistic
+    // message's delivery status, only refresh from the store.
     if (isOutgoing) {
-      if (sender && text) {
+      if (sender && text && eventData.outgoing !== false) {
         const ackReceived = eventData.ack_received as boolean | undefined;
         const repeaterCount = eventData.repeater_count as number | undefined;
         const rxLogData = eventData.rx_log_data as Array<Record<string, unknown>> | undefined;

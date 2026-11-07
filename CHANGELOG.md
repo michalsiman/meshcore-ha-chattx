@@ -4,6 +4,10 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+### Fixed
+
+- An own channel message that looped through the mesh and came back, sometimes an hour later and over 25 hops, showed as a new received message from yourself and counted as unread. Chattx now recognises such a copy (own name as sender, same text, and the same send time when the packet carries one) and keeps it on the message you sent; its dialog says when it came back and through which repeaters. Copies stored before this version are moved the same way when the conversation loads.
+
 ## [0.5.0] - 2026-11-07
 
 ### Added

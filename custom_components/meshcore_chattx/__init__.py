@@ -512,6 +512,12 @@ def _make_message_handler(hass: HomeAssistant, entry_id: str):
         else:
             record.setdefault("delivery_status", "sent")
 
+        # A late copy of our own channel message (a flood that looped
+        # through the mesh) belongs to the message we sent, not to the chat.
+        if await store.attach_late_echo(entity_id, record):
+            _LOGGER.debug("Late echo of an own message in %s kept on the original", entity_id)
+            return
+
         await store.store_message(entity_id, record)
 
         # Inbound (non-outgoing) messages may have advanced the unread

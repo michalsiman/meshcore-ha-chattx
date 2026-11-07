@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nowe wiadomości z tego kanału dalej pokazuje jego własny znaczek, ale liczba na karcie Chat ich nie liczy. Przydaje się dla ruchliwych kanałów, np. testowych albo z botami.",
   "Browser tab": "Karta przeglądarki",
   "Show unread messages in the browser tab title": "Pokazuj nieprzeczytane wiadomości w tytule karty przeglądarki",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na każdej stronie Home Assistanta w tej przeglądarce tytuł karty zaczyna się od liczby z karty Chat, na przykład (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na każdej stronie Home Assistanta w tej przeglądarce tytuł karty zaczyna się od liczby z karty Chat, na przykład (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Wróciła przez sieć po {minutes} min, {hops} hopów",
+  "Came back through the mesh after {minutes} min": "Wróciła przez sieć po {minutes} min"
 }

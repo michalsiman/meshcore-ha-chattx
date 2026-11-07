@@ -69,6 +69,16 @@ export interface HassEvent {
  * Stored message record from the message store backend.
  * Returned by meshcore/get_stored_messages and meshcore/search_stored_messages.
  */
+/** A late copy of an own message heard back from the mesh. */
+export interface LateEcho {
+  received_at: string;
+  hop_count?: number;
+  snr?: number;
+  rssi?: number;
+  path_nodes?: string[];
+  path_hash_size?: number;
+}
+
 export interface StoredMessage {
   id: string;
   sender: string;
@@ -93,6 +103,12 @@ export interface StoredMessage {
   flood_scope?: string | null;
   /** True when the received flood carried a transport region code. */
   region_scope?: boolean;
+  /**
+   * Late copies of this outgoing channel message that came back through
+   * the mesh (a looping flood), kept by the backend instead of showing
+   * them as new received messages.
+   */
+  late_echoes?: LateEcho[];
   /** Present on search results only */
   entity_id?: string;
   /** Present on search results only */
@@ -135,6 +151,8 @@ export interface ChatMessage {
   deliveryStatus?: DeliveryStatus;
   /** Number of repeaters in message path */
   repeaterCount?: number;
+  /** Late copies of an own message that came back through the mesh. */
+  lateEchoes?: LateEcho[];
   /**
    * Inbound region scope for a received channel message. "*" renders as
    * "🌐 all regions", a region name renders verbatim, absent renders

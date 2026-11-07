@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nye beskeder i denne kanal vises stadig på dens eget badge, men tallet på Chat-fanen tæller dem ikke med. Praktisk til travle kanaler som test- eller bot-kanaler.",
   "Browser tab": "Browserfane",
   "Show unread messages in the browser tab title": "Vis ulæste beskeder i browserfanens titel",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "På alle Home Assistant-sider i denne browser starter fanens titel med tallet fra Chat-fanen, for eksempel (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "På alle Home Assistant-sider i denne browser starter fanens titel med tallet fra Chat-fanen, for eksempel (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Kom tilbage gennem meshen efter {minutes} min, {hops} hops",
+  "Came back through the mesh after {minutes} min": "Kom tilbage gennem meshen efter {minutes} min"
 }

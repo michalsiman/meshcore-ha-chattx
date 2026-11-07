@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Нові повідомлення цього каналу й далі показує його власний значок, але число на вкладці Chat їх не враховує. Зручно для жвавих каналів, наприклад тестових або з ботами.",
   "Browser tab": "Вкладка браузера",
   "Show unread messages in the browser tab title": "Показувати непрочитані повідомлення в заголовку вкладки браузера",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "На кожній сторінці Home Assistant у цьому браузері заголовок вкладки починається з числа з вкладки Chat, наприклад (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "На кожній сторінці Home Assistant у цьому браузері заголовок вкладки починається з числа з вкладки Chat, наприклад (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Повернулося через mesh за {minutes} хв, {hops} hops",
+  "Came back through the mesh after {minutes} min": "Повернулося через mesh за {minutes} хв"
 }

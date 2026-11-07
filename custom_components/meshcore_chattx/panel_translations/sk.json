@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nové správy v tomto kanáli ďalej ukazuje jeho vlastná bublina, ale číslo na záložke Chat ich nepočíta. Hodí sa pre rušné kanály, napríklad testovacie alebo s botmi.",
   "Browser tab": "Záložka prehliadača",
   "Show unread messages in the browser tab title": "Zobraziť neprečítané správy v názve záložky prehliadača",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na každej stránke Home Assistanta v tomto prehliadači začne názov záložky číslom zo záložky Chat, napríklad (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na každej stránke Home Assistanta v tomto prehliadači začne názov záložky číslom zo záložky Chat, napríklad (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Vrátila sa sieťou po {minutes} min, {hops} hops",
+  "Came back through the mesh after {minutes} min": "Vrátila sa sieťou po {minutes} min"
 }

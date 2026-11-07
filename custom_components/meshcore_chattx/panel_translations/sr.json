@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nove poruke u ovom kanalu i dalje prikazuje njegova sopstvena značka, ali ih broj na kartici Chat ne broji. Korisno za prometne kanale, na primer test kanale ili kanale sa botovima.",
   "Browser tab": "Kartica pregledača",
   "Show unread messages in the browser tab title": "Prikaži nepročitane poruke u naslovu kartice pregledača",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na svakoj stranici Home Assistanta u ovom pregledaču naslov kartice počinje brojem sa kartice Chat, na primer (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na svakoj stranici Home Assistanta u ovom pregledaču naslov kartice počinje brojem sa kartice Chat, na primer (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Vratila se kroz mrežu posle {minutes} min, {hops} hops",
+  "Came back through the mesh after {minutes} min": "Vratila se kroz mrežu posle {minutes} min"
 }

@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Neue Nachrichten in diesem Kanal zeigt weiter sein eigenes Badge, aber die Zahl am Chat-Tab zählt sie nicht mit. Praktisch für viel genutzte Kanäle wie Test- oder Bot-Kanäle.",
   "Browser tab": "Browser-Tab",
   "Show unread messages in the browser tab title": "Ungelesene Nachrichten im Titel des Browser-Tabs anzeigen",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Auf jeder Home-Assistant-Seite in diesem Browser beginnt der Tab-Titel mit der Zahl vom Chat-Tab, zum Beispiel (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Auf jeder Home-Assistant-Seite in diesem Browser beginnt der Tab-Titel mit der Zahl vom Chat-Tab, zum Beispiel (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Kam nach {minutes} Min. über das Mesh zurück, {hops} Hops",
+  "Came back through the mesh after {minutes} min": "Kam nach {minutes} Min. über das Mesh zurück"
 }

@@ -576,5 +576,7 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Les nouveaux messages de ce canal restent affichés sur son propre badge, mais le nombre sur l'onglet Chat ne les compte pas. Utile pour les canaux très actifs, comme les canaux de test ou de bots.",
   "Browser tab": "Onglet du navigateur",
   "Show unread messages in the browser tab title": "Afficher les messages non lus dans le titre de l'onglet",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Sur chaque page de Home Assistant dans ce navigateur, le titre de l'onglet commence par le nombre de l'onglet Chat, par exemple (3)."
+  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Sur chaque page de Home Assistant dans ce navigateur, le titre de l'onglet commence par le nombre de l'onglet Chat, par exemple (3).",
+  "Came back through the mesh after {minutes} min, {hops} hops": "Revenu par le mesh après {minutes} min, {hops} hops",
+  "Came back through the mesh after {minutes} min": "Revenu par le mesh après {minutes} min"
 }
