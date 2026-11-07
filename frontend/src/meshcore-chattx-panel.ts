@@ -1,6 +1,7 @@
 import './define-guard';
 import { t, tn, setHassLanguage, loadTranslations } from './i18n';
 import { isOutdated, panelModuleUrl } from './utils/update-check';
+import { setSharedHeardReply, syncHeardReply } from './utils/heard-reply';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice } from './types';
@@ -758,6 +759,19 @@ export class MeshCorePanel extends LitElement {
     ).then(unsubscribe => {
       this._unsubscribeList.push(unsubscribe);
     });
+
+    // The quick reply text changed in another browser.
+    this.hass.connection.subscribeEvents(
+      (event: { data?: { text?: string } }) => {
+        setSharedHeardReply(event.data?.text);
+        this.requestUpdate();
+      },
+      'meshcore_chattx_heard_reply_updated'
+    ).then(unsubscribe => {
+      this._unsubscribeList.push(unsubscribe);
+    }).catch(() => {
+      // Users who may not subscribe to it see a change on the next load.
+    });
   }
 
   /**
@@ -1074,7 +1088,7 @@ export class MeshCorePanel extends LitElement {
 
     try {
       setHassLanguage(this.hass.language);
-      await loadTranslations();
+      await Promise.all([loadTranslations(), syncHeardReply(this.hass)]);
       const devices = await getDevices(this.hass);
       this._devices = devices;
 

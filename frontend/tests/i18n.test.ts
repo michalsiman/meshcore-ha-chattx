@@ -10,7 +10,7 @@ import {
   saveLanguageSetting, setHassLanguage, t, tn,
 } from '../src/i18n';
 import { readLanguage } from './helpers/language';
-import { formatHeardReply, saveHeardReply } from '../src/utils/heard-reply';
+import { formatHeardReply, setSharedHeardReply } from '../src/utils/heard-reply';
 
 const NAMES_ONLY = new Set(['MeshCore Chattx', 'MC Chattx', '']);
 
@@ -122,9 +122,9 @@ describe('quick reply text', () => {
 
   it('uses the saved text, and an empty text restores the default', () => {
     saveLanguageSetting('en');
-    saveHeardReply('Copy, {hops} here');
+    setSharedHeardReply('Copy, {hops} here');
     expect(formatHeardReply(2)).toBe('Copy, 2 hops here');
-    saveHeardReply('  ');
+    setSharedHeardReply('  ');
     expect(formatHeardReply(2)).toBe('Heard, 2 hops!');
   });
 });

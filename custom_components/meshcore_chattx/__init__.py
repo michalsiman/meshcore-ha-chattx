@@ -45,7 +45,7 @@ from .channel_scopes import ChannelScopeStore
 from .channel_total_exclusions import ChannelTotalExclusionStore
 from .message_store import MessageStore
 from .panel import async_register_panel, async_remove_panel
-from .quick_messages import QuickMessageStore
+from .quick_messages import HeardReplyStore, QuickMessageStore
 from .repeater_credentials import (
     RepeaterCredentialStore,
     RepeaterLoginStore,
@@ -230,6 +230,11 @@ async def async_setup_entry(
         credentials = RepeaterCredentialStore(hass)
         await credentials.async_load()
         bucket["repeater_credentials"] = credentials
+
+    if "heard_reply" not in bucket:
+        heard_reply = HeardReplyStore(hass)
+        await heard_reply.async_load()
+        bucket["heard_reply"] = heard_reply
 
     if "quick_messages" not in bucket:
         quick_messages = QuickMessageStore(hass)

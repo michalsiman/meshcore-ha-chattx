@@ -578,5 +578,7 @@
   "Show unread messages in the browser tab title": "Pokazuj nieprzeczytane wiadomości w tytule karty przeglądarki",
   "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na każdej stronie Home Assistanta w tej przeglądarce tytuł karty zaczyna się od liczby z karty Chat, na przykład (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Wróciła przez sieć po {minutes} min, {hops} hopów",
-  "Came back through the mesh after {minutes} min": "Wróciła przez sieć po {minutes} min"
+  "Came back through the mesh after {minutes} min": "Wróciła przez sieć po {minutes} min",
+  "Saved for every browser": "Zapisano dla wszystkich przeglądarek",
+  "Failed to save the reply text": "Nie udało się zapisać tekstu odpowiedzi"
 }

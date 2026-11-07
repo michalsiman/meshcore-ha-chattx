@@ -4,6 +4,10 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+### Changed
+
+- The quick reply text of the message dialog ("Heard, 3 hops!") is now kept in Home Assistant, so every browser and computer offers the same text. It was kept in each browser before. The first time an administrator opens Chattx after the update, the text that browser had is carried over, unless one is already set in Home Assistant. Only administrators can change it.
+
 ## [0.5.1] - 2026-11-07
 
 ### Fixed

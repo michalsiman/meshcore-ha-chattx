@@ -827,7 +827,7 @@ export class SettingsPage extends LitElement {
               <div class="section-row">
                 <div class="form-group-inline">
                   <label class="form-label" for="chattx-heard-reply">${t('Reply text in the message dialog')}</label>
-                  <input id="chattx-heard-reply" class="form-input" type="text" .value=${loadHeardReply()} placeholder=${defaultHeardReply()} @change=${this._onHeardReplyChanged} />
+                  <input id="chattx-heard-reply" class="form-input" type="text" .value=${loadHeardReply()} placeholder=${defaultHeardReply()} ?disabled=${!this.hass?.user?.is_admin} @change=${this._onHeardReplyChanged} />
                   <div class="form-description">${t('{hops} is replaced with the hop count, for example 3 hops. The sender\'s name is added at the start. Leave empty for the default text.')}</div>
                 </div>
               </div>
@@ -1562,8 +1562,13 @@ export class SettingsPage extends LitElement {
     saveTabBadge((e.target as HTMLInputElement).checked);
   }
 
-  private _onHeardReplyChanged(e: Event) {
-    saveHeardReply((e.target as HTMLInputElement).value);
+  private async _onHeardReplyChanged(e: Event) {
+    if (!this.hass) return;
+    if (await saveHeardReply(this.hass, (e.target as HTMLInputElement).value)) {
+      this._showStatusMessage(t('Saved for every browser'), 'success');
+    } else {
+      this._showStatusMessage(t('Failed to save the reply text'), 'error');
+    }
     this.requestUpdate();
   }
 

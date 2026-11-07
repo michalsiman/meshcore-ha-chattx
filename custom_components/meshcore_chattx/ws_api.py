@@ -465,6 +465,8 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_get_conversation_activity)
     websocket_api.async_register_command(hass, ws_get_quick_messages)
     websocket_api.async_register_command(hass, ws_set_quick_messages)
+    websocket_api.async_register_command(hass, ws_get_heard_reply)
+    websocket_api.async_register_command(hass, ws_set_heard_reply)
     websocket_api.async_register_command(hass, ws_mark_read)
     websocket_api.async_register_command(hass, ws_regenerate_identity)
     websocket_api.async_register_command(hass, ws_import_identity)
@@ -1801,6 +1803,44 @@ async def ws_set_quick_messages(hass, connection, msg):
         connection.send_result(msg["id"], {"messages": store.get()})
     except Exception as ex:
         _ws_send_error_safe(connection, msg["id"], ex, handler="ws_set_quick_messages")
+
+
+# ─── meshcore/heard_reply ───────────────────────────────────────────────
+# The quick reply text of the message dialog, the same in every browser.
+
+EVENT_HEARD_REPLY_UPDATED = f"{DOMAIN}_heard_reply_updated"
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "meshcore_chattx/get_heard_reply"}
+)
+@websocket_api.async_response
+async def ws_get_heard_reply(hass, connection, msg):
+    """Return the reply text: '' for the default, None when never set."""
+    store = hass.data.get(DOMAIN, {}).get("heard_reply")
+    connection.send_result(msg["id"], {"text": store.get() if store else None})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/set_heard_reply",
+        vol.Required("text"): vol.All(str, vol.Length(max=_MAX_QUICK_MESSAGE_BYTES)),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_set_heard_reply(hass, connection, msg):
+    """Replace the reply text; '' restores the default."""
+    store = hass.data.get(DOMAIN, {}).get("heard_reply")
+    if not store:
+        connection.send_error(msg["id"], "not_found", "Integration is not set up yet")
+        return
+    try:
+        await store.async_set(msg["text"])
+        hass.bus.async_fire(EVENT_HEARD_REPLY_UPDATED, {"text": store.get()})
+        connection.send_result(msg["id"], {"text": store.get()})
+    except Exception as ex:
+        _ws_send_error_safe(connection, msg["id"], ex, handler="ws_set_heard_reply")
 
 
 # ─── meshcore/repeater_login ────────────────────────────────────────────
