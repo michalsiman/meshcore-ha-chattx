@@ -4,6 +4,18 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-07
+
+### Added
+
+- A channel can be left out of the unread total on the Chat tab, in the channel settings ("Leave out of the Chat tab total"). Busy channels such as test or bot channels then stop raising the total, while their own conversation badges still count new messages. The choice is kept in Home Assistant, so it applies in every browser.
+- New sensor `sensor.meshcore_chattx_unread` with the same total as the Chat tab, channels left out of it included. It adds up the counts Chattx already keeps for the conversation badges. Use it for a sidebar badge, a dashboard chip or an automation.
+- The browser tab title starts with the unread total, such as `(3) Home Assistant`, on every Home Assistant page. It can be switched off per browser in Settings → Browser tab.
+
+### Fixed
+
+- Translations: 89 texts were missing in every language except Czech and showed in English, among them the new region and unread texts and the long technical tooltips. All 12 languages are complete again; only Czech has been reviewed by a native speaker.
+
 ## [0.4.1] - 2026-11-06
 
 ### Fixed
