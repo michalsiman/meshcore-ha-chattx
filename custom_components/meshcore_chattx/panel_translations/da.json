@@ -594,5 +594,14 @@
   "Shorten link": "Forkort link",
   "Shortening…": "Forkorter…",
   "The link could not be shortened: {error}": "Linket kunne ikke forkortes: {error}",
-  "Show the newest message (sender and text) in the chat list": "Vis den nyeste besked (afsender og tekst) i chatlisten"
+  "Show the newest message (sender and text) in the chat list": "Vis den nyeste besked (afsender og tekst) i chatlisten",
+  "View": "Visning",
+  "List": "Liste",
+  "Map": "Kort",
+  "Nodes on the map": "Noder på kortet",
+  "Zoom in": "Zoom ind",
+  "Zoom out": "Zoom ud",
+  "Show all": "Vis alle",
+  "Room server": "Room server",
+  "{shown} of {total} nodes have a known position": "{shown} af {total} noder har en kendt position"
 }

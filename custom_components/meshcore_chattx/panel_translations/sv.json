@@ -594,5 +594,14 @@
   "Shorten link": "Korta länk",
   "Shortening…": "Kortar…",
   "The link could not be shortened: {error}": "Länken kunde inte kortas: {error}",
-  "Show the newest message (sender and text) in the chat list": "Visa det senaste meddelandet (avsändare och text) i chattlistan"
+  "Show the newest message (sender and text) in the chat list": "Visa det senaste meddelandet (avsändare och text) i chattlistan",
+  "View": "Vy",
+  "List": "Lista",
+  "Map": "Karta",
+  "Nodes on the map": "Noder på kartan",
+  "Zoom in": "Zooma in",
+  "Zoom out": "Zooma ut",
+  "Show all": "Visa alla",
+  "Room server": "Room server",
+  "{shown} of {total} nodes have a known position": "{shown} av {total} noder har en känd position"
 }

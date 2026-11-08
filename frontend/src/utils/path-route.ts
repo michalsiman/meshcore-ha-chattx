@@ -179,3 +179,13 @@ export function fitZoom(
   }
   return 2;
 }
+
+
+/** Coordinate of a world pixel position at a zoom level (inverse of project). */
+export function unproject(x: number, y: number, zoom: number): { lat: number; lon: number } {
+  const size = TILE_SIZE * 2 ** zoom;
+  const lon = (x / size) * 360 - 180;
+  const n = Math.PI - (2 * Math.PI * y) / size;
+  const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+  return { lat, lon };
+}

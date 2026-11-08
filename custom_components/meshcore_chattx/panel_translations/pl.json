@@ -594,5 +594,14 @@
   "Shorten link": "Skróć link",
   "Shortening…": "Skracanie…",
   "The link could not be shortened: {error}": "Nie udało się skrócić linku: {error}",
-  "Show the newest message (sender and text) in the chat list": "Pokazuj najnowszą wiadomość (nadawcę i tekst) na liście czatów"
+  "Show the newest message (sender and text) in the chat list": "Pokazuj najnowszą wiadomość (nadawcę i tekst) na liście czatów",
+  "View": "Widok",
+  "List": "Lista",
+  "Map": "Mapa",
+  "Nodes on the map": "Nody na mapie",
+  "Zoom in": "Przybliż",
+  "Zoom out": "Oddal",
+  "Show all": "Pokaż wszystko",
+  "Room server": "Room server",
+  "{shown} of {total} nodes have a known position": "{shown} z {total} nodów ma znaną pozycję"
 }

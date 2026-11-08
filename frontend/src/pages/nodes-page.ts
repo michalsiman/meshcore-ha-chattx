@@ -11,6 +11,8 @@ import type {
 import '../components/contact-card';
 import '../components/node-card';
 import '../components/node-detail-dialog';
+import '../components/nodes-map';
+import { loadOwnPosition } from '../components/path-map';
 
 const PAGE_SIZE = 50;
 
@@ -66,6 +68,14 @@ export class NodesPage extends LitElement {
 
   // ─── Sort state ─────────────────────────────────────────────────────
   @state() private _sortBy: 'last_heard' | 'name' | 'prefix' = 'last_heard';
+  /** List of cards or map; remembered in this browser. */
+  @state() private _view: 'list' | 'map' = (() => {
+    try { return localStorage.getItem('chattx-nodes-view') === 'map' ? 'map' : 'list'; } catch { return 'list'; }
+  })();
+  /** Every node matching the filters, for the map (not paged). */
+  @state() private _mapContacts: Contact[] = [];
+  @state() private _mapLoading = false;
+  @state() private _home: { lat: number; lon: number } | null = null;
 
   private _searchTimer?: ReturnType<typeof setTimeout>;
 
@@ -232,6 +242,26 @@ export class NodesPage extends LitElement {
 
     /* ─── Search bar ────────────────────────────────────────────────── */
 
+    .view-toggle {
+      display: flex;
+      border: 1px solid var(--divider-color, #e0e0e0);
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .view-toggle button {
+      border: none;
+      background: none;
+      color: var(--secondary-text-color);
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .view-toggle button.active {
+      background: var(--primary-color, #03a9f4);
+      color: var(--text-primary-color, #fff);
+    }
+
     .search-bar {
       display: flex;
       align-items: center;
@@ -268,8 +298,19 @@ export class NodesPage extends LitElement {
 
     .header-actions {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 8px;
+    }
+
+    :host([narrow]) .header-actions .search-bar {
+      flex: 1 1 100% !important;
+    }
+
+    .content-area.map {
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
     }
 
     .sync-btn {
@@ -466,6 +507,10 @@ export class NodesPage extends LitElement {
                 ? html`<button class="clear-search" @click=${() => { this._searchQuery = ''; this._loadPage(true); }}>✕</button>`
                 : nothing}
             </div>
+            <div class="view-toggle" role="group" aria-label=${t('View')}>
+              <button class=${this._view === 'list' ? 'active' : ''} @click=${() => this._setView('list')}>☰ ${t('List')}</button>
+              <button class=${this._view === 'map' ? 'active' : ''} @click=${() => this._setView('map')}>🗺 ${t('Map')}</button>
+            </div>
             <select class="sort-select"
               .value=${this._sortBy}
               @change=${(e: Event) => {
@@ -489,8 +534,11 @@ export class NodesPage extends LitElement {
         </div>
 
         <!-- Content area -->
-        <div class="content-area">
-          ${this._renderContactsContent()}
+        <div class=${this._view === 'map' ? 'content-area map' : 'content-area'}>
+          ${this._view === 'map'
+            ? html`<chattx-nodes-map .nodes=${this._mapContacts} .home=${this._home} ?loading=${this._mapLoading}
+                @node-selected=${(e: CustomEvent<{ node: Contact }>) => this._openNodeDetail(e.detail.node)}></chattx-nodes-map>`
+            : this._renderContactsContent()}
         </div>
       </div>
 
@@ -585,8 +633,39 @@ export class NodesPage extends LitElement {
 
   // ─── Data loading ─────────────────────────────────────────────────
 
+  private _setView(view: 'list' | 'map') {
+    this._view = view;
+    try { localStorage.setItem('chattx-nodes-view', view); } catch { /* storage unavailable */ }
+    if (view === 'map') void this._loadMap();
+  }
+
+  /** All nodes matching the current filters, for the map. */
+  private async _loadMap() {
+    if (!this.hass) return;
+    this._mapLoading = true;
+    if (!this._home) void loadOwnPosition(this.hass).then((pos) => { this._home = pos; });
+    try {
+      const nodeType = this._typeFilter ? NODE_TYPE_MAP[this._typeFilter] : undefined;
+      const result = await getContactsPaginated(this.hass, this._primaryFilter, {
+        nodeType,
+        search: this._searchQuery.trim() || undefined,
+        limit: 10000,
+        offset: 0,
+        entryId: this.config?.entry_id,
+        sortBy: this._sortBy,
+      });
+      this._mapContacts = result.contacts;
+    } catch (err) {
+      console.error('Failed to load contacts for the map:', err);
+    } finally {
+      this._mapLoading = false;
+    }
+  }
+
   private async _loadPage(reset = false) {
     if (!this.hass) return;
+    // Filters changed: the map follows them.
+    if (reset && this._view === 'map') void this._loadMap();
     this._loading = true;
 
     try {

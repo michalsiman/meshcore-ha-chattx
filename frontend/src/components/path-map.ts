@@ -18,7 +18,7 @@ const HEIGHT = 320;
 /** Our companion's position, read once per page load. */
 let ownPosition: Promise<{ lat: number; lon: number } | null> | null = null;
 
-function loadOwnPosition(hass: HomeAssistant): Promise<{ lat: number; lon: number } | null> {
+export function loadOwnPosition(hass: HomeAssistant): Promise<{ lat: number; lon: number } | null> {
   ownPosition ??= getDeviceConfig(hass)
     .then((c) => {
       const lat = Number(c.latitude);

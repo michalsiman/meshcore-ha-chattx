@@ -594,5 +594,14 @@
   "Shorten link": "Skrátiť odkaz",
   "Shortening…": "Skracujem…",
   "The link could not be shortened: {error}": "Odkaz sa nepodarilo skrátiť: {error}",
-  "Show the newest message (sender and text) in the chat list": "Zobraziť v zozname chatov poslednú správu (odosielateľa a text)"
+  "Show the newest message (sender and text) in the chat list": "Zobraziť v zozname chatov poslednú správu (odosielateľa a text)",
+  "View": "Zobrazenie",
+  "List": "Zoznam",
+  "Map": "Mapa",
+  "Nodes on the map": "Nody na mape",
+  "Zoom in": "Priblížiť",
+  "Zoom out": "Oddialiť",
+  "Show all": "Zobraziť všetko",
+  "Room server": "Room server",
+  "{shown} of {total} nodes have a known position": "{shown} z {total} nodov má známu polohu"
 }

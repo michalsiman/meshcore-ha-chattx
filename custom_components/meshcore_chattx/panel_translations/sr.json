@@ -594,5 +594,14 @@
   "Shorten link": "Skrati link",
   "Shortening…": "Skraćujem…",
   "The link could not be shortened: {error}": "Link nije moguće skratiti: {error}",
-  "Show the newest message (sender and text) in the chat list": "Prikaži najnoviju poruku (pošiljaoca i tekst) u listi razgovora"
+  "Show the newest message (sender and text) in the chat list": "Prikaži najnoviju poruku (pošiljaoca i tekst) u listi razgovora",
+  "View": "Prikaz",
+  "List": "Lista",
+  "Map": "Mapa",
+  "Nodes on the map": "Nodovi na mapi",
+  "Zoom in": "Približi",
+  "Zoom out": "Udalji",
+  "Show all": "Prikaži sve",
+  "Room server": "Room server",
+  "{shown} of {total} nodes have a known position": "{shown} od {total} nodova ima poznat položaj"
 }

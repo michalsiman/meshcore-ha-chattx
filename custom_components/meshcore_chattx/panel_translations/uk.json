@@ -594,5 +594,14 @@
   "Shorten link": "Скоротити посилання",
   "Shortening…": "Скорочення…",
   "The link could not be shortened: {error}": "Не вдалося скоротити посилання: {error}",
-  "Show the newest message (sender and text) in the chat list": "Показувати останнє повідомлення (відправника й текст) у списку чатів"
+  "Show the newest message (sender and text) in the chat list": "Показувати останнє повідомлення (відправника й текст) у списку чатів",
+  "View": "Вигляд",
+  "List": "Список",
+  "Map": "Мапа",
+  "Nodes on the map": "Ноди на мапі",
+  "Zoom in": "Наблизити",
+  "Zoom out": "Віддалити",
+  "Show all": "Показати все",
+  "Room server": "Room server",
+  "{shown} of {total} nodes have a known position": "{shown} з {total} нодів мають відоме розташування"
 }

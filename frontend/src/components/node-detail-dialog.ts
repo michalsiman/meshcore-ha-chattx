@@ -79,8 +79,9 @@ export class NodeDetailDialog extends LitElement {
     .dialog {
       background: var(--card-background-color, #fff);
       border-radius: 8px;
-      max-width: 500px;
-      max-height: 80vh;
+      width: min(420px, 92vw);
+      max-width: 420px;
+      max-height: 72vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -96,15 +97,15 @@ export class NodeDetailDialog extends LitElement {
     .dialog-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 16px;
+      gap: 10px;
+      padding: 12px;
       border-bottom: 1px solid var(--divider-color, #e0e0e0);
       flex-shrink: 0;
     }
 
     .dialog-avatar {
-      width: 56px;
-      height: 56px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       background: var(--primary-color, #03a9f4);
       color: #fff;
@@ -112,7 +113,7 @@ export class NodeDetailDialog extends LitElement {
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 24px;
+      font-size: 19px;
       flex-shrink: 0;
     }
 
@@ -124,7 +125,7 @@ export class NodeDetailDialog extends LitElement {
     .dialog-title { flex: 1; overflow: hidden; }
 
     .dialog-name {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       color: var(--primary-text-color);
       overflow: hidden;
@@ -155,7 +156,7 @@ export class NodeDetailDialog extends LitElement {
 
     .dialog-close:hover { color: var(--primary-text-color); }
 
-    .dialog-content { flex: 1; min-height: 0; overflow-y: auto; padding: 16px; }
+    .dialog-content { flex: 1; min-height: 0; overflow-y: auto; padding: 12px; }
 
     .section { margin-bottom: 16px; }
 

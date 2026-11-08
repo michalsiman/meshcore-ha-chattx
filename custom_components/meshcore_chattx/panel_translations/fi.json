@@ -594,5 +594,14 @@
   "Shorten link": "Lyhennä linkki",
   "Shortening…": "Lyhennetään…",
   "The link could not be shortened: {error}": "Linkkiä ei voitu lyhentää: {error}",
-  "Show the newest message (sender and text) in the chat list": "Näytä uusin viesti (lähettäjä ja teksti) chattiluettelossa"
+  "Show the newest message (sender and text) in the chat list": "Näytä uusin viesti (lähettäjä ja teksti) chattiluettelossa",
+  "View": "Näkymä",
+  "List": "Luettelo",
+  "Map": "Kartta",
+  "Nodes on the map": "Nodet kartalla",
+  "Zoom in": "Lähennä",
+  "Zoom out": "Loitonna",
+  "Show all": "Näytä kaikki",
+  "Room server": "Room server",
+  "{shown} of {total} nodes have a known position": "{shown}/{total} nodella on tunnettu sijainti"
 }
