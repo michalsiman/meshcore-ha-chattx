@@ -590,5 +590,8 @@
   "No repeater on this path has a known position.": "Жоден repeater на цьому шляху не має відомого розташування.",
   "no known position": "розташування невідоме",
   "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Кілька repeater мають цей префікс; показано найближчий до шляху.",
-  "Experimental feature": "Експериментальна функція"
+  "Experimental feature": "Експериментальна функція",
+  "Shorten link": "Скоротити посилання",
+  "Shortening…": "Скорочення…",
+  "The link could not be shortened: {error}": "Не вдалося скоротити посилання: {error}"
 }

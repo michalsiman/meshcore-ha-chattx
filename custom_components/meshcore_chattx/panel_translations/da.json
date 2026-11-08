@@ -590,5 +590,8 @@
   "No repeater on this path has a known position.": "Ingen repeater på denne rute har en kendt position.",
   "no known position": "ukendt position",
   "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Flere repeaters deler dette præfiks; den nærmeste ruten vises.",
-  "Experimental feature": "Eksperimentel funktion"
+  "Experimental feature": "Eksperimentel funktion",
+  "Shorten link": "Forkort link",
+  "Shortening…": "Forkorter…",
+  "The link could not be shortened: {error}": "Linket kunne ikke forkortes: {error}"
 }

@@ -8,6 +8,7 @@ import { hasMapPath } from './path-map';
 import { fewestHops, formatHopLabel, formatTimestamp } from '../chat/message-parser';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
+import { splitLinks } from '../utils/links';
 
 /**
  * Generate a deterministic color from a string (e.g., pubkey prefix).
@@ -158,6 +159,16 @@ export class MessageBubble extends LitElement {
       font-weight: 600;
       padding: 1px 4px;
       border-radius: 4px;
+    }
+
+    .message-text .link {
+      color: var(--primary-color, #03a9f4);
+      text-decoration: underline;
+      word-break: break-all;
+    }
+
+    .bubble.outgoing .message-text .link {
+      color: #fff;
     }
 
     .bubble.outgoing .message-text .mention {
@@ -417,9 +428,9 @@ export class MessageBubble extends LitElement {
 
   private _renderTextWithMentions(text: string, mentions: string[]) {
     if (mentions.length === 0) {
-      // No mentions to highlight — return raw text. Lit auto-escapes
-      // string interpolations in html`...` templates.
-      return text;
+      // No mentions to highlight. Lit auto-escapes string interpolations
+      // in html`...` templates; web addresses become links.
+      return this._renderLinks(text);
     }
 
     // Build a single regex matching either @[Name] or @Name forms for any
@@ -432,17 +443,31 @@ export class MessageBubble extends LitElement {
       'g',
     );
 
-    const parts: (string | ReturnType<typeof html>)[] = [];
+    const parts: unknown[] = [];
     let last = 0;
     let m: RegExpExecArray | null;
     while ((m = pattern.exec(text)) !== null) {
-      if (m.index > last) parts.push(text.slice(last, m.index));
+      if (m.index > last) parts.push(this._renderLinks(text.slice(last, m.index)));
       const name = m[1] ?? m[2];
       parts.push(html`<span class="mention">@${name}</span>`);
       last = m.index + m[0].length;
     }
-    if (last < text.length) parts.push(text.slice(last));
+    if (last < text.length) parts.push(this._renderLinks(text.slice(last)));
     return parts;
+  }
+
+  /**
+   * Web addresses as links that open in a new window, which the Home
+   * Assistant app hands to the default browser. A click on a link does not
+   * open the message dialog.
+   */
+  private _renderLinks(text: string) {
+    const parts = splitLinks(text);
+    if (parts.length === 1 && 'text' in parts[0]) return text;
+    return parts.map((p) => ('url' in p
+      ? html`<a class="link" href=${p.url} target="_blank" rel="noopener noreferrer"
+          @click=${(e: Event) => e.stopPropagation()}>${p.label}</a>`
+      : p.text));
   }
 
   // ── Phone back gesture ──────────────────────────────────────────────

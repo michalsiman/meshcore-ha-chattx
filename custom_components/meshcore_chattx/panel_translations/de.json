@@ -590,5 +590,8 @@
   "No repeater on this path has a known position.": "Kein Repeater auf diesem Weg hat eine bekannte Position.",
   "no known position": "Position unbekannt",
   "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Mehrere Repeater teilen dieses Präfix; der dem Weg nächste wird gezeigt.",
-  "Experimental feature": "Experimentelle Funktion"
+  "Experimental feature": "Experimentelle Funktion",
+  "Shorten link": "Link kürzen",
+  "Shortening…": "Wird gekürzt…",
+  "The link could not be shortened: {error}": "Der Link konnte nicht gekürzt werden: {error}"
 }

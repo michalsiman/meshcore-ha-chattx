@@ -466,6 +466,7 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_get_quick_messages)
     websocket_api.async_register_command(hass, ws_set_quick_messages)
     websocket_api.async_register_command(hass, ws_get_heard_reply)
+    websocket_api.async_register_command(hass, ws_shorten_url)
     websocket_api.async_register_command(hass, ws_set_heard_reply)
     websocket_api.async_register_command(hass, ws_mark_read)
     websocket_api.async_register_command(hass, ws_regenerate_identity)
@@ -1841,6 +1842,49 @@ async def ws_set_heard_reply(hass, connection, msg):
         connection.send_result(msg["id"], {"text": store.get()})
     except Exception as ex:
         _ws_send_error_safe(connection, msg["id"], ex, handler="ws_set_heard_reply")
+
+
+# ─── meshcore/shorten_url ───────────────────────────────────────────────
+# Shorten a web address for a message through a public shortener. Done
+# here rather than in the browser, which may not call another site.
+
+_SHORTENERS = ("https://is.gd/create.php", "https://v.gd/create.php")
+_MAX_URL_LENGTH = 2000
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/shorten_url",
+        vol.Required("url"): vol.All(str, vol.Length(min=8, max=_MAX_URL_LENGTH)),
+    }
+)
+@websocket_api.async_response
+async def ws_shorten_url(hass, connection, msg):
+    """Return a short address for an http(s) address, from is.gd or else v.gd."""
+    from homeassistant.helpers.aiohttp_client import async_get_clientsession
+    import aiohttp
+
+    url = msg["url"].strip()
+    if not re.match(r"^https?://[^\s]+$", url, re.IGNORECASE):
+        connection.send_error(msg["id"], "invalid", "Only http and https addresses can be shortened")
+        return
+    session = async_get_clientsession(hass)
+    last_error = "no shortener answered"
+    for service in _SHORTENERS:
+        try:
+            async with session.get(
+                service,
+                params={"format": "simple", "url": url},
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as resp:
+                body = (await resp.text()).strip()
+                if resp.status == 200 and re.match(r"^https://[a-z.]+/\S+$", body):
+                    connection.send_result(msg["id"], {"short": body, "service": service})
+                    return
+                last_error = body[:200] or f"HTTP {resp.status}"
+        except Exception as ex:  # network down, timeout, DNS
+            last_error = str(ex) or type(ex).__name__
+    connection.send_error(msg["id"], "unavailable", f"Could not shorten the address: {last_error}")
 
 
 # ─── meshcore/repeater_login ────────────────────────────────────────────

@@ -590,5 +590,8 @@
   "No repeater on this path has a known position.": "Žiadny repeater na tejto ceste nemá známu polohu.",
   "no known position": "poloha neznáma",
   "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Tento začiatok kľúča má viac repeaterov, zobrazený je ten najbližší k ceste.",
-  "Experimental feature": "Experimentálna funkcia"
+  "Experimental feature": "Experimentálna funkcia",
+  "Shorten link": "Skrátiť odkaz",
+  "Shortening…": "Skracujem…",
+  "The link could not be shortened: {error}": "Odkaz sa nepodarilo skrátiť: {error}"
 }

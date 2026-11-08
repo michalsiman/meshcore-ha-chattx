@@ -590,5 +590,8 @@
   "No repeater on this path has a known position.": "Noben repeater na tej poti nima znanega položaja.",
   "no known position": "položaj neznan",
   "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Več repeaterjev ima to predpono; prikazan je tisti, ki je najbližje poti.",
-  "Experimental feature": "Preizkusna funkcija"
+  "Experimental feature": "Preizkusna funkcija",
+  "Shorten link": "Skrajšaj povezavo",
+  "Shortening…": "Krajšam…",
+  "The link could not be shortened: {error}": "Povezave ni bilo mogoče skrajšati: {error}"
 }

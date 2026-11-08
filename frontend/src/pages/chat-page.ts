@@ -8,8 +8,9 @@ import { buildRenderItems } from '../chat/message-parser';
 import { remainingMessageBytes } from '../utils/message-limit';
 import { loadStripDiacritics, saveStripDiacritics, stripDiacritics } from '../utils/diacritics';
 import { loadShowContactIds, saveShowContactIds } from '../utils/contact-ids';
+import { longLink } from '../utils/links';
 import { discoverChannelEntity, discoverContactEntity } from '../chat/entity-resolver';
-import { getRepeaterLoginState, sendDirectMessage, sendChannelMessage } from '../api';
+import { getRepeaterLoginState, sendDirectMessage, sendChannelMessage, shortenUrl } from '../api';
 import {
   AT_BOTTOM_THRESHOLD_PX,
   LAZY_LOAD_TRIGGER_PX,
@@ -60,6 +61,8 @@ export class ChatPage extends LitElement {
   /** Unsubscribe handle for the `UnreadController` subscription. */
   private _unsubUnread: (() => void) | null = null;
   @state() private _inputText = '';
+  @state() private _shortening = false;
+  @state() private _shortenError = '';
   @state() private _sending = false;
   @state() private _viewportNarrow = false;
   private _mediaQuery: MediaQueryList | null = null;
@@ -219,6 +222,41 @@ export class ChatPage extends LitElement {
       border-color: var(--primary-color, #03a9f4);
       background: var(--primary-color, #03a9f4);
       color: var(--text-primary-color, #fff);
+    }
+
+    .shorten-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px 0;
+      font-size: 12px;
+    }
+
+    .shorten-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+      padding: 3px 10px;
+      border: 1px solid var(--primary-color, #03a9f4);
+      border-radius: 12px;
+      background: none;
+      color: var(--primary-color, #03a9f4);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .shorten-url {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 220px;
+      color: var(--secondary-text-color, #727272);
+    }
+
+    .shorten-error {
+      color: var(--error-color, #db4437);
     }
 
     .composer-counter {
@@ -980,6 +1018,7 @@ export class ChatPage extends LitElement {
         ${this._renderItemsWithDivider(renderItems)}
         ${this._renderNewMessagesIndicator()}
       </div>
+      ${this._renderShortenBar()}
       <div class="input-area" @mousedown=${this._keepComposerFocus}>
         <div class="composer-tools">
           <chattx-quick-message-picker
@@ -1251,6 +1290,41 @@ export class ChatPage extends LitElement {
 
   private _remainingBytes(): number {
     return remainingMessageBytes(this._outgoingText(), this._isContact() ? null : this.config?.node_name ?? '');
+  }
+
+  /**
+   * Offer to shorten the first long web address in the composer, which
+   * saves bytes in a message. Shown only while there is such an address.
+   */
+  private _renderShortenBar() {
+    const link = longLink(this._inputText);
+    if (!link && !this._shortenError) return html``;
+    return html`
+      <div class="shorten-bar" @mousedown=${this._keepComposerFocus}>
+        ${link
+          ? html`<button class="shorten-button" ?disabled=${this._shortening || this._sending}
+              @click=${() => this._shortenLink(link.label, link.url)}>
+              ✂ ${this._shortening ? t('Shortening…') : t('Shorten link')}
+              <span class="shorten-url">${link.label}</span>
+            </button>`
+          : html``}
+        ${this._shortenError ? html`<span class="shorten-error">${this._shortenError}</span>` : html``}
+      </div>
+    `;
+  }
+
+  private async _shortenLink(label: string, url: string) {
+    if (!this.hass) return;
+    this._shortening = true;
+    this._shortenError = '';
+    const result = await shortenUrl(this.hass, url);
+    this._shortening = false;
+    if ('short' in result) {
+      this._inputText = this._inputText.replace(label, result.short);
+    } else {
+      this._shortenError = t('The link could not be shortened: {error}', { error: result.error });
+      setTimeout(() => { this._shortenError = ''; }, 8000);
+    }
   }
 
   /** The composer's text as it would go out. */

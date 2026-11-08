@@ -1274,3 +1274,14 @@ export async function setDefaultFloodScope(
     return { success: false, error: e?.message || String(error) };
   }
 }
+
+
+/** Shorten a web address through a public shortener (is.gd, else v.gd), via Home Assistant. */
+export async function shortenUrl(hass: HomeAssistant, url: string): Promise<{ short: string } | { error: string }> {
+  try {
+    const result = await hass.callWS<{ short: string }>({ type: 'meshcore_chattx/shorten_url', url });
+    return { short: result.short };
+  } catch (error) {
+    return { error: wsErrorMessage(error) };
+  }
+}
