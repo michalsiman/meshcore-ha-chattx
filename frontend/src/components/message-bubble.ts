@@ -40,7 +40,7 @@ export class MessageBubble extends LitElement {
     // Focus trap + Escape closes the message-action sheet.
     attachDialogA11y(this, {
       isOpen: () => this._selectedMessage !== null,
-      onEscape: () => { this._selectedMessage = null; },
+      onEscape: () => this._closeDialog(),
       getScope: () => this.shadowRoot?.querySelector('.message-dialog'),
     });
   }
@@ -383,7 +383,7 @@ export class MessageBubble extends LitElement {
     const scopeLabel = !msg.isOutgoing && !msg.isSystem ? regionInfo(msg.floodScope, msg.regionScope).short : '';
 
     return html`
-      <div class=${this._classMap(bubbleClasses)} data-msg-id=${msg.id} @click=${(e: Event) => { e.stopPropagation(); this._selectedMessage = msg; }}>
+      <div class=${this._classMap(bubbleClasses)} data-msg-id=${msg.id} @click=${(e: Event) => { e.stopPropagation(); this._openDialog(msg); }}>
         <div class="message-text">${this._renderTextWithMentions(msg.text, msg.mentions)}</div>
         <div class="timestamp">${statusLabel ? html`<span class="delivery-status">${statusLabel}</span> · ` : ''}${ts}${scopeLabel ? html` · <span class="flood-scope">${scopeLabel}</span>` : ''}</div>
       </div>
@@ -445,6 +445,59 @@ export class MessageBubble extends LitElement {
     return parts;
   }
 
+  // ── Phone back gesture ──────────────────────────────────────────────
+  // The open dialog and the open map each get a history entry, so the
+  // system back gesture first hides the map, then closes the dialog,
+  // instead of leaving the conversation. The URL stays the same.
+
+  private _historyState(): Record<string, unknown> {
+    return (history.state as Record<string, unknown> | null) ?? {};
+  }
+
+  private _openDialog(msg: ChatMessage) {
+    this._selectedMessage = msg;
+    if (!this._historyState().chattxMessageDialog) {
+      history.pushState({ ...this._historyState(), chattxMessageDialog: true }, '');
+    }
+  }
+
+  private _toggleMap() {
+    if (!this._showMap) {
+      this._showMap = true;
+      history.pushState({ ...this._historyState(), chattxMessageMap: true }, '');
+    } else if (this._historyState().chattxMessageMap) {
+      history.back(); // _onPopState hides the map
+    } else {
+      this._showMap = false;
+    }
+  }
+
+  private _closeDialog() {
+    const st = this._historyState();
+    const entries = (st.chattxMessageMap ? 1 : 0) + (st.chattxMessageDialog ? 1 : 0);
+    if (this._selectedMessage && entries > 0) {
+      history.go(-entries); // _onPopState closes the dialog
+    } else {
+      this._selectedMessage = null;
+    }
+  }
+
+  private _onPopState = () => {
+    const st = this._historyState();
+    if (this._showMap && !st.chattxMessageMap) this._showMap = false;
+    if (this._selectedMessage && !st.chattxMessageDialog) this._selectedMessage = null;
+  };
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('popstate', this._onPopState);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('popstate', this._onPopState);
+  }
+
   willUpdate(changed: Map<string, unknown>) {
     if (changed.has('_selectedMessage')) this._showMap = false;
   }
@@ -491,14 +544,14 @@ export class MessageBubble extends LitElement {
     const footerStyle = 'padding: 8px 16px; font-size: 12px; color: var(--secondary-text-color); border-top: 1px solid var(--divider-color, #e0e0e0);';
 
     return html`
-      <div class="message-dialog-overlay" @click=${() => { this._selectedMessage = null; }}>
+      <div class="message-dialog-overlay" @click=${() => this._closeDialog()}>
         <div class="message-dialog ${this._showMap ? 'with-map' : ''}"
              role="dialog" aria-modal="true" aria-label=${t('Message actions')}
              @click=${(e: Event) => e.stopPropagation()}>
           <div class="message-dialog-top">
             <div class="message-dialog-preview">${msg.text}</div>
             <button class="message-dialog-close" aria-label=${t('Close')} title=${t('Close')}
-              @click=${() => { this._selectedMessage = null; }}>✕</button>
+              @click=${() => this._closeDialog()}>✕</button>
           </div>
           <button class="message-dialog-action" @click=${() => this._copyText(msg.text)}>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>${t('Copy Text')}
@@ -526,7 +579,7 @@ export class MessageBubble extends LitElement {
             : html``}
           ${this.hass && hasMapPath(msg)
             ? html`
-                <button class="message-dialog-action" @click=${() => { this._showMap = !this._showMap; }}>
+                <button class="message-dialog-action" @click=${() => this._toggleMap()}>
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>${this._showMap ? t('Hide map') : t('Show route on map')}
                 </button>
                 ${this._showMap
@@ -575,7 +628,7 @@ export class MessageBubble extends LitElement {
       document.execCommand('copy');
       document.body.removeChild(textarea);
     }
-    this._selectedMessage = null;
+    this._closeDialog();
   }
 
   /** Hand the composer a reply to the sender; sending stays a separate step. */
@@ -587,7 +640,7 @@ export class MessageBubble extends LitElement {
         composed: true,
       }),
     );
-    this._selectedMessage = null;
+    this._closeDialog();
   }
 
   private _classMap(obj: Record<string, boolean>): string {
