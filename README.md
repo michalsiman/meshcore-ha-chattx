@@ -103,8 +103,16 @@ These use demo data, and the names and values are made up.
 <td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-composer.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-composer.png" alt="Emoji picker, bytes-left counter and diacritics switch"></a></td>
 </tr>
 <tr>
-<td><b>Chat</b> — initials and message ages in the list, hop count and path size on messages.</td>
+<td><b>Chat</b> — the newest message under each conversation, unread total on the Chat tab, clickable links, hop count and path size on messages, and "Shorten link" above the message field.</td>
 <td><b>Writing</b> — quick messages and the diacritics switch on the left, emoji and bytes left on the right.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-route-map.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-route-map.png" alt="Route of a message on a map"></a></td>
+<td align="center"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-route-map.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-route-map.png" alt="Route map on a phone" width="300"></a></td>
+</tr>
+<tr>
+<td><b>Route on a map</b> (experimental) — the repeaters a message went through, found among your contacts by their key prefix and drawn over OpenStreetMap, with the list below.</td>
+<td align="center"><b>Phone</b> — the same map; the dialog scrolls, and the back gesture hides the map, then closes the dialog.</td>
 </tr>
 <tr>
 <td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png" alt="Message dialog with the heard reply"></a></td>
@@ -138,7 +146,7 @@ These use demo data, and the names and values are made up.
 <td width="50%" align="center"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-chat.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-chat.png" alt="Chat on a phone" width="300"></a></td>
 </tr>
 <tr>
-<td align="center"><b>Phone</b> — conversation list.</td>
+<td align="center"><b>Phone</b> — conversation list with the newest message of each conversation.</td>
 <td align="center"><b>Phone</b> — chat with the compact message bar.</td>
 </tr>
 </table>
