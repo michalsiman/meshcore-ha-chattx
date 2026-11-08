@@ -864,13 +864,23 @@ export async function getUnreadAndLastRead(
 export async function getConversationActivity(
   hass: HomeAssistant,
 ): Promise<Record<string, string>> {
+  return (await getConversationOverview(hass)).activity;
+}
+
+/** Newest message per conversation: who wrote it and how it starts. */
+export type ConversationPreviews = Record<string, { sender: string; text: string }>;
+
+/** Newest message time and preview per message entity_id. */
+export async function getConversationOverview(
+  hass: HomeAssistant,
+): Promise<{ activity: Record<string, string>; previews: ConversationPreviews }> {
   try {
-    const result = await hass.callWS<{ activity: Record<string, string> }>({
+    const result = await hass.callWS<{ activity: Record<string, string>; previews?: ConversationPreviews }>({
       type: 'meshcore_chattx/get_conversation_activity',
     });
-    return result.activity;
+    return { activity: result.activity, previews: result.previews ?? {} };
   } catch {
-    return {};
+    return { activity: {}, previews: {} };
   }
 }
 

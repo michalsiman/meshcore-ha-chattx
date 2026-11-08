@@ -8,7 +8,9 @@ import { buildRenderItems } from '../chat/message-parser';
 import { remainingMessageBytes } from '../utils/message-limit';
 import { loadStripDiacritics, saveStripDiacritics, stripDiacritics } from '../utils/diacritics';
 import { loadShowContactIds, saveShowContactIds } from '../utils/contact-ids';
+import { loadShowMessagePreview, saveShowMessagePreview } from '../utils/message-preview';
 import { longLink } from '../utils/links';
+import { loadDraft, saveDraft } from '../utils/drafts';
 import { discoverChannelEntity, discoverContactEntity } from '../chat/entity-resolver';
 import { getRepeaterLoginState, sendDirectMessage, sendChannelMessage, shortenUrl } from '../api';
 import {
@@ -30,6 +32,8 @@ export class ChatPage extends LitElement {
   @property({ type: Array }) conversations: Array<Contact | Channel> = [];
   /** Time of the newest message per message entity_id. */
   @property({ type: Object }) activity: Record<string, string> = {};
+  /** Newest message per message entity_id: sender and start of the text. */
+  @property({ type: Object }) previews: Record<string, { sender: string; text: string }> = {};
   @property({ type: String }) selectedId: string | null = null;
   @property({ type: Boolean }) narrow = false;
   /**
@@ -76,6 +80,7 @@ export class ChatPage extends LitElement {
   @state() private _repeaterDialogOpen = false;
   @state() private _stripDiacritics = loadStripDiacritics();
   @state() private _showContactIds = loadShowContactIds();
+  @state() private _showMessagePreview = loadShowMessagePreview();
   /** Focus the composer once it is ready after picking a conversation. */
   private _focusAfterSelect = false;
   @state() private _repeaterLoggedIn = false;
@@ -693,6 +698,22 @@ export class ChatPage extends LitElement {
     }
   }
 
+  /**
+   * Keep what is being written as the conversation's draft, and bring a
+   * conversation's draft back when it is opened again (also after the
+   * panel was left for another Home Assistant page).
+   */
+  willUpdate(changedProperties: Map<string, unknown>) {
+    super.willUpdate?.(changedProperties);
+    if (changedProperties.has('selectedId')) {
+      const previous = changedProperties.get('selectedId') as string | null | undefined;
+      if (previous) saveDraft(previous, this._inputText);
+      this._inputText = this.selectedId ? loadDraft(this.selectedId) : '';
+    } else if (changedProperties.has('_inputText') && this.selectedId) {
+      saveDraft(this.selectedId, this._inputText);
+    }
+  }
+
   updated(changedProperties: Map<string, unknown>) {
     this._syncRepeaterLoginState();
     if (this._focusAfterSelect) {
@@ -851,6 +872,9 @@ export class ChatPage extends LitElement {
           <div class="chat-layout narrow-list-only">
             <chattx-conversation-list
               .showContactIds=${this._showContactIds}
+              .showMessagePreview=${this._showMessagePreview}
+              .previews=${this.previews}
+              .nodeName=${this.config?.node_name ?? ''}
               .conversations=${this.conversations}
               .activity=${this.activity}
               .activeId=${this.selectedId}
@@ -874,6 +898,8 @@ export class ChatPage extends LitElement {
               <chattx-manage-dialog
                 .showContactIds=${this._showContactIds}
                 @show-contact-ids-changed=${this._onShowContactIdsChanged}
+                .showMessagePreview=${this._showMessagePreview}
+                @show-message-preview-changed=${this._onShowMessagePreviewChanged}
                 .hass=${this.hass}
                 .entryId=${this.config?.entry_id}
                 .narrow=${this.narrow}
@@ -893,6 +919,9 @@ export class ChatPage extends LitElement {
       <div class="chat-layout">
         <chattx-conversation-list
           .showContactIds=${this._showContactIds}
+          .showMessagePreview=${this._showMessagePreview}
+          .previews=${this.previews}
+          .nodeName=${this.config?.node_name ?? ''}
           .conversations=${this.conversations}
           .activity=${this.activity}
           .activeId=${this.selectedId}
@@ -942,6 +971,8 @@ export class ChatPage extends LitElement {
           <chattx-manage-dialog
             .showContactIds=${this._showContactIds}
             @show-contact-ids-changed=${this._onShowContactIdsChanged}
+                .showMessagePreview=${this._showMessagePreview}
+                @show-message-preview-changed=${this._onShowMessagePreviewChanged}
             .hass=${this.hass}
             .entryId=${this.config?.entry_id}
             .narrow=${this.narrow}
@@ -1330,6 +1361,11 @@ export class ChatPage extends LitElement {
   /** The composer's text as it would go out. */
   private _outgoingText(): string {
     return this._stripDiacritics ? stripDiacritics(this._inputText) : this._inputText;
+  }
+
+  private _onShowMessagePreviewChanged(e: CustomEvent<{ enabled: boolean }>) {
+    this._showMessagePreview = e.detail.enabled;
+    saveShowMessagePreview(e.detail.enabled);
   }
 
   private _onShowContactIdsChanged(e: CustomEvent<{ enabled: boolean }>) {

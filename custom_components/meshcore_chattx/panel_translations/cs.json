@@ -593,5 +593,6 @@
   "Experimental feature": "Experimentální funkce",
   "Shorten link": "Zkrátit odkaz",
   "Shortening…": "Zkracuji…",
-  "The link could not be shortened: {error}": "Odkaz se nepodařilo zkrátit: {error}"
+  "The link could not be shortened: {error}": "Odkaz se nepodařilo zkrátit: {error}",
+  "Show the newest message (sender and text) in the chat list": "Zobrazit v seznamu chatů poslední zprávu (odesílatele a text)"
 }

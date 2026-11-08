@@ -82,3 +82,17 @@ export function sortByActivity<T extends Contact | Channel>(
     .sort((a, b) => b.time - a.time)
     .map((item) => item.conversation);
 }
+
+
+/** Who wrote a conversation's newest message and how it starts, if known. */
+export function lastPreviewOf<T>(
+  conversation: Contact | Channel,
+  previews: Record<string, T>,
+  nodePrefix: string | null | undefined,
+): T | undefined {
+  const suffix = entitySuffix(conversation, nodePrefix);
+  for (const [entityId, preview] of Object.entries(previews)) {
+    if (entityId.substring(entityId.indexOf('.') + 1) === suffix) return preview;
+  }
+  return undefined;
+}

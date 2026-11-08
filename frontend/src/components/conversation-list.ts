@@ -3,7 +3,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, Channel } from '../types';
 import type { UnreadController } from '../chat/unread-controller';
-import { formatLastActivity, lastActivityOf } from '../utils/conversation-activity';
+import { formatLastActivity, lastActivityOf, lastPreviewOf } from '../utils/conversation-activity';
 import { avatarLabel } from '../utils/avatar-label';
 // manage-dialog is loaded by chat-page
 
@@ -30,6 +30,11 @@ export class ConversationList extends LitElement {
   @property({ type: Object }) activity: Record<string, string> = {};
   /** Whether rows show the contact ID or channel number under the name. */
   @property({ type: Boolean }) showContactIds = true;
+  /** Show who wrote the newest message and how it starts, under the name. */
+  @property({ type: Boolean }) showMessagePreview = true;
+  @property({ type: Object }) previews: Record<string, { sender: string; text: string }> = {};
+  /** Our node name, shown as "You" when we wrote the newest message. */
+  @property({ type: String }) nodeName = '';
   private _ageTimer: ReturnType<typeof setInterval> | null = null;
 
   @state() private _activeFilter: ChatFilter = 'all';
@@ -182,9 +187,18 @@ export class ConversationList extends LitElement {
     }
 
     .conversation-name {
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
       color: var(--primary-text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .conversation-preview {
+      font-size: 12px;
+      color: var(--secondary-text-color, #727272);
+      opacity: 0.8;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -381,6 +395,10 @@ export class ConversationList extends LitElement {
     const idLabel = isContact ? (conv as Contact).pubkey_prefix : t('Channel {index}', { index: (conv as Channel).channel_idx });
     const label = this.showContactIds ? idLabel : '';
     const detail = [label, age].filter(Boolean).join(' · ');
+    const last = this.showMessagePreview ? lastPreviewOf(conv, this.previews, this.nodePrefix) : undefined;
+    const preview = last
+      ? `${last.sender && last.sender === this.nodeName ? t('You') : last.sender}${last.sender ? ': ' : ''}${last.text}`
+      : '';
     const avatar = avatarLabel(
       name,
       isContact ? (conv as Contact).pubkey_prefix.substring(0, 2).toUpperCase() : `#${(conv as Channel).channel_idx}`,
@@ -415,6 +433,7 @@ export class ConversationList extends LitElement {
         <div class="conversation-info">
           <div class="conversation-name">${name}</div>
           ${detail ? html`<div class="conversation-detail">${detail}</div>` : ''}
+          ${preview ? html`<div class="conversation-preview">${preview}</div>` : ''}
         </div>
         ${unread > 0
           ? html`<div class="unread-badge" aria-hidden="true">${unread}</div>`

@@ -27,6 +27,7 @@ export class ManageDialog extends LitElement {
    * the channel whose scope they tapped. */
   @property({ type: String }) initialTab?: ManageTab;
   @property({ type: Boolean }) showContactIds = true;
+  @property({ type: Boolean }) showMessagePreview = true;
 
   private _tabInitialized = false;
 
@@ -580,6 +581,18 @@ export class ManageDialog extends LitElement {
               }),
             )} />
           ${t('Show contact IDs and channel numbers in the chat list')}
+        </label>
+
+        <label class="list-option">
+          <input
+            type="checkbox"
+            .checked=${this.showMessagePreview}
+            @change=${(e: Event) => this.dispatchEvent(
+              new CustomEvent('show-message-preview-changed', {
+                detail: { enabled: (e.target as HTMLInputElement).checked },
+              }),
+            )} />
+          ${t('Show the newest message (sender and text) in the chat list')}
         </label>
 
         <div class="tab-bar">

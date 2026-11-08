@@ -593,5 +593,6 @@
   "Experimental feature": "Fonction expérimentale",
   "Shorten link": "Raccourcir le lien",
   "Shortening…": "Raccourcissement…",
-  "The link could not be shortened: {error}": "Le lien n'a pas pu être raccourci : {error}"
+  "The link could not be shortened: {error}": "Le lien n'a pas pu être raccourci : {error}",
+  "Show the newest message (sender and text) in the chat list": "Afficher le dernier message (expéditeur et texte) dans la liste des discussions"
 }

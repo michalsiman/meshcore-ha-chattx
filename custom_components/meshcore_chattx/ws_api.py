@@ -1755,7 +1755,13 @@ async def ws_get_conversation_activity(hass, connection, msg):
         for entity_id, entry in index.items()
         if entry.get("last_message_ts")
     }
-    connection.send_result(msg["id"], {"activity": activity})
+    # Who wrote the newest message and how it starts, for the chat list.
+    previews = {
+        entity_id: {"sender": entry.get("last_sender", ""), "text": entry.get("last_preview", "")}
+        for entity_id, entry in index.items()
+        if entry.get("last_preview")
+    }
+    connection.send_result(msg["id"], {"activity": activity, "previews": previews})
 
 
 # ─── meshcore/quick_messages ────────────────────────────────────────────

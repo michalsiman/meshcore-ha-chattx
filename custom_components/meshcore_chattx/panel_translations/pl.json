@@ -593,5 +593,6 @@
   "Experimental feature": "Funkcja eksperymentalna",
   "Shorten link": "Skróć link",
   "Shortening…": "Skracanie…",
-  "The link could not be shortened: {error}": "Nie udało się skrócić linku: {error}"
+  "The link could not be shortened: {error}": "Nie udało się skrócić linku: {error}",
+  "Show the newest message (sender and text) in the chat list": "Pokazuj najnowszą wiadomość (nadawcę i tekst) na liście czatów"
 }

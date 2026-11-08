@@ -593,5 +593,6 @@
   "Experimental feature": "Експериментальна функція",
   "Shorten link": "Скоротити посилання",
   "Shortening…": "Скорочення…",
-  "The link could not be shortened: {error}": "Не вдалося скоротити посилання: {error}"
+  "The link could not be shortened: {error}": "Не вдалося скоротити посилання: {error}",
+  "Show the newest message (sender and text) in the chat list": "Показувати останнє повідомлення (відправника й текст) у списку чатів"
 }

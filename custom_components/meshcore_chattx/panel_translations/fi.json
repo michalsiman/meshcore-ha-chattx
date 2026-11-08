@@ -593,5 +593,6 @@
   "Experimental feature": "Kokeellinen ominaisuus",
   "Shorten link": "Lyhennä linkki",
   "Shortening…": "Lyhennetään…",
-  "The link could not be shortened: {error}": "Linkkiä ei voitu lyhentää: {error}"
+  "The link could not be shortened: {error}": "Linkkiä ei voitu lyhentää: {error}",
+  "Show the newest message (sender and text) in the chat list": "Näytä uusin viesti (lähettäjä ja teksti) chattiluettelossa"
 }

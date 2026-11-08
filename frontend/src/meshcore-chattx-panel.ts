@@ -10,7 +10,7 @@ import { panelStyles } from './styles';
 import { MESHCORE_PRESET, DEFAULT_PANEL_CONFIG } from './constants';
 import { mergeActivity, sortByActivity, type ConversationActivity } from './utils/conversation-activity';
 import { keepAboveKeyboard } from './utils/keyboard-viewport';
-import { getConversationActivity, isRepeaterSettingsReply, getDevices, getContacts, getChannels, getUnreadAndLastRead, markConversationRead, removeContact, addContact, traceContact, type TracePathMode } from './api';
+import { getConversationOverview, type ConversationPreviews, isRepeaterSettingsReply, getDevices, getContacts, getChannels, getUnreadAndLastRead, markConversationRead, removeContact, addContact, traceContact, type TracePathMode } from './api';
 import { UnreadController } from './chat/unread-controller';
 import './pages/chat-page';
 import './pages/devices-page';
@@ -42,6 +42,7 @@ export class MeshCorePanel extends LitElement {
   @state() private _devices: MeshCoreDevice[] = [];
   @state() private _contacts: Contact[] = [];
   @state() private _conversationActivity: ConversationActivity = {};
+  @state() private _conversationPreviews: ConversationPreviews = {};
   private _releaseKeyboardViewport: (() => void) | null = null;
   @state() private _channels: Channel[] = [];
   @state() private _selectedEntryId: string | null = null;
@@ -741,6 +742,13 @@ export class MeshCorePanel extends LitElement {
         this._conversationActivity = mergeActivity(this._conversationActivity, {
           [entityId]: new Date().toISOString(),
         });
+        const text = String(data.message ?? data.text ?? '');
+        if (text) {
+          this._conversationPreviews = {
+            ...this._conversationPreviews,
+            [entityId]: { sender: String(data.sender_name ?? ''), text: text.slice(0, 50) },
+          };
+        }
       },
       'meshcore_message'
     ).then(unsubscribe => {
@@ -1003,6 +1011,7 @@ export class MeshCorePanel extends LitElement {
             .config=${this._config}
             .conversations=${sortByActivity([...this._channels, ...this._contacts.filter(c => c.added_to_node)], this._conversationActivity, this._config?.node_prefix)}
             .activity=${this._conversationActivity}
+            .previews=${this._conversationPreviews}
             .unread=${this._unread}
             .selectedId=${this._pendingChatTarget}
             .narrow=${this.narrow}
@@ -1203,10 +1212,9 @@ export class MeshCorePanel extends LitElement {
       // zeroing that used to be inline here, and notifies the
       // controller's subscribers (i.e. `<chat-page>`).
       this._unread.ingestBackendData(result, this._activeChatEntityId);
-      this._conversationActivity = mergeActivity(
-        this._conversationActivity,
-        await getConversationActivity(this.hass),
-      );
+      const overview = await getConversationOverview(this.hass);
+      this._conversationActivity = mergeActivity(this._conversationActivity, overview.activity);
+      this._conversationPreviews = { ...this._conversationPreviews, ...overview.previews };
     } catch {
       // Silently fail
     }

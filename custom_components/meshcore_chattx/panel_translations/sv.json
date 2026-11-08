@@ -593,5 +593,6 @@
   "Experimental feature": "Experimentell funktion",
   "Shorten link": "Korta länk",
   "Shortening…": "Kortar…",
-  "The link could not be shortened: {error}": "Länken kunde inte kortas: {error}"
+  "The link could not be shortened: {error}": "Länken kunde inte kortas: {error}",
+  "Show the newest message (sender and text) in the chat list": "Visa det senaste meddelandet (avsändare och text) i chattlistan"
 }

@@ -593,5 +593,6 @@
   "Experimental feature": "Eksperimentalna funkcija",
   "Shorten link": "Skrati link",
   "Shortening…": "Skraćujem…",
-  "The link could not be shortened: {error}": "Link nije moguće skratiti: {error}"
+  "The link could not be shortened: {error}": "Link nije moguće skratiti: {error}",
+  "Show the newest message (sender and text) in the chat list": "Prikaži najnoviju poruku (pošiljaoca i tekst) u listi razgovora"
 }

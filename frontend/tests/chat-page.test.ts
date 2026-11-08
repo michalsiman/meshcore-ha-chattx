@@ -198,6 +198,8 @@ async function mountChatPage(opts: {
   unreadCounts?: Record<string, number>;
   lastRead?: Record<string, string>;
 } = {}): Promise<ChatPage> {
+  // Drafts persist in localStorage; start every mount without one.
+  localStorage.removeItem('chattx-drafts');
   const container = document.createElement('div');
   document.body.appendChild(container);
   containers.push(container);

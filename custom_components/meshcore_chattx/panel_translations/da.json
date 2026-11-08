@@ -593,5 +593,6 @@
   "Experimental feature": "Eksperimentel funktion",
   "Shorten link": "Forkort link",
   "Shortening…": "Forkorter…",
-  "The link could not be shortened: {error}": "Linket kunne ikke forkortes: {error}"
+  "The link could not be shortened: {error}": "Linket kunne ikke forkortes: {error}",
+  "Show the newest message (sender and text) in the chat list": "Vis den nyeste besked (afsender og tekst) i chatlisten"
 }

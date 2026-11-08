@@ -593,5 +593,6 @@
   "Experimental feature": "Preizkusna funkcija",
   "Shorten link": "Skrajšaj povezavo",
   "Shortening…": "Krajšam…",
-  "The link could not be shortened: {error}": "Povezave ni bilo mogoče skrajšati: {error}"
+  "The link could not be shortened: {error}": "Povezave ni bilo mogoče skrajšati: {error}",
+  "Show the newest message (sender and text) in the chat list": "Prikaži najnovejše sporočilo (pošiljatelja in besedilo) na seznamu klepetov"
 }
