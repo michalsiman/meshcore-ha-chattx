@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-08
+
+### Added
+
+- Experimental: the route of a message on a map. In the message dialog, "Show route on map" draws the path over OpenStreetMap: the sender when its position is known, every repeater of the path, and your companion, with the list of repeaters below. Repeaters are found among your contacts by the start of their public key; when several share it, the one nearest to the route is shown and marked "(?)", and a repeater without a known position is listed but not drawn. A message heard over several paths gets a tab per path. The map tiles come from openstreetmap.org, so the browser needs internet access.
+
 ### Changed
 
 - The quick reply text of the message dialog ("Heard, 3 hops!") is now kept in Home Assistant, so every browser and computer offers the same text. It was kept in each browser before. The first time an administrator opens Chattx after the update, the text that browser had is carried over, unless one is already set in Home Assistant. Only administrators can change it.
