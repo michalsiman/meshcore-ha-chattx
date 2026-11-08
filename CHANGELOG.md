@@ -4,6 +4,17 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-08
+
+### Added
+
+- A message being written stays in the message field when you switch to another conversation or another Home Assistant page and come back. Each conversation keeps its own draft in this browser; a draft untouched for an hour is forgotten, and sending removes it.
+- The chat list shows who wrote the newest message of each conversation and how it starts, such as "Alice: see you at the repeater", or "You: …" for your own. It updates as messages come in. The switch is in the chat list's gear menu, per browser, and on by default.
+
+### Changed
+
+- Conversation names in the chat list are a little larger and bolder; the age and message preview below them are quieter.
+
 ## [0.7.0] - 2026-11-08
 
 ### Added

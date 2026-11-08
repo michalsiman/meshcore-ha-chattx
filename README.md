@@ -66,6 +66,8 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - Sorted by the newest message, with its age in minutes, hours or days
 - Readable initials in the circles: `Forest Hill Relay` is FH, `#hiking` is HI, `Anna K. 📟` is A📟
 - Switch in the gear menu that hides contact IDs and channel numbers
+- The newest message of each conversation (sender and start of the text), switchable in the gear menu
+- Unsent drafts stay in the message field per conversation for an hour, also after leaving the panel
 - Unread total on the Chat tab; busy channels such as #test can be left out of it in the channel settings, while their own badges still count
 
 **Unread messages outside the panel**
