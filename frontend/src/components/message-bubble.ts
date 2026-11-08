@@ -233,8 +233,40 @@ export class MessageBubble extends LitElement {
       box-shadow: 0 0 20px rgba(var(--rgb-primary-color, 3, 169, 244), 0.3);
       min-width: 240px;
       max-width: 300px;
-      overflow: hidden;
+      /* A dialog taller than the screen (the route map on a phone) scrolls
+         inside instead of hiding its top and bottom. */
+      max-height: calc(100dvh - 24px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       z-index: 21;
+    }
+
+    .message-dialog-top {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      background: #333;
+      border-bottom: 1px solid var(--divider-color, #e0e0e0);
+    }
+
+    .message-dialog-top .message-dialog-preview {
+      flex: 1;
+      min-width: 0;
+      border-bottom: none;
+    }
+
+    .message-dialog-close {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: transparent;
+      color: var(--primary-text-color, #fff);
+      font-size: 20px;
+      cursor: pointer;
     }
 
     .message-dialog-preview {
@@ -463,7 +495,11 @@ export class MessageBubble extends LitElement {
         <div class="message-dialog ${this._showMap ? 'with-map' : ''}"
              role="dialog" aria-modal="true" aria-label=${t('Message actions')}
              @click=${(e: Event) => e.stopPropagation()}>
-          <div class="message-dialog-preview">${msg.text}</div>
+          <div class="message-dialog-top">
+            <div class="message-dialog-preview">${msg.text}</div>
+            <button class="message-dialog-close" aria-label=${t('Close')} title=${t('Close')}
+              @click=${() => { this._selectedMessage = null; }}>✕</button>
+          </div>
           <button class="message-dialog-action" @click=${() => this._copyText(msg.text)}>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>${t('Copy Text')}
           </button>

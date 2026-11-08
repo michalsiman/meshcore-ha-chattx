@@ -2424,7 +2424,11 @@ let e,t,i,o,r,s,a,n,l,d,c,p,h,u,g,m,v,f,y,b,_,x,w,$,k,C,F,S,A,D,E,M,B,I,z,R,O,T,
         <div class="message-dialog ${0}"
              role="dialog" aria-modal="true" aria-label=${0}
              @click=${0}>
-          <div class="message-dialog-preview">${0}</div>
+          <div class="message-dialog-top">
+            <div class="message-dialog-preview">${0}</div>
+            <button class="message-dialog-close" aria-label=${0} title=${0}
+              @click=${0}>✕</button>
+          </div>
           <button class="message-dialog-action" @click=${0}>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>${0}
           </button>
@@ -2439,7 +2443,7 @@ let e,t,i,o,r,s,a,n,l,d,c,p,h,u,g,m,v,f,y,b,_,x,w,$,k,C,F,S,A,D,E,M,B,I,z,R,O,T,
           ${0}
         </div>
       </div>
-    `),()=>{this._selectedMessage=null},this._showMap?"with-map":"",Zl("Message actions"),e=>e.stopPropagation(),e.text,()=>this._copyText(e.text),Zl("Copy Text"),e.isOutgoing||e.isSystem?Zd($e||($e=Rl``)):Zd(_e||(_e=Rl`
+    `),()=>{this._selectedMessage=null},this._showMap?"with-map":"",Zl("Message actions"),e=>e.stopPropagation(),e.text,Zl("Close"),Zl("Close"),()=>{this._selectedMessage=null},()=>this._copyText(e.text),Zl("Copy Text"),e.isOutgoing||e.isSystem?Zd($e||($e=Rl``)):Zd(_e||(_e=Rl`
                 <button class="message-dialog-action" @click=${0}>
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>${0}
                 </button>
@@ -2653,8 +2657,40 @@ let e,t,i,o,r,s,a,n,l,d,c,p,h,u,g,m,v,f,y,b,_,x,w,$,k,C,F,S,A,D,E,M,B,I,z,R,O,T,
       box-shadow: 0 0 20px rgba(var(--rgb-primary-color, 3, 169, 244), 0.3);
       min-width: 240px;
       max-width: 300px;
-      overflow: hidden;
+      /* A dialog taller than the screen (the route map on a phone) scrolls
+         inside instead of hiding its top and bottom. */
+      max-height: calc(100dvh - 24px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       z-index: 21;
+    }
+
+    .message-dialog-top {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      background: #333;
+      border-bottom: 1px solid var(--divider-color, #e0e0e0);
+    }
+
+    .message-dialog-top .message-dialog-preview {
+      flex: 1;
+      min-width: 0;
+      border-bottom: none;
+    }
+
+    .message-dialog-close {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: transparent;
+      color: var(--primary-text-color, #fff);
+      font-size: 20px;
+      cursor: pointer;
     }
 
     .message-dialog-preview {
