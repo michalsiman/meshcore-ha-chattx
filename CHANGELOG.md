@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-08
+
+### Fixed
+
+- On a phone the message dialog with the route map was taller than the screen: it could not be scrolled and there was no way to close it. The dialog now scrolls inside and has a close button at the top that stays visible.
+
 ## [0.6.0] - 2026-11-08
 
 ### Added
