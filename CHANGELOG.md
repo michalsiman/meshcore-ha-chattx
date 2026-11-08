@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-11-08
+
+### Changed
+
+- On a phone the system back gesture in the message dialog first hides the route map, then closes the dialog, instead of leaving the conversation. The close button, a tap outside the dialog and Escape keep the browser history in step, so the next back gesture still behaves as expected.
+
 ## [0.6.1] - 2026-11-08
 
 ### Fixed
