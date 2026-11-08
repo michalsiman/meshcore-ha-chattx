@@ -54,6 +54,7 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 **Writing messages**
 
 - Bytes-left counter that counts in UTF-8 bytes and blocks messages that are too long
+- Long web addresses can be shortened with is.gd before sending; addresses in messages are clickable
 - Switch that sends text without diacritics, which leaves more room in a message
 - Emoji picker, inserting at the cursor
 - Quick messages, managed in Settings

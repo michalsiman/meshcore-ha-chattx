@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-08
+
+### Added
+
+- Web addresses in messages are links. Addresses starting with http://, https:// or www. open in a new window, which the Home Assistant app hands to the default browser; a tap on a link does not open the message dialog. Punctuation that ends the sentence stays out of the link, other schemes such as javascript: stay plain text.
+- Shorten a link before sending. When the message being written contains a web address longer than a short one would be, "Shorten link" above the message field replaces it with a short address from is.gd (or v.gd when is.gd does not answer), such as https://is.gd/T4mWrg, which leaves more bytes for the text. Home Assistant asks the shortener, so it needs internet access; when it fails, the text stays as it was and the reason is shown.
+
 ## [0.6.2] - 2026-11-08
 
 ### Changed
