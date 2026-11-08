@@ -4,6 +4,16 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-08
+
+### Added
+
+- Experimental: the Nodes tab can show the nodes on a map. The List / Map switch next to the search shows every node matching the current filters and search that advertises a position, coloured by type (repeater, companion, room server, sensor), with your own node marked. Nodes close together are drawn as a numbered cluster; a tap on a cluster zooms in, a tap on a node opens its details. The map can be dragged and zoomed with the mouse wheel, two fingers or the buttons, and ⤢ returns to the whole view, which fits the bulk of the nodes. The choice of list or map is kept per browser. Map tiles come from openstreetmap.org.
+
+### Changed
+
+- The node details dialog is a little smaller, and on a phone the Nodes tab's buttons wrap onto a second row instead of running off the screen.
+
 ## [0.8.0] - 2026-11-08
 
 ### Added
