@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Vrátila se sítí po {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Vrátila se sítí po {minutes} min",
   "Saved for every browser": "Uloženo pro všechny prohlížeče",
-  "Failed to save the reply text": "Text odpovědi se nepodařilo uložit"
+  "Failed to save the reply text": "Text odpovědi se nepodařilo uložit",
+  "Show route on map": "Zobrazit cestu na mapě",
+  "Hide map": "Skrýt mapu",
+  "Path {n}": "Cesta {n}",
+  "You": "Ty",
+  "Sender": "Odesílatel",
+  "Route on the map": "Cesta na mapě",
+  "No repeater on this path has a known position.": "Žádný repeater na této cestě nemá známou polohu.",
+  "no known position": "poloha neznámá",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Tento začátek klíče má víc repeaterů, zobrazen je ten nejblíž k cestě.",
+  "Experimental feature": "Experimentální funkce"
 }

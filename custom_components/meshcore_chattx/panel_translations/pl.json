@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Wróciła przez sieć po {minutes} min, {hops} hopów",
   "Came back through the mesh after {minutes} min": "Wróciła przez sieć po {minutes} min",
   "Saved for every browser": "Zapisano dla wszystkich przeglądarek",
-  "Failed to save the reply text": "Nie udało się zapisać tekstu odpowiedzi"
+  "Failed to save the reply text": "Nie udało się zapisać tekstu odpowiedzi",
+  "Show route on map": "Pokaż trasę na mapie",
+  "Hide map": "Ukryj mapę",
+  "Path {n}": "Trasa {n}",
+  "You": "Ty",
+  "Sender": "Nadawca",
+  "Route on the map": "Trasa na mapie",
+  "No repeater on this path has a known position.": "Żaden repeater na tej trasie nie ma znanej pozycji.",
+  "no known position": "pozycja nieznana",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Kilka repeaterów ma ten sam prefiks; pokazano najbliższy trasie.",
+  "Experimental feature": "Funkcja eksperymentalna"
 }

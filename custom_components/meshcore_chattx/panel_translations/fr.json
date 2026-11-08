@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Revenu par le mesh après {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Revenu par le mesh après {minutes} min",
   "Saved for every browser": "Enregistré pour tous les navigateurs",
-  "Failed to save the reply text": "Impossible d'enregistrer le texte de réponse"
+  "Failed to save the reply text": "Impossible d'enregistrer le texte de réponse",
+  "Show route on map": "Afficher le trajet sur la carte",
+  "Hide map": "Masquer la carte",
+  "Path {n}": "Trajet {n}",
+  "You": "Vous",
+  "Sender": "Expéditeur",
+  "Route on the map": "Trajet sur la carte",
+  "No repeater on this path has a known position.": "Aucun repeater de ce trajet n'a de position connue.",
+  "no known position": "position inconnue",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Plusieurs repeaters partagent ce préfixe ; le plus proche du trajet est affiché.",
+  "Experimental feature": "Fonction expérimentale"
 }

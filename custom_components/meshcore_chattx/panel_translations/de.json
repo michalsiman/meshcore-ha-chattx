@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Kam nach {minutes} Min. über das Mesh zurück, {hops} Hops",
   "Came back through the mesh after {minutes} min": "Kam nach {minutes} Min. über das Mesh zurück",
   "Saved for every browser": "Für alle Browser gespeichert",
-  "Failed to save the reply text": "Antworttext konnte nicht gespeichert werden"
+  "Failed to save the reply text": "Antworttext konnte nicht gespeichert werden",
+  "Show route on map": "Weg auf der Karte zeigen",
+  "Hide map": "Karte ausblenden",
+  "Path {n}": "Weg {n}",
+  "You": "Du",
+  "Sender": "Absender",
+  "Route on the map": "Weg auf der Karte",
+  "No repeater on this path has a known position.": "Kein Repeater auf diesem Weg hat eine bekannte Position.",
+  "no known position": "Position unbekannt",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Mehrere Repeater teilen dieses Präfix; der dem Weg nächste wird gezeigt.",
+  "Experimental feature": "Experimentelle Funktion"
 }

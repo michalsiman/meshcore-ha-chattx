@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Повернулося через mesh за {minutes} хв, {hops} hops",
   "Came back through the mesh after {minutes} min": "Повернулося через mesh за {minutes} хв",
   "Saved for every browser": "Збережено для всіх браузерів",
-  "Failed to save the reply text": "Не вдалося зберегти текст відповіді"
+  "Failed to save the reply text": "Не вдалося зберегти текст відповіді",
+  "Show route on map": "Показати шлях на мапі",
+  "Hide map": "Сховати мапу",
+  "Path {n}": "Шлях {n}",
+  "You": "Ви",
+  "Sender": "Відправник",
+  "Route on the map": "Шлях на мапі",
+  "No repeater on this path has a known position.": "Жоден repeater на цьому шляху не має відомого розташування.",
+  "no known position": "розташування невідоме",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Кілька repeater мають цей префікс; показано найближчий до шляху.",
+  "Experimental feature": "Експериментальна функція"
 }

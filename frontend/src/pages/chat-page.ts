@@ -1069,6 +1069,8 @@ export class ChatPage extends LitElement {
       results.push(html`
         <chattx-message-bubble
           .group=${item.group}
+          .hass=${this.hass}
+          .nodeName=${this.config?.node_name ?? ''}
           .timestampFormat=${this.config?.timestamp_format ?? 'relative'}></chattx-message-bubble>
       `);
       messageIdx++;

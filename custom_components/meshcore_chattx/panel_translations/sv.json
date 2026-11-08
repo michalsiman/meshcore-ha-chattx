@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Kom tillbaka genom meshen efter {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Kom tillbaka genom meshen efter {minutes} min",
   "Saved for every browser": "Sparat för alla webbläsare",
-  "Failed to save the reply text": "Det gick inte att spara svarstexten"
+  "Failed to save the reply text": "Det gick inte att spara svarstexten",
+  "Show route on map": "Visa vägen på kartan",
+  "Hide map": "Dölj kartan",
+  "Path {n}": "Väg {n}",
+  "You": "Du",
+  "Sender": "Avsändare",
+  "Route on the map": "Vägen på kartan",
+  "No repeater on this path has a known position.": "Ingen repeater på den här vägen har en känd position.",
+  "no known position": "okänd position",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Flera repeaters delar detta prefix; den närmast vägen visas.",
+  "Experimental feature": "Experimentell funktion"
 }

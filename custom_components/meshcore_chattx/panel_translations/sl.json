@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Vrnilo se je skozi omrežje po {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Vrnilo se je skozi omrežje po {minutes} min",
   "Saved for every browser": "Shranjeno za vse brskalnike",
-  "Failed to save the reply text": "Besedila odgovora ni bilo mogoče shraniti"
+  "Failed to save the reply text": "Besedila odgovora ni bilo mogoče shraniti",
+  "Show route on map": "Pokaži pot na zemljevidu",
+  "Hide map": "Skrij zemljevid",
+  "Path {n}": "Pot {n}",
+  "You": "Ti",
+  "Sender": "Pošiljatelj",
+  "Route on the map": "Pot na zemljevidu",
+  "No repeater on this path has a known position.": "Noben repeater na tej poti nima znanega položaja.",
+  "no known position": "položaj neznan",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Več repeaterjev ima to predpono; prikazan je tisti, ki je najbližje poti.",
+  "Experimental feature": "Preizkusna funkcija"
 }

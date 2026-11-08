@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Palasi meshin kautta {minutes} min jälkeen, {hops} hops",
   "Came back through the mesh after {minutes} min": "Palasi meshin kautta {minutes} min jälkeen",
   "Saved for every browser": "Tallennettu kaikille selaimille",
-  "Failed to save the reply text": "Vastaustekstin tallennus epäonnistui"
+  "Failed to save the reply text": "Vastaustekstin tallennus epäonnistui",
+  "Show route on map": "Näytä reitti kartalla",
+  "Hide map": "Piilota kartta",
+  "Path {n}": "Reitti {n}",
+  "You": "Sinä",
+  "Sender": "Lähettäjä",
+  "Route on the map": "Reitti kartalla",
+  "No repeater on this path has a known position.": "Yhdenkään tämän reitin repeaterin sijainti ei ole tiedossa.",
+  "no known position": "sijainti tuntematon",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Usealla repeaterilla on sama etuliite; reittiä lähin näytetään.",
+  "Experimental feature": "Kokeellinen ominaisuus"
 }

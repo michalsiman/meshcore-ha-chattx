@@ -580,5 +580,15 @@
   "Came back through the mesh after {minutes} min, {hops} hops": "Kom tilbage gennem meshen efter {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Kom tilbage gennem meshen efter {minutes} min",
   "Saved for every browser": "Gemt for alle browsere",
-  "Failed to save the reply text": "Svarteksten kunne ikke gemmes"
+  "Failed to save the reply text": "Svarteksten kunne ikke gemmes",
+  "Show route on map": "Vis ruten på kort",
+  "Hide map": "Skjul kort",
+  "Path {n}": "Rute {n}",
+  "You": "Dig",
+  "Sender": "Afsender",
+  "Route on the map": "Rute på kort",
+  "No repeater on this path has a known position.": "Ingen repeater på denne rute har en kendt position.",
+  "no known position": "ukendt position",
+  "(?) Several repeaters share this prefix; the one nearest to the route is shown.": "(?) Flere repeaters deler dette præfiks; den nærmeste ruten vises.",
+  "Experimental feature": "Eksperimentel funktion"
 }

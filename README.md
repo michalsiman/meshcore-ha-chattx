@@ -75,6 +75,7 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 **Messages**
 
 - Hop count and path size on received messages, for example `3 hops (2B)`
+- Experimental: the route of a message on a map, with the repeaters it went through
 
 **Phones**
 
