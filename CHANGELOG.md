@@ -4,6 +4,18 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-11-09
+
+### Added
+
+- The contact details show the contact's full public key with a Copy button, for example to block it.
+- The message details show the sender's name and public key; a tap copies the key. A channel message carries only the name, so the key is looked up among the contacts by name (all of them when several share it).
+
+### Fixed
+
+- The Map and Blocked contacts cards in Settings were as tall as the screen, leaving large gaps between the cards.
+- The country list of the offline map has a frame, an always visible scrollbar and a count, so it is clear that it scrolls.
+
 ## [0.13.0] - 2026-11-09
 
 ### Added
