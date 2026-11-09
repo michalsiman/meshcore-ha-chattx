@@ -4,6 +4,16 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-09
+
+### Added
+
+- Simplified offline map for the route map and the nodes map. When the online map can't be loaded, for example without internet, the maps switch to a plain map drawn by the panel itself: borders of countries and regions, towns with their local names (more of them as you zoom in) and named peaks with their height. Settings → Map downloads it once per chosen country (Czechia and its neighbours are offered first; about 1 MB together) and Home Assistant keeps it, so it then works without internet. A switch there shows only the simplified map even with internet (per browser). The data is built by `tools/build_offline_maps.py` into `offline_maps/` from geoBoundaries and GeoNames (both CC BY 4.0). All languages are translated.
+
+### Fixed
+
+- The route map and the nodes map showed "403 Access blocked" instead of the map on some devices, because openstreetmap.org refused their tile requests. Both maps now load the OpenStreetMap tiles through Home Assistant's own tile proxy (`/api/map_tiles`, Home Assistant 2026.11 or newer), the same way Home Assistant's own maps do. Older Home Assistant versions still load them from openstreetmap.org.
+
 ## [0.11.0] - 2026-11-09
 
 ### Added
