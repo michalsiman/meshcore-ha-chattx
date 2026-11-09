@@ -4,6 +4,28 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-09
+
+### Added
+
+- Blocked contacts (Settings): messages from the senders listed there are neither shown nor stored, in channels and direct messages, and don't count as unread. A sender is added by choosing a contact or entering its public key, whatever its name. Direct messages are matched by key; channel messages carry only the sender's name, so every name the key has gone by is matched, and a blocked contact that renames itself stays blocked once its new advert is heard. Messages stored before blocking are hidden too.
+
+- Offline map for the whole world: the borders and capitals of every country always come with it (about 330 kB), and any of 247 countries can be added in detail (regions, towns in the country's own language, peaks; most countries 20–300 kB, the largest about 1 MB). Settings → Map suggests Home Assistant's country and its neighbours, has a search, and names the countries in the panel's language. The data now lives on the repository's `offline-maps` branch, rebuilt by `tools/build_offline_maps.py`.
+- The route map in the message dialog can be dragged and zoomed: one finger or the mouse moves it, two fingers or the mouse wheel zoom, and the +, − and ⤢ buttons zoom or return to the whole route.
+- Distances in the message dialog: the route line ends with the straight-line distance and the route's length, so they show without opening the map, and the repeater list under the map shows each repeater's leg from the previous one, with both totals below.
+- Distance unit: kilometres or miles, by default following Home Assistant's unit system; Settings → Map can choose one per browser. Used for every distance in the panel and in the quick reply.
+- The quick reply in the message dialog can include distances: {km} becomes the straight-line distance between the first and the last repeater and {route} the length of the route through all repeaters (for example "Heard, {hops}, {km}!"), or "? km" when a repeater's position is unknown. Set the text in Settings → Quick reply.
+- Received messages show the straight-line distance between the first and the last repeater of their path, and in brackets the length of the route through all repeaters, for example "↔ 241 km (∑ 530 km)", when the repeaters' positions are known. "~" marks a value that is approximate, because a repeater prefix is shared or a repeater has no position.
+
+### Changed
+
+- A message that its sender sent again within 5 minutes (the same text, as a new packet, which some clients do when they don't hear it repeated) is shown once, with "×2" by its time; the message details list each repeat with its delay and path. Repeats stored earlier are merged when a conversation is opened.
+
+### Fixed
+
+- Downloading the offline map failed with a JSON error, because only the first part of each file was read.
+- The close button of the message dialog stays at the right edge when the route map widens the dialog.
+
 ## [0.12.0] - 2026-11-09
 
 ### Added

@@ -1,6 +1,6 @@
 {
   "name": "meshcore-chattx-panel",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "private": true,
   "description": "MeshCore sidebar panel for Home Assistant",
   "scripts": {
