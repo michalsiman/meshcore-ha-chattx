@@ -80,6 +80,7 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - Hop count and path size on received messages, for example `3 hops (2B)`
 - Experimental: the route of a message on a map, with the repeaters it went through
 - Experimental: all nodes with a known position on a map in the Nodes tab, with clusters, zoom and node details
+- A simplified offline map (borders, regions, towns, peaks) for both maps when there is no internet, downloaded once per country in Settings → Map
 
 **Phones**
 

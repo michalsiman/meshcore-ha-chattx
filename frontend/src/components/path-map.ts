@@ -3,6 +3,8 @@ import { LitElement, html, css, svg, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { ChatMessage, HomeAssistant } from '../types';
 import { getDeviceConfig } from '../api';
+import { MapTilesController } from '../utils/map-tiles';
+import { offlineMapLayer, offlineMapStyles } from '../utils/offline-map';
 import {
   TILE_SIZE,
   fitZoom,
@@ -67,8 +69,9 @@ export class PathMap extends LitElement {
   @state() private _me: { lat: number; lon: number } | null = null;
   @state() private _meLoaded = false;
   @state() private _pathIndex = 0;
+  private _tiles = new MapTilesController(this, () => this.hass);
 
-  static styles = css`
+  static styles = [offlineMapStyles, css`
     :host {
       display: block;
     }
@@ -128,7 +131,7 @@ export class PathMap extends LitElement {
       font: 9px sans-serif;
       fill: #333;
     }
-  `;
+  `];
 
   connectedCallback() {
     super.connectedCallback();
@@ -181,12 +184,18 @@ export class PathMap extends LitElement {
     const top = cy - HEIGHT / 2;
     const tiles = [];
     const n = 2 ** zoom;
-    for (let tx = Math.floor(left / TILE_SIZE); tx <= Math.floor((left + WIDTH) / TILE_SIZE); tx++) {
-      for (let ty = Math.floor(top / TILE_SIZE); ty <= Math.floor((top + HEIGHT) / TILE_SIZE); ty++) {
-        if (ty < 0 || ty >= n) continue;
-        const wx = ((tx % n) + n) % n;
-        tiles.push(svg`<image href=${`https://tile.openstreetmap.org/${zoom}/${wx}/${ty}.png`}
-          x=${tx * TILE_SIZE - left} y=${ty * TILE_SIZE - top} width=${TILE_SIZE} height=${TILE_SIZE} />`);
+    const offline = this._tiles.offline;
+    if (offline) {
+      tiles.push(offlineMapLayer(this._tiles.offlineMap, zoom, left, top, WIDTH, HEIGHT));
+    } else {
+      for (let tx = Math.floor(left / TILE_SIZE); tx <= Math.floor((left + WIDTH) / TILE_SIZE); tx++) {
+        for (let ty = Math.floor(top / TILE_SIZE); ty <= Math.floor((top + HEIGHT) / TILE_SIZE); ty++) {
+          if (ty < 0 || ty >= n) continue;
+          const wx = ((tx % n) + n) % n;
+          if (!this._tiles.ready) continue;
+          tiles.push(svg`<image href=${this._tiles.url(zoom, wx, ty)} @error=${this._tiles.tileError} @load=${this._tiles.tileLoad}
+            x=${tx * TILE_SIZE - left} y=${ty * TILE_SIZE - top} width=${TILE_SIZE} height=${TILE_SIZE} />`);
+        }
       }
     }
     const at = (p: { lat: number; lon: number }) => {
@@ -230,8 +239,11 @@ export class PathMap extends LitElement {
       ${tiles}
       ${segments}
       ${markers}
-      <text class="attribution" x=${WIDTH - 4} y=${HEIGHT - 4} text-anchor="end">© OpenStreetMap</text>
-    </svg>`;
+      <text class="attribution" x=${WIDTH - 4} y=${HEIGHT - 4} text-anchor="end">${offline ? '© geoBoundaries, GeoNames' : '© OpenStreetMap'}</text>
+    </svg>
+    ${offline && this._tiles.offlineLoaded && !this._tiles.offlineMap
+      ? html`<div class="note">${t('No offline map downloaded. Download it in Settings → Map.')}</div>`
+      : nothing}`;
   }
 
   private _renderList(route: RoutePoint[]) {

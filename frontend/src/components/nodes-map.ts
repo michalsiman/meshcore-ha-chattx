@@ -1,7 +1,9 @@
 import { t } from '../i18n';
 import { LitElement, html, css, svg, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { Contact } from '../types';
+import type { Contact, HomeAssistant } from '../types';
+import { MapTilesController } from '../utils/map-tiles';
+import { offlineMapLayer, offlineMapStyles } from '../utils/offline-map';
 import { TILE_SIZE, fitZoom, project } from '../utils/path-route';
 
 const MIN_ZOOM = 2;
@@ -41,6 +43,9 @@ export class NodesMap extends LitElement {
   @property({ attribute: false }) nodes: Contact[] = [];
   @property({ attribute: false }) home: { lat: number; lon: number } | null = null;
   @property({ type: Boolean }) loading = false;
+  /** Only the first hass is used (for the tile token), so state changes don't redraw the map. */
+  @property({ attribute: false, hasChanged: (value: unknown, old: unknown) => !old && !!value }) hass?: HomeAssistant;
+  private _tiles = new MapTilesController(this, () => this.hass);
 
   @state() private _zoom = 7;
   /** Centre of the view in world pixels at the current zoom. */
@@ -60,7 +65,7 @@ export class NodesMap extends LitElement {
   /** Marker under the first finger or the mouse when pressed. */
   private _downMarker: string | null = null;
 
-  static styles = css`
+  static styles = [offlineMapStyles, css`
     :host {
       display: flex;
       flex-direction: column;
@@ -139,7 +144,20 @@ export class NodesMap extends LitElement {
       font: 9px sans-serif;
       fill: #333;
     }
-  `;
+    .offline-note {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      max-width: calc(100% - 70px);
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--card-background-color, #fff);
+      color: var(--secondary-text-color);
+      font-size: 11px;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+  `];
 
   firstUpdated() {
     const wrap = this.renderRoot.querySelector('.wrap') as HTMLElement;
@@ -290,12 +308,18 @@ export class NodesMap extends LitElement {
     const top = this._cy - this._h / 2;
     const n = 2 ** z;
     const tiles = [];
-    for (let tx = Math.floor(left / TILE_SIZE); tx <= Math.floor((left + this._w) / TILE_SIZE); tx++) {
-      for (let ty = Math.floor(top / TILE_SIZE); ty <= Math.floor((top + this._h) / TILE_SIZE); ty++) {
-        if (ty < 0 || ty >= n) continue;
-        const wx = ((tx % n) + n) % n;
-        tiles.push(svg`<image href=${`https://tile.openstreetmap.org/${z}/${wx}/${ty}.png`}
-          x=${tx * TILE_SIZE - left} y=${ty * TILE_SIZE - top} width=${TILE_SIZE} height=${TILE_SIZE} />`);
+    const offline = this._tiles.offline;
+    if (offline) {
+      tiles.push(offlineMapLayer(this._tiles.offlineMap, z, left, top, this._w, this._h));
+    } else {
+      for (let tx = Math.floor(left / TILE_SIZE); tx <= Math.floor((left + this._w) / TILE_SIZE); tx++) {
+        for (let ty = Math.floor(top / TILE_SIZE); ty <= Math.floor((top + this._h) / TILE_SIZE); ty++) {
+          if (ty < 0 || ty >= n) continue;
+          const wx = ((tx % n) + n) % n;
+          if (!this._tiles.ready) continue;
+          tiles.push(svg`<image href=${this._tiles.url(z, wx, ty)} @error=${this._tiles.tileError} @load=${this._tiles.tileLoad}
+            x=${tx * TILE_SIZE - left} y=${ty * TILE_SIZE - top} width=${TILE_SIZE} height=${TILE_SIZE} />`);
+        }
       }
     }
     // Cluster markers on a screen grid; only what is in view.
@@ -351,8 +375,11 @@ export class NodesMap extends LitElement {
           ${tiles}
           ${markers}
           ${homeMarker}
-          <text class="attribution" x=${this._w - 4} y=${this._h - 4} text-anchor="end">© OpenStreetMap</text>
+          <text class="attribution" x=${this._w - 4} y=${this._h - 4} text-anchor="end">${offline ? '© geoBoundaries, GeoNames' : '© OpenStreetMap'}</text>
         </svg>
+        ${offline ? html`<div class="offline-note">${this._tiles.offlineLoaded && !this._tiles.offlineMap
+          ? t('No offline map downloaded. Download it in Settings → Map.')
+          : t('Offline map')}</div>` : nothing}
         <div class="controls" @pointerdown=${(e: Event) => e.stopPropagation()}>
           <button aria-label=${t('Zoom in')} @click=${() => this._zoomAt(this._zoom + 1)}>+</button>
           <button aria-label=${t('Zoom out')} @click=${() => this._zoomAt(this._zoom - 1)}>−</button>

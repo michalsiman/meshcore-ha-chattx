@@ -536,7 +536,7 @@ export class NodesPage extends LitElement {
         <!-- Content area -->
         <div class=${this._view === 'map' ? 'content-area map' : 'content-area'}>
           ${this._view === 'map'
-            ? html`<chattx-nodes-map .nodes=${this._mapContacts} .home=${this._home} ?loading=${this._mapLoading}
+            ? html`<chattx-nodes-map .hass=${this.hass} .nodes=${this._mapContacts} .home=${this._home} ?loading=${this._mapLoading}
                 @node-selected=${(e: CustomEvent<{ node: Contact }>) => this._openNodeDetail(e.detail.node)}></chattx-nodes-map>`
             : this._renderContactsContent()}
         </div>

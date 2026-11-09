@@ -37,6 +37,7 @@ from .const import (
     MESHCORE_DOMAIN,
 )
 from .message_store import MessageStore
+from .offline_map import async_register_offline_map_commands
 from .sensor import SIGNAL_TOTAL_EXCLUSIONS_CHANGED
 from .radio_compat import (
     cache_self_info,
@@ -430,6 +431,7 @@ def _get_channel_scopes(hass: HomeAssistant):
 
 def async_register_ws_commands(hass: HomeAssistant) -> None:
     """Register all MeshCore Chattx WebSocket commands."""
+    async_register_offline_map_commands(hass)
     # Device / contact / channel read commands
     websocket_api.async_register_command(hass, ws_get_devices)
     websocket_api.async_register_command(hass, ws_get_contacts)

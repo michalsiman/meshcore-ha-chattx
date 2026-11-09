@@ -20,6 +20,7 @@ import '../components/command-dialog';
 import '../components/sensor-tile';
 import '../components/node-summary';
 import '../components/quick-messages-editor';
+import '../components/offline-map-settings';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import type { CompanionDeviceDescriptor } from '../components/node-summary';
 import { modalFrameStyles, panelStyles } from '../styles';
@@ -846,6 +847,12 @@ export class SettingsPage extends LitElement {
                   <div class="form-description">${t('On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).')}</div>
                 </div>
               </div>
+            </div>
+
+            <!-- Simplified offline map for the route map and the nodes map -->
+            <div class="device-section">
+              <div class="card-title">${t('Map')}</div>
+              <chattx-offline-map-settings .hass=${this.hass}></chattx-offline-map-settings>
             </div>
 
             <!-- Quick messages for the chat composer -->
