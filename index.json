@@ -1,0 +1,2053 @@
+{
+ "v": 2,
+ "built": "2026-11-09",
+ "world": {
+  "size": 332989
+ },
+ "countries": {
+  "AD": {
+   "name": "Andorra",
+   "size": 3697,
+   "neighbours": [
+    "ES",
+    "FR"
+   ]
+  },
+  "AE": {
+   "name": "United Arab Emirates",
+   "size": 48705,
+   "neighbours": [
+    "SA",
+    "OM"
+   ]
+  },
+  "AF": {
+   "name": "Afghanistan",
+   "size": 130199,
+   "neighbours": [
+    "TM",
+    "CN",
+    "IR",
+    "TJ",
+    "PK",
+    "UZ"
+   ]
+  },
+  "AG": {
+   "name": "Antigua and Barbuda",
+   "size": 6079,
+   "neighbours": []
+  },
+  "AI": {
+   "name": "Anguilla",
+   "size": 2006,
+   "neighbours": []
+  },
+  "AL": {
+   "name": "Albania",
+   "size": 34870,
+   "neighbours": [
+    "MK",
+    "GR",
+    "ME",
+    "RS",
+    "XK"
+   ]
+  },
+  "AM": {
+   "name": "Armenia",
+   "size": 46247,
+   "neighbours": [
+    "GE",
+    "IR",
+    "AZ",
+    "TR"
+   ]
+  },
+  "AO": {
+   "name": "Angola",
+   "size": 149013,
+   "neighbours": [
+    "CD",
+    "NA",
+    "ZM",
+    "CG"
+   ]
+  },
+  "AQ": {
+   "name": "Antarctica",
+   "size": 112495,
+   "neighbours": []
+  },
+  "AR": {
+   "name": "Argentina",
+   "size": 185071,
+   "neighbours": [
+    "CL",
+    "BO",
+    "UY",
+    "PY",
+    "BR"
+   ]
+  },
+  "AS": {
+   "name": "American Samoa",
+   "size": 2589,
+   "neighbours": []
+  },
+  "AT": {
+   "name": "Austria",
+   "size": 149273,
+   "neighbours": [
+    "CH",
+    "DE",
+    "HU",
+    "SK",
+    "CZ",
+    "IT",
+    "SI",
+    "LI"
+   ]
+  },
+  "AU": {
+   "name": "Australia",
+   "size": 603510,
+   "neighbours": []
+  },
+  "AW": {
+   "name": "Aruba",
+   "size": 1044,
+   "neighbours": []
+  },
+  "AX": {
+   "name": "Aland Islands",
+   "size": 575,
+   "neighbours": []
+  },
+  "AZ": {
+   "name": "Azerbaijan",
+   "size": 139162,
+   "neighbours": [
+    "GE",
+    "IR",
+    "AM",
+    "TR",
+    "RU"
+   ]
+  },
+  "BA": {
+   "name": "Bosnia and Herzegovina",
+   "size": 60401,
+   "neighbours": [
+    "HR",
+    "ME",
+    "RS"
+   ]
+  },
+  "BB": {
+   "name": "Barbados",
+   "size": 2378,
+   "neighbours": []
+  },
+  "BD": {
+   "name": "Bangladesh",
+   "size": 32618,
+   "neighbours": [
+    "MM",
+    "IN"
+   ]
+  },
+  "BE": {
+   "name": "Belgium",
+   "size": 59155,
+   "neighbours": [
+    "DE",
+    "NL",
+    "LU",
+    "FR"
+   ]
+  },
+  "BF": {
+   "name": "Burkina Faso",
+   "size": 61181,
+   "neighbours": [
+    "NE",
+    "BJ",
+    "GH",
+    "CI",
+    "TG",
+    "ML"
+   ]
+  },
+  "BG": {
+   "name": "Bulgaria",
+   "size": 74509,
+   "neighbours": [
+    "MK",
+    "GR",
+    "RO",
+    "TR",
+    "RS"
+   ]
+  },
+  "BH": {
+   "name": "Bahrain",
+   "size": 13338,
+   "neighbours": []
+  },
+  "BI": {
+   "name": "Burundi",
+   "size": 27715,
+   "neighbours": [
+    "TZ",
+    "CD",
+    "RW"
+   ]
+  },
+  "BJ": {
+   "name": "Benin",
+   "size": 15308,
+   "neighbours": [
+    "NE",
+    "TG",
+    "BF",
+    "NG"
+   ]
+  },
+  "BL": {
+   "name": "Saint Barthelemy",
+   "size": 769,
+   "neighbours": []
+  },
+  "BM": {
+   "name": "Bermuda",
+   "size": 2240,
+   "neighbours": []
+  },
+  "BN": {
+   "name": "Brunei",
+   "size": 9097,
+   "neighbours": [
+    "MY"
+   ]
+  },
+  "BO": {
+   "name": "Bolivia",
+   "size": 236781,
+   "neighbours": [
+    "PE",
+    "CL",
+    "PY",
+    "BR",
+    "AR"
+   ]
+  },
+  "BQ": {
+   "name": "Bonaire, Saint Eustatius and Saba ",
+   "size": 2636,
+   "neighbours": []
+  },
+  "BR": {
+   "name": "Brazil",
+   "size": 539100,
+   "neighbours": [
+    "SR",
+    "PE",
+    "BO",
+    "UY",
+    "GY",
+    "PY",
+    "GF",
+    "VE",
+    "CO",
+    "AR"
+   ]
+  },
+  "BS": {
+   "name": "Bahamas",
+   "size": 115370,
+   "neighbours": []
+  },
+  "BT": {
+   "name": "Bhutan",
+   "size": 20437,
+   "neighbours": [
+    "CN",
+    "IN"
+   ]
+  },
+  "BW": {
+   "name": "Botswana",
+   "size": 47850,
+   "neighbours": [
+    "ZW",
+    "ZA",
+    "NA"
+   ]
+  },
+  "BY": {
+   "name": "Belarus",
+   "size": 53558,
+   "neighbours": [
+    "PL",
+    "LT",
+    "UA",
+    "RU",
+    "LV"
+   ]
+  },
+  "BZ": {
+   "name": "Belize",
+   "size": 23819,
+   "neighbours": [
+    "GT",
+    "MX"
+   ]
+  },
+  "CA": {
+   "name": "Canada",
+   "size": 642779,
+   "neighbours": [
+    "US"
+   ]
+  },
+  "CC": {
+   "name": "Cocos Islands",
+   "size": 214,
+   "neighbours": []
+  },
+  "CD": {
+   "name": "Democratic Republic of the Congo",
+   "size": 288788,
+   "neighbours": [
+    "TZ",
+    "CF",
+    "SS",
+    "RW",
+    "ZM",
+    "BI",
+    "UG",
+    "CG",
+    "AO"
+   ]
+  },
+  "CF": {
+   "name": "Central African Republic",
+   "size": 30775,
+   "neighbours": [
+    "TD",
+    "SD",
+    "CD",
+    "SS",
+    "CM",
+    "CG"
+   ]
+  },
+  "CG": {
+   "name": "Republic of the Congo",
+   "size": 60068,
+   "neighbours": [
+    "CF",
+    "GA",
+    "CD",
+    "CM",
+    "AO"
+   ]
+  },
+  "CH": {
+   "name": "Switzerland",
+   "size": 126578,
+   "neighbours": [
+    "DE",
+    "IT",
+    "LI",
+    "FR",
+    "AT"
+   ]
+  },
+  "CI": {
+   "name": "Ivory Coast",
+   "size": 194909,
+   "neighbours": [
+    "LR",
+    "GH",
+    "GN",
+    "BF",
+    "ML"
+   ]
+  },
+  "CK": {
+   "name": "Cook Islands",
+   "size": 2561,
+   "neighbours": []
+  },
+  "CL": {
+   "name": "Chile",
+   "size": 635042,
+   "neighbours": [
+    "PE",
+    "BO",
+    "AR"
+   ]
+  },
+  "CM": {
+   "name": "Cameroon",
+   "size": 52772,
+   "neighbours": [
+    "TD",
+    "CF",
+    "GA",
+    "GQ",
+    "CG",
+    "NG"
+   ]
+  },
+  "CN": {
+   "name": "China",
+   "size": 243545,
+   "neighbours": [
+    "LA",
+    "BT",
+    "TJ",
+    "KZ",
+    "MN",
+    "AF",
+    "NP",
+    "MM",
+    "KG",
+    "PK",
+    "KP",
+    "RU",
+    "VN",
+    "IN"
+   ]
+  },
+  "CO": {
+   "name": "Colombia",
+   "size": 295517,
+   "neighbours": [
+    "EC",
+    "PE",
+    "PA",
+    "BR",
+    "VE"
+   ]
+  },
+  "CR": {
+   "name": "Costa Rica",
+   "size": 59026,
+   "neighbours": [
+    "PA",
+    "NI"
+   ]
+  },
+  "CU": {
+   "name": "Cuba",
+   "size": 178781,
+   "neighbours": [
+    "US"
+   ]
+  },
+  "CV": {
+   "name": "Cabo Verde",
+   "size": 23988,
+   "neighbours": []
+  },
+  "CW": {
+   "name": "Curacao",
+   "size": 2713,
+   "neighbours": []
+  },
+  "CX": {
+   "name": "Christmas Island",
+   "size": 224,
+   "neighbours": []
+  },
+  "CY": {
+   "name": "Cyprus",
+   "size": 24099,
+   "neighbours": []
+  },
+  "CZ": {
+   "name": "Czechia",
+   "size": 161257,
+   "neighbours": [
+    "PL",
+    "DE",
+    "SK",
+    "AT"
+   ]
+  },
+  "DE": {
+   "name": "Germany",
+   "size": 491442,
+   "neighbours": [
+    "CH",
+    "PL",
+    "NL",
+    "DK",
+    "BE",
+    "CZ",
+    "LU",
+    "FR",
+    "AT"
+   ]
+  },
+  "DJ": {
+   "name": "Djibouti",
+   "size": 10677,
+   "neighbours": [
+    "ER",
+    "ET",
+    "SO"
+   ]
+  },
+  "DK": {
+   "name": "Denmark",
+   "size": 90887,
+   "neighbours": [
+    "DE"
+   ]
+  },
+  "DM": {
+   "name": "Dominica",
+   "size": 4667,
+   "neighbours": []
+  },
+  "DO": {
+   "name": "Dominican Republic",
+   "size": 45955,
+   "neighbours": [
+    "HT"
+   ]
+  },
+  "DZ": {
+   "name": "Algeria",
+   "size": 247670,
+   "neighbours": [
+    "NE",
+    "EH",
+    "LY",
+    "MR",
+    "TN",
+    "MA",
+    "ML"
+   ]
+  },
+  "EC": {
+   "name": "Ecuador",
+   "size": 91536,
+   "neighbours": [
+    "PE",
+    "CO"
+   ]
+  },
+  "EE": {
+   "name": "Estonia",
+   "size": 104561,
+   "neighbours": [
+    "RU",
+    "LV"
+   ]
+  },
+  "EG": {
+   "name": "Egypt",
+   "size": 102362,
+   "neighbours": [
+    "LY",
+    "SD",
+    "IL",
+    "PS"
+   ]
+  },
+  "EH": {
+   "name": "Western Sahara",
+   "size": 1066,
+   "neighbours": [
+    "DZ",
+    "MR",
+    "MA"
+   ]
+  },
+  "ER": {
+   "name": "Eritrea",
+   "size": 79882,
+   "neighbours": [
+    "ET",
+    "SD",
+    "DJ"
+   ]
+  },
+  "ES": {
+   "name": "Spain",
+   "size": 391641,
+   "neighbours": [
+    "AD",
+    "PT",
+    "GI",
+    "FR",
+    "MA"
+   ]
+  },
+  "ET": {
+   "name": "Ethiopia",
+   "size": 121346,
+   "neighbours": [
+    "ER",
+    "KE",
+    "SD",
+    "SS",
+    "SO",
+    "DJ"
+   ]
+  },
+  "FI": {
+   "name": "Finland",
+   "size": 405748,
+   "neighbours": [
+    "NO",
+    "RU",
+    "SE"
+   ]
+  },
+  "FJ": {
+   "name": "Fiji",
+   "size": 49160,
+   "neighbours": []
+  },
+  "FK": {
+   "name": "Falkland Islands",
+   "size": 94187,
+   "neighbours": []
+  },
+  "FM": {
+   "name": "Micronesia",
+   "size": 20749,
+   "neighbours": []
+  },
+  "FO": {
+   "name": "Faroe Islands",
+   "size": 12471,
+   "neighbours": []
+  },
+  "FR": {
+   "name": "France",
+   "size": 577811,
+   "neighbours": [
+    "CH",
+    "DE",
+    "BE",
+    "LU",
+    "IT",
+    "AD",
+    "MC",
+    "ES"
+   ]
+  },
+  "GA": {
+   "name": "Gabon",
+   "size": 27230,
+   "neighbours": [
+    "CM",
+    "GQ",
+    "CG"
+   ]
+  },
+  "GB": {
+   "name": "United Kingdom",
+   "size": 200994,
+   "neighbours": [
+    "IE"
+   ]
+  },
+  "GD": {
+   "name": "Grenada",
+   "size": 4608,
+   "neighbours": []
+  },
+  "GE": {
+   "name": "Georgia",
+   "size": 64666,
+   "neighbours": [
+    "AM",
+    "AZ",
+    "TR",
+    "RU"
+   ]
+  },
+  "GF": {
+   "name": "French Guiana",
+   "size": 77572,
+   "neighbours": [
+    "SR",
+    "BR"
+   ]
+  },
+  "GG": {
+   "name": "Guernsey",
+   "size": 1985,
+   "neighbours": []
+  },
+  "GH": {
+   "name": "Ghana",
+   "size": 65063,
+   "neighbours": [
+    "CI",
+    "TG",
+    "BF"
+   ]
+  },
+  "GI": {
+   "name": "Gibraltar",
+   "size": 442,
+   "neighbours": [
+    "ES"
+   ]
+  },
+  "GL": {
+   "name": "Greenland",
+   "size": 435896,
+   "neighbours": []
+  },
+  "GM": {
+   "name": "Gambia",
+   "size": 20065,
+   "neighbours": [
+    "SN"
+   ]
+  },
+  "GN": {
+   "name": "Guinea",
+   "size": 89669,
+   "neighbours": [
+    "LR",
+    "SN",
+    "SL",
+    "CI",
+    "GW",
+    "ML"
+   ]
+  },
+  "GP": {
+   "name": "Guadeloupe",
+   "size": 6064,
+   "neighbours": []
+  },
+  "GQ": {
+   "name": "Equatorial Guinea",
+   "size": 13588,
+   "neighbours": [
+    "GA",
+    "CM"
+   ]
+  },
+  "GR": {
+   "name": "Greece",
+   "size": 221462,
+   "neighbours": [
+    "AL",
+    "MK",
+    "TR",
+    "BG"
+   ]
+  },
+  "GS": {
+   "name": "South Georgia and the South Sandwich Islands",
+   "size": 2942,
+   "neighbours": []
+  },
+  "GT": {
+   "name": "Guatemala",
+   "size": 81853,
+   "neighbours": [
+    "MX",
+    "HN",
+    "BZ",
+    "SV"
+   ]
+  },
+  "GU": {
+   "name": "Guam",
+   "size": 2734,
+   "neighbours": []
+  },
+  "GW": {
+   "name": "Guinea-Bissau",
+   "size": 44869,
+   "neighbours": [
+    "SN",
+    "GN"
+   ]
+  },
+  "GY": {
+   "name": "Guyana",
+   "size": 41764,
+   "neighbours": [
+    "SR",
+    "BR",
+    "VE"
+   ]
+  },
+  "HK": {
+   "name": "Hong Kong",
+   "size": 1303,
+   "neighbours": []
+  },
+  "HN": {
+   "name": "Honduras",
+   "size": 121067,
+   "neighbours": [
+    "GT",
+    "NI",
+    "SV"
+   ]
+  },
+  "HR": {
+   "name": "Croatia",
+   "size": 190203,
+   "neighbours": [
+    "HU",
+    "SI",
+    "BA",
+    "ME",
+    "RS"
+   ]
+  },
+  "HT": {
+   "name": "Haiti",
+   "size": 57441,
+   "neighbours": [
+    "DO"
+   ]
+  },
+  "HU": {
+   "name": "Hungary",
+   "size": 73520,
+   "neighbours": [
+    "SK",
+    "SI",
+    "RO",
+    "UA",
+    "HR",
+    "AT",
+    "RS"
+   ]
+  },
+  "ID": {
+   "name": "Indonesia",
+   "size": 628313,
+   "neighbours": [
+    "PG",
+    "TL",
+    "MY"
+   ]
+  },
+  "IE": {
+   "name": "Ireland",
+   "size": 190581,
+   "neighbours": [
+    "GB"
+   ]
+  },
+  "IL": {
+   "name": "Israel",
+   "size": 32752,
+   "neighbours": [
+    "SY",
+    "JO",
+    "LB",
+    "EG",
+    "PS"
+   ]
+  },
+  "IM": {
+   "name": "Isle of Man",
+   "size": 2504,
+   "neighbours": []
+  },
+  "IN": {
+   "name": "India",
+   "size": 719568,
+   "neighbours": [
+    "CN",
+    "NP",
+    "MM",
+    "BT",
+    "PK",
+    "BD"
+   ]
+  },
+  "IO": {
+   "name": "British Indian Ocean Territory",
+   "size": 271,
+   "neighbours": []
+  },
+  "IQ": {
+   "name": "Iraq",
+   "size": 53998,
+   "neighbours": [
+    "SY",
+    "SA",
+    "IR",
+    "JO",
+    "TR",
+    "KW"
+   ]
+  },
+  "IR": {
+   "name": "Iran",
+   "size": 304127,
+   "neighbours": [
+    "TM",
+    "AF",
+    "IQ",
+    "AM",
+    "PK",
+    "AZ",
+    "TR"
+   ]
+  },
+  "IS": {
+   "name": "Iceland",
+   "size": 151971,
+   "neighbours": []
+  },
+  "IT": {
+   "name": "Italy",
+   "size": 472129,
+   "neighbours": [
+    "CH",
+    "VA",
+    "SI",
+    "SM",
+    "FR",
+    "AT"
+   ]
+  },
+  "JE": {
+   "name": "Jersey",
+   "size": 391,
+   "neighbours": []
+  },
+  "JM": {
+   "name": "Jamaica",
+   "size": 19037,
+   "neighbours": []
+  },
+  "JO": {
+   "name": "Jordan",
+   "size": 21510,
+   "neighbours": [
+    "SY",
+    "SA",
+    "IQ",
+    "IL",
+    "PS"
+   ]
+  },
+  "JP": {
+   "name": "Japan",
+   "size": 628051,
+   "neighbours": []
+  },
+  "KE": {
+   "name": "Kenya",
+   "size": 149200,
+   "neighbours": [
+    "ET",
+    "TZ",
+    "SS",
+    "SO",
+    "UG"
+   ]
+  },
+  "KG": {
+   "name": "Kyrgyzstan",
+   "size": 90119,
+   "neighbours": [
+    "CN",
+    "TJ",
+    "UZ",
+    "KZ"
+   ]
+  },
+  "KH": {
+   "name": "Cambodia",
+   "size": 107699,
+   "neighbours": [
+    "LA",
+    "TH",
+    "VN"
+   ]
+  },
+  "KI": {
+   "name": "Kiribati",
+   "size": 19562,
+   "neighbours": []
+  },
+  "KM": {
+   "name": "Comoros",
+   "size": 10341,
+   "neighbours": []
+  },
+  "KN": {
+   "name": "Saint Kitts and Nevis",
+   "size": 3623,
+   "neighbours": []
+  },
+  "KP": {
+   "name": "North Korea",
+   "size": 129888,
+   "neighbours": [
+    "CN",
+    "KR",
+    "RU"
+   ]
+  },
+  "KR": {
+   "name": "South Korea",
+   "size": 98508,
+   "neighbours": [
+    "KP"
+   ]
+  },
+  "XK": {
+   "name": "Kosovo",
+   "size": 29486,
+   "neighbours": [
+    "RS",
+    "AL",
+    "MK",
+    "ME"
+   ]
+  },
+  "KW": {
+   "name": "Kuwait",
+   "size": 16560,
+   "neighbours": [
+    "SA",
+    "IQ"
+   ]
+  },
+  "KY": {
+   "name": "Cayman Islands",
+   "size": 4986,
+   "neighbours": []
+  },
+  "KZ": {
+   "name": "Kazakhstan",
+   "size": 237165,
+   "neighbours": [
+    "TM",
+    "CN",
+    "KG",
+    "UZ",
+    "RU"
+   ]
+  },
+  "LA": {
+   "name": "Laos",
+   "size": 150285,
+   "neighbours": [
+    "CN",
+    "MM",
+    "KH",
+    "TH",
+    "VN"
+   ]
+  },
+  "LB": {
+   "name": "Lebanon",
+   "size": 21212,
+   "neighbours": [
+    "SY",
+    "IL"
+   ]
+  },
+  "LC": {
+   "name": "Saint Lucia",
+   "size": 5921,
+   "neighbours": []
+  },
+  "LI": {
+   "name": "Liechtenstein",
+   "size": 4612,
+   "neighbours": [
+    "CH",
+    "AT"
+   ]
+  },
+  "LK": {
+   "name": "Sri Lanka",
+   "size": 53691,
+   "neighbours": []
+  },
+  "LR": {
+   "name": "Liberia",
+   "size": 53199,
+   "neighbours": [
+    "SL",
+    "CI",
+    "GN"
+   ]
+  },
+  "LS": {
+   "name": "Lesotho",
+   "size": 45925,
+   "neighbours": [
+    "ZA"
+   ]
+  },
+  "LT": {
+   "name": "Lithuania",
+   "size": 64533,
+   "neighbours": [
+    "PL",
+    "BY",
+    "RU",
+    "LV"
+   ]
+  },
+  "LU": {
+   "name": "Luxembourg",
+   "size": 18598,
+   "neighbours": [
+    "DE",
+    "BE",
+    "FR"
+   ]
+  },
+  "LV": {
+   "name": "Latvia",
+   "size": 100469,
+   "neighbours": [
+    "LT",
+    "EE",
+    "BY",
+    "RU"
+   ]
+  },
+  "LY": {
+   "name": "Libya",
+   "size": 27083,
+   "neighbours": [
+    "TD",
+    "NE",
+    "DZ",
+    "SD",
+    "TN",
+    "EG"
+   ]
+  },
+  "MA": {
+   "name": "Morocco",
+   "size": 176153,
+   "neighbours": [
+    "DZ",
+    "EH",
+    "ES"
+   ]
+  },
+  "MC": {
+   "name": "Monaco",
+   "size": 462,
+   "neighbours": [
+    "FR"
+   ]
+  },
+  "MD": {
+   "name": "Moldova",
+   "size": 61659,
+   "neighbours": [
+    "RO",
+    "UA"
+   ]
+  },
+  "ME": {
+   "name": "Montenegro",
+   "size": 32108,
+   "neighbours": [
+    "AL",
+    "HR",
+    "BA",
+    "RS",
+    "XK"
+   ]
+  },
+  "MF": {
+   "name": "Saint Martin",
+   "size": 593,
+   "neighbours": [
+    "SX"
+   ]
+  },
+  "MG": {
+   "name": "Madagascar",
+   "size": 240501,
+   "neighbours": []
+  },
+  "MH": {
+   "name": "Marshall Islands",
+   "size": 13582,
+   "neighbours": []
+  },
+  "MK": {
+   "name": "North Macedonia",
+   "size": 44599,
+   "neighbours": [
+    "AL",
+    "GR",
+    "BG",
+    "RS",
+    "XK"
+   ]
+  },
+  "ML": {
+   "name": "Mali",
+   "size": 66774,
+   "neighbours": [
+    "SN",
+    "NE",
+    "DZ",
+    "CI",
+    "GN",
+    "MR",
+    "BF"
+   ]
+  },
+  "MM": {
+   "name": "Myanmar",
+   "size": 390714,
+   "neighbours": [
+    "CN",
+    "LA",
+    "TH",
+    "BD",
+    "IN"
+   ]
+  },
+  "MN": {
+   "name": "Mongolia",
+   "size": 136916,
+   "neighbours": [
+    "CN",
+    "RU"
+   ]
+  },
+  "MO": {
+   "name": "Macao",
+   "size": 239,
+   "neighbours": []
+  },
+  "MP": {
+   "name": "Northern Mariana Islands",
+   "size": 2159,
+   "neighbours": []
+  },
+  "MQ": {
+   "name": "Martinique",
+   "size": 5601,
+   "neighbours": []
+  },
+  "MR": {
+   "name": "Mauritania",
+   "size": 35248,
+   "neighbours": [
+    "SN",
+    "DZ",
+    "EH",
+    "ML"
+   ]
+  },
+  "MS": {
+   "name": "Montserrat",
+   "size": 630,
+   "neighbours": []
+  },
+  "MT": {
+   "name": "Malta",
+   "size": 10797,
+   "neighbours": []
+  },
+  "MU": {
+   "name": "Mauritius",
+   "size": 15226,
+   "neighbours": []
+  },
+  "MV": {
+   "name": "Maldives",
+   "size": 22809,
+   "neighbours": []
+  },
+  "MW": {
+   "name": "Malawi",
+   "size": 54936,
+   "neighbours": [
+    "TZ",
+    "MZ",
+    "ZM"
+   ]
+  },
+  "MX": {
+   "name": "Mexico",
+   "size": 760952,
+   "neighbours": [
+    "GT",
+    "US",
+    "BZ"
+   ]
+  },
+  "MY": {
+   "name": "Malaysia",
+   "size": 209897,
+   "neighbours": [
+    "BN",
+    "TH",
+    "ID"
+   ]
+  },
+  "MZ": {
+   "name": "Mozambique",
+   "size": 141027,
+   "neighbours": [
+    "ZW",
+    "TZ",
+    "SZ",
+    "ZA",
+    "ZM",
+    "MW"
+   ]
+  },
+  "NA": {
+   "name": "Namibia",
+   "size": 51813,
+   "neighbours": [
+    "ZA",
+    "BW",
+    "ZM",
+    "AO"
+   ]
+  },
+  "NC": {
+   "name": "New Caledonia",
+   "size": 60400,
+   "neighbours": []
+  },
+  "NE": {
+   "name": "Niger",
+   "size": 30120,
+   "neighbours": [
+    "TD",
+    "BJ",
+    "DZ",
+    "LY",
+    "BF",
+    "NG",
+    "ML"
+   ]
+  },
+  "NF": {
+   "name": "Norfolk Island",
+   "size": 248,
+   "neighbours": []
+  },
+  "NG": {
+   "name": "Nigeria",
+   "size": 150373,
+   "neighbours": [
+    "TD",
+    "NE",
+    "BJ",
+    "CM"
+   ]
+  },
+  "NI": {
+   "name": "Nicaragua",
+   "size": 69215,
+   "neighbours": [
+    "CR",
+    "HN"
+   ]
+  },
+  "NL": {
+   "name": "The Netherlands",
+   "size": 70123,
+   "neighbours": [
+    "DE",
+    "BE"
+   ]
+  },
+  "NO": {
+   "name": "Norway",
+   "size": 585524,
+   "neighbours": [
+    "FI",
+    "RU",
+    "SE"
+   ]
+  },
+  "NP": {
+   "name": "Nepal",
+   "size": 91281,
+   "neighbours": [
+    "CN",
+    "IN"
+   ]
+  },
+  "NR": {
+   "name": "Nauru",
+   "size": 1530,
+   "neighbours": []
+  },
+  "NU": {
+   "name": "Niue",
+   "size": 2046,
+   "neighbours": []
+  },
+  "NZ": {
+   "name": "New Zealand",
+   "size": 376913,
+   "neighbours": []
+  },
+  "OM": {
+   "name": "Oman",
+   "size": 56493,
+   "neighbours": [
+    "SA",
+    "YE",
+    "AE"
+   ]
+  },
+  "PA": {
+   "name": "Panama",
+   "size": 114154,
+   "neighbours": [
+    "CR",
+    "CO"
+   ]
+  },
+  "PE": {
+   "name": "Peru",
+   "size": 150218,
+   "neighbours": [
+    "EC",
+    "CL",
+    "BO",
+    "BR",
+    "CO"
+   ]
+  },
+  "PF": {
+   "name": "French Polynesia",
+   "size": 75845,
+   "neighbours": []
+  },
+  "PG": {
+   "name": "Papua New Guinea",
+   "size": 308628,
+   "neighbours": [
+    "ID"
+   ]
+  },
+  "PH": {
+   "name": "Philippines",
+   "size": 614345,
+   "neighbours": []
+  },
+  "PK": {
+   "name": "Pakistan",
+   "size": 173996,
+   "neighbours": [
+    "CN",
+    "AF",
+    "IR",
+    "IN"
+   ]
+  },
+  "PL": {
+   "name": "Poland",
+   "size": 232044,
+   "neighbours": [
+    "DE",
+    "LT",
+    "SK",
+    "CZ",
+    "BY",
+    "UA",
+    "RU"
+   ]
+  },
+  "PM": {
+   "name": "Saint Pierre and Miquelon",
+   "size": 308,
+   "neighbours": []
+  },
+  "PN": {
+   "name": "Pitcairn",
+   "size": 345,
+   "neighbours": []
+  },
+  "PR": {
+   "name": "Puerto Rico",
+   "size": 12297,
+   "neighbours": []
+  },
+  "PS": {
+   "name": "Palestinian Territory",
+   "size": 22412,
+   "neighbours": [
+    "JO",
+    "IL",
+    "EG"
+   ]
+  },
+  "PT": {
+   "name": "Portugal",
+   "size": 136221,
+   "neighbours": [
+    "ES"
+   ]
+  },
+  "PW": {
+   "name": "Palau",
+   "size": 12124,
+   "neighbours": []
+  },
+  "PY": {
+   "name": "Paraguay",
+   "size": 115785,
+   "neighbours": [
+    "BO",
+    "BR",
+    "AR"
+   ]
+  },
+  "QA": {
+   "name": "Qatar",
+   "size": 20695,
+   "neighbours": [
+    "SA"
+   ]
+  },
+  "RE": {
+   "name": "Reunion",
+   "size": 4494,
+   "neighbours": []
+  },
+  "RO": {
+   "name": "Romania",
+   "size": 342328,
+   "neighbours": [
+    "MD",
+    "HU",
+    "UA",
+    "BG",
+    "RS"
+   ]
+  },
+  "RS": {
+   "name": "Serbia",
+   "size": 110485,
+   "neighbours": [
+    "AL",
+    "HU",
+    "MK",
+    "RO",
+    "HR",
+    "BA",
+    "BG",
+    "ME",
+    "XK"
+   ]
+  },
+  "RU": {
+   "name": "Russia",
+   "size": 827639,
+   "neighbours": [
+    "GE",
+    "CN",
+    "BY",
+    "UA",
+    "KZ",
+    "LV",
+    "PL",
+    "EE",
+    "LT",
+    "FI",
+    "MN",
+    "NO",
+    "AZ",
+    "KP"
+   ]
+  },
+  "RW": {
+   "name": "Rwanda",
+   "size": 48895,
+   "neighbours": [
+    "TZ",
+    "CD",
+    "BI",
+    "UG"
+   ]
+  },
+  "SA": {
+   "name": "Saudi Arabia",
+   "size": 169007,
+   "neighbours": [
+    "QA",
+    "OM",
+    "IQ",
+    "YE",
+    "JO",
+    "AE",
+    "KW"
+   ]
+  },
+  "SB": {
+   "name": "Solomon Islands",
+   "size": 33968,
+   "neighbours": []
+  },
+  "SC": {
+   "name": "Seychelles",
+   "size": 14770,
+   "neighbours": []
+  },
+  "SD": {
+   "name": "Sudan",
+   "size": 99680,
+   "neighbours": [
+    "SS",
+    "TD",
+    "EG",
+    "ET",
+    "ER",
+    "LY",
+    "CF"
+   ]
+  },
+  "SS": {
+   "name": "South Sudan",
+   "size": 61134,
+   "neighbours": [
+    "CD",
+    "CF",
+    "ET",
+    "KE",
+    "SD",
+    "UG"
+   ]
+  },
+  "SE": {
+   "name": "Sweden",
+   "size": 281015,
+   "neighbours": [
+    "NO",
+    "FI"
+   ]
+  },
+  "SG": {
+   "name": "Singapore",
+   "size": 7993,
+   "neighbours": []
+  },
+  "SH": {
+   "name": "Saint Helena",
+   "size": 2528,
+   "neighbours": []
+  },
+  "SI": {
+   "name": "Slovenia",
+   "size": 22297,
+   "neighbours": [
+    "HU",
+    "IT",
+    "HR",
+    "AT"
+   ]
+  },
+  "SJ": {
+   "name": "Svalbard and Jan Mayen",
+   "size": 28854,
+   "neighbours": []
+  },
+  "SK": {
+   "name": "Slovakia",
+   "size": 87589,
+   "neighbours": [
+    "PL",
+    "HU",
+    "CZ",
+    "UA",
+    "AT"
+   ]
+  },
+  "SL": {
+   "name": "Sierra Leone",
+   "size": 41854,
+   "neighbours": [
+    "LR",
+    "GN"
+   ]
+  },
+  "SM": {
+   "name": "San Marino",
+   "size": 2118,
+   "neighbours": [
+    "IT"
+   ]
+  },
+  "SN": {
+   "name": "Senegal",
+   "size": 45149,
+   "neighbours": [
+    "GN",
+    "MR",
+    "GW",
+    "GM",
+    "ML"
+   ]
+  },
+  "SO": {
+   "name": "Somalia",
+   "size": 44565,
+   "neighbours": [
+    "ET",
+    "KE",
+    "DJ"
+   ]
+  },
+  "SR": {
+   "name": "Suriname",
+   "size": 28761,
+   "neighbours": [
+    "GY",
+    "BR",
+    "GF"
+   ]
+  },
+  "ST": {
+   "name": "Sao Tome and Principe",
+   "size": 5641,
+   "neighbours": []
+  },
+  "SV": {
+   "name": "El Salvador",
+   "size": 33787,
+   "neighbours": [
+    "GT",
+    "HN"
+   ]
+  },
+  "SX": {
+   "name": "Sint Maarten",
+   "size": 496,
+   "neighbours": [
+    "MF"
+   ]
+  },
+  "SY": {
+   "name": "Syria",
+   "size": 61081,
+   "neighbours": [
+    "IQ",
+    "JO",
+    "IL",
+    "TR",
+    "LB"
+   ]
+  },
+  "SZ": {
+   "name": "Eswatini",
+   "size": 11298,
+   "neighbours": [
+    "ZA",
+    "MZ"
+   ]
+  },
+  "TC": {
+   "name": "Turks and Caicos Islands",
+   "size": 20694,
+   "neighbours": []
+  },
+  "TD": {
+   "name": "Chad",
+   "size": 54002,
+   "neighbours": [
+    "NE",
+    "LY",
+    "CF",
+    "SD",
+    "CM",
+    "NG"
+   ]
+  },
+  "TF": {
+   "name": "French Southern Territories",
+   "size": 4742,
+   "neighbours": []
+  },
+  "TG": {
+   "name": "Togo",
+   "size": 26453,
+   "neighbours": [
+    "BJ",
+    "GH",
+    "BF"
+   ]
+  },
+  "TH": {
+   "name": "Thailand",
+   "size": 365413,
+   "neighbours": [
+    "LA",
+    "MM",
+    "KH",
+    "MY"
+   ]
+  },
+  "TJ": {
+   "name": "Tajikistan",
+   "size": 61574,
+   "neighbours": [
+    "CN",
+    "AF",
+    "KG",
+    "UZ"
+   ]
+  },
+  "TK": {
+   "name": "Tokelau",
+   "size": 1550,
+   "neighbours": []
+  },
+  "TL": {
+   "name": "Timor Leste",
+   "size": 22666,
+   "neighbours": [
+    "ID"
+   ]
+  },
+  "TM": {
+   "name": "Turkmenistan",
+   "size": 28946,
+   "neighbours": [
+    "AF",
+    "IR",
+    "UZ",
+    "KZ"
+   ]
+  },
+  "TN": {
+   "name": "Tunisia",
+   "size": 100322,
+   "neighbours": [
+    "DZ",
+    "LY"
+   ]
+  },
+  "TO": {
+   "name": "Tonga",
+   "size": 11458,
+   "neighbours": []
+  },
+  "TR": {
+   "name": "Turkey",
+   "size": 530493,
+   "neighbours": [
+    "SY",
+    "GE",
+    "IQ",
+    "IR",
+    "GR",
+    "AM",
+    "AZ",
+    "BG"
+   ]
+  },
+  "TT": {
+   "name": "Trinidad and Tobago",
+   "size": 13617,
+   "neighbours": []
+  },
+  "TV": {
+   "name": "Tuvalu",
+   "size": 2365,
+   "neighbours": []
+  },
+  "TW": {
+   "name": "Taiwan",
+   "size": 63548,
+   "neighbours": []
+  },
+  "TZ": {
+   "name": "Tanzania",
+   "size": 205312,
+   "neighbours": [
+    "MZ",
+    "KE",
+    "CD",
+    "RW",
+    "ZM",
+    "BI",
+    "UG",
+    "MW"
+   ]
+  },
+  "UA": {
+   "name": "Ukraine",
+   "size": 340147,
+   "neighbours": [
+    "PL",
+    "MD",
+    "HU",
+    "SK",
+    "BY",
+    "RO",
+    "RU"
+   ]
+  },
+  "UG": {
+   "name": "Uganda",
+   "size": 88747,
+   "neighbours": [
+    "TZ",
+    "KE",
+    "SS",
+    "CD",
+    "RW"
+   ]
+  },
+  "US": {
+   "name": "United States",
+   "size": 1046457,
+   "neighbours": [
+    "CA",
+    "MX",
+    "CU"
+   ]
+  },
+  "UY": {
+   "name": "Uruguay",
+   "size": 92407,
+   "neighbours": [
+    "BR",
+    "AR"
+   ]
+  },
+  "UZ": {
+   "name": "Uzbekistan",
+   "size": 76824,
+   "neighbours": [
+    "TM",
+    "AF",
+    "KG",
+    "TJ",
+    "KZ"
+   ]
+  },
+  "VA": {
+   "name": "Vatican",
+   "size": 253,
+   "neighbours": [
+    "IT"
+   ]
+  },
+  "VC": {
+   "name": "Saint Vincent and the Grenadines",
+   "size": 6058,
+   "neighbours": []
+  },
+  "VE": {
+   "name": "Venezuela",
+   "size": 244456,
+   "neighbours": [
+    "GY",
+    "BR",
+    "CO"
+   ]
+  },
+  "VG": {
+   "name": "British Virgin Islands",
+   "size": 4255,
+   "neighbours": []
+  },
+  "VI": {
+   "name": "U.S. Virgin Islands",
+   "size": 2037,
+   "neighbours": []
+  },
+  "VN": {
+   "name": "Vietnam",
+   "size": 179232,
+   "neighbours": [
+    "CN",
+    "LA",
+    "KH"
+   ]
+  },
+  "VU": {
+   "name": "Vanuatu",
+   "size": 45261,
+   "neighbours": []
+  },
+  "WF": {
+   "name": "Wallis and Futuna",
+   "size": 1544,
+   "neighbours": []
+  },
+  "WS": {
+   "name": "Samoa",
+   "size": 10261,
+   "neighbours": []
+  },
+  "YE": {
+   "name": "Yemen",
+   "size": 119885,
+   "neighbours": [
+    "SA",
+    "OM"
+   ]
+  },
+  "YT": {
+   "name": "Mayotte",
+   "size": 4477,
+   "neighbours": []
+  },
+  "ZA": {
+   "name": "South Africa",
+   "size": 233000,
+   "neighbours": [
+    "ZW",
+    "SZ",
+    "MZ",
+    "BW",
+    "NA",
+    "LS"
+   ]
+  },
+  "ZM": {
+   "name": "Zambia",
+   "size": 108561,
+   "neighbours": [
+    "ZW",
+    "TZ",
+    "MZ",
+    "CD",
+    "NA",
+    "MW",
+    "AO"
+   ]
+  },
+  "ZW": {
+   "name": "Zimbabwe",
+   "size": 77605,
+   "neighbours": [
+    "ZA",
+    "MZ",
+    "BW",
+    "ZM"
+   ]
+  }
+ }
+}
