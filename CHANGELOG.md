@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-09
+
+### Added
+
+- Sensor nodes: the node details of a sensor contact stored on the radio have a Telemetry section with a Load button that asks the sensor for its readings (battery voltage, MCU temperature and the attached sensors, with units). The last reading is remembered and shown with its age. A sensor answers only to clients in its access list, so log in with its password first (the Log in button, as for repeaters); after login only Telemetry is shown, because neighbours, regions, settings and the terminal are repeater features. All languages are translated.
+
 ## [0.10.0] - 2026-11-09
 
 ### Changed
