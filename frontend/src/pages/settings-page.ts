@@ -1,6 +1,7 @@
 import { N_, t, tn, LANGUAGE_NAMES, loadLanguageSetting, saveLanguageSetting } from '../i18n';
 import { defaultHeardReply, loadHeardReply, saveHeardReply } from '../utils/heard-reply';
 import { loadTabBadge, saveTabBadge } from '../utils/tab-badge';
+import { loadImagePreviews, saveImagePreviews } from '../utils/image-previews';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, DeviceConfig, MeshCoreDevice } from '../types';
@@ -861,6 +862,21 @@ export class SettingsPage extends LitElement {
             <div class="device-section">
               <div class="card-title">${t('Map')}</div>
               <chattx-offline-map-settings .hass=${this.hass}></chattx-offline-map-settings>
+            </div>
+
+            <!-- Previews of image links in messages, per browser -->
+            <div class="device-section">
+              <div class="card-title">${t('Images')}</div>
+              <div class="section-row">
+                <div class="form-group-inline">
+                  <label class="form-toggle">
+                    <input type="checkbox" .checked=${loadImagePreviews()}
+                      @change=${(e: Event) => { saveImagePreviews((e.target as HTMLInputElement).checked); this.requestUpdate(); }} />
+                    <span class="form-toggle-label">${t('Show previews of image links in messages')}</span>
+                  </label>
+                  <div class="form-description">${t('A preview is loaded from the server where the image is, which then sees this browser\'s address. In this browser only.')}</div>
+                </div>
+              </div>
             </div>
 
             <!-- Quick messages for the chat composer -->

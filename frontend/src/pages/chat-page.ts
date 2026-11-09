@@ -24,6 +24,7 @@ import '../components/message-search';
 import '../components/node-detail-dialog';
 import '../components/quick-message-picker';
 import '../components/emoji-picker';
+import '../components/image-upload-dialog';
 
 @customElement('chattx-chat-page')
 export class ChatPage extends LitElement {
@@ -66,6 +67,8 @@ export class ChatPage extends LitElement {
   private _unsubUnread: (() => void) | null = null;
   @state() private _inputText = '';
   @state() private _shortening = false;
+  /** Image chosen or pasted for upload; the upload dialog is open while set. */
+  @state() private _imageFile: Blob | null = null;
   @state() private _shortenError = '';
   @state() private _sending = false;
   @state() private _viewportNarrow = false;
@@ -221,6 +224,10 @@ export class ChatPage extends LitElement {
       font-size: 11px;
       white-space: nowrap;
       cursor: pointer;
+    }
+
+    .image-button {
+      font-size: 13px;
     }
 
     .diacritics-toggle.on {
@@ -1050,6 +1057,11 @@ export class ChatPage extends LitElement {
         ${this._renderNewMessagesIndicator()}
       </div>
       ${this._renderShortenBar()}
+      <chattx-image-upload-dialog
+        .hass=${this.hass}
+        .file=${this._imageFile}
+        @close=${() => { this._imageFile = null; }}
+        @image-uploaded=${this._onImageUploaded}></chattx-image-upload-dialog>
       <div class="input-area" @mousedown=${this._keepComposerFocus}>
         <div class="composer-tools">
           <chattx-quick-message-picker
@@ -1062,8 +1074,21 @@ export class ChatPage extends LitElement {
             aria-label=${diacriticsLabel}
             aria-pressed=${this._stripDiacritics ? 'true' : 'false'}
             @click=${this._toggleStripDiacritics}>á→a</button>
+          <button
+            class="diacritics-toggle image-button"
+            title=${t('Send an image')}
+            aria-label=${t('Send an image')}
+            ?disabled=${this._sending || !this.selectedId}
+            @click=${this._pickImage}>📎</button>
+          <input class="image-input" type="file" accept="image/*" hidden
+            @change=${(e: Event) => {
+              const input = e.target as HTMLInputElement;
+              if (input.files?.[0]) this._imageFile = input.files[0];
+              input.value = '';
+            }} />
         </div>
         <textarea
+          @paste=${this._onPaste}
           placeholder=${t('Type a message...')}
           aria-label=${t('Message text. Press Enter to send, Shift+Enter for newline.')}
           .value=${this._inputText}
@@ -1391,6 +1416,27 @@ export class ChatPage extends LitElement {
   }
 
   /** Put an emoji where the cursor was and return the focus to the message field. */
+  private _pickImage() {
+    this.shadowRoot?.querySelector<HTMLInputElement>('.image-input')?.click();
+  }
+
+  /** An image pasted into the message field opens the upload dialog; text pastes as usual. */
+  private _onPaste(e: ClipboardEvent) {
+    const item = [...(e.clipboardData?.items ?? [])].find((i) => i.kind === 'file' && i.type.startsWith('image/'));
+    const file = item?.getAsFile();
+    if (!file || !this.selectedId) return;
+    e.preventDefault();
+    this._imageFile = file;
+  }
+
+  /** Put the uploaded image's address into the message at the cursor. */
+  private async _onImageUploaded(e: CustomEvent<{ url: string }>) {
+    this._imageFile = null;
+    await this._onEmojiSelected(new CustomEvent('emoji-selected', {
+      detail: { emoji: this._inputText && !/\s$/.test(this._inputText) ? ` ${e.detail.url} ` : `${e.detail.url} ` },
+    }));
+  }
+
   private async _onEmojiSelected(e: CustomEvent<{ emoji: string }>) {
     const textarea = this.shadowRoot?.querySelector<HTMLTextAreaElement>('.input-area textarea');
     const start = textarea?.selectionStart ?? this._inputText.length;

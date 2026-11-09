@@ -642,5 +642,19 @@
   "Copied": "Kopioitu",
   "{shown} of {total} countries, the list scrolls": "{shown}/{total} maata, luetteloa voi vierittää",
   "Public key unknown: the sender is not among the contacts.": "Julkinen avain tuntematon: lähettäjä ei ole yhteystiedoissa.",
-  "Several contacts have this name.": "Usealla yhteystiedolla on tämä nimi."
+  "Several contacts have this name.": "Usealla yhteystiedolla on tämä nimi.",
+  "Send an image": "Lähetä kuva",
+  "This file can't be read as an image.": "Tätä tiedostoa ei voi lukea kuvana.",
+  "Uploading the image failed: {message}": "Kuvan lähetys epäonnistui: {message}",
+  "{width} × {height} px, {kb} kB to upload": "{width} × {height} px, lähetettävänä {kb} kt",
+  "Preparing…": "Valmistellaan…",
+  "Keep the image": "Säilytä kuva",
+  "Permanently (catbox.moe)": "Pysyvästi (catbox.moe)",
+  "{n} hours (litterbox.catbox.moe)": "{n} t (litterbox.catbox.moe)",
+  "The image will be public: anyone with the link can open it, and a permanent one can't be deleted. The link is put into your message; recipients need internet to open it.": "Kuva on julkinen: kuka tahansa linkin saanut voi avata sen, eikä pysyvää voi poistaa. Linkki lisätään viestiisi; vastaanottajat tarvitsevat internetin sen avaamiseen.",
+  "Uploading…": "Lähetetään…",
+  "Upload": "Lähetä",
+  "Images": "Kuvat",
+  "Show previews of image links in messages": "Näytä viestien kuvalinkkien esikatselut",
+  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Esikatselu ladataan palvelimelta, jolla kuva on, ja se näkee näin tämän selaimen osoitteen. Vain tässä selaimessa."
 }

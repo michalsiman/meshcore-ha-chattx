@@ -10,7 +10,8 @@ import { cachedKnownNodes, edgeDistance, formatDistance, shortestPath } from '..
 import { closeStep, openStep } from '../utils/back-stack';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
-import { splitLinks } from '../utils/links';
+import { imageLinks, splitLinks } from '../utils/links';
+import { loadImagePreviews } from '../utils/image-previews';
 
 /**
  * Generate a deterministic color from a string (e.g., pubkey prefix).
@@ -227,6 +228,22 @@ export class MessageBubble extends LitElement {
       white-space: nowrap;
     }
 
+    .message-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .message-images img {
+      display: block;
+      height: 140px;
+      max-width: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: rgba(127, 127, 127, 0.2);
+    }
+
     .message-dialog-overlay {
       position: fixed;
       top: 0;
@@ -426,6 +443,7 @@ export class MessageBubble extends LitElement {
     return html`
       <div class=${this._classMap(bubbleClasses)} data-msg-id=${msg.id} @click=${(e: Event) => { e.stopPropagation(); this._openDialog(msg); }}>
         <div class="message-text">${this._renderTextWithMentions(msg.text, msg.mentions)}</div>
+        ${this._renderImages(msg.text)}
         <div class="timestamp">${statusLabel ? html`<span class="delivery-status">${statusLabel}</span> · ` : ''}${ts}${scopeLabel ? html` · <span class="flood-scope">${scopeLabel}</span>` : ''}</div>
       </div>
     `;
@@ -484,6 +502,25 @@ export class MessageBubble extends LitElement {
     }
     if (last < text.length) parts.push(this._renderLinks(text.slice(last)));
     return parts;
+  }
+
+  /**
+   * Small previews of image links (catbox.moe uploads and any other https
+   * address of an image). A fixed height keeps the conversation from
+   * jumping while they load; one that fails to load is hidden. A tap opens
+   * the image in the browser, not the message dialog.
+   */
+  private _renderImages(text: string) {
+    if (!loadImagePreviews()) return html``;
+    const urls = imageLinks(text);
+    if (urls.length === 0) return html``;
+    return html`<div class="message-images">
+      ${urls.map((url) => html`<a href=${url} target="_blank" rel="noopener noreferrer"
+          @click=${(e: Event) => e.stopPropagation()}>
+        <img src=${url} alt="" loading="lazy" referrerpolicy="no-referrer"
+          @error=${(e: Event) => { ((e.target as HTMLElement).parentElement as HTMLElement).style.display = 'none'; }} />
+      </a>`)}
+    </div>`;
   }
 
   /**

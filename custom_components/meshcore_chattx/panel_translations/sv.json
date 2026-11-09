@@ -642,5 +642,19 @@
   "Copied": "Kopierat",
   "{shown} of {total} countries, the list scrolls": "{shown} av {total} länder, listan går att rulla",
   "Public key unknown: the sender is not among the contacts.": "Publik nyckel okänd: avsändaren finns inte bland kontakterna.",
-  "Several contacts have this name.": "Flera kontakter har det här namnet."
+  "Several contacts have this name.": "Flera kontakter har det här namnet.",
+  "Send an image": "Skicka en bild",
+  "This file can't be read as an image.": "Filen kan inte läsas som en bild.",
+  "Uploading the image failed: {message}": "Uppladdningen av bilden misslyckades: {message}",
+  "{width} × {height} px, {kb} kB to upload": "{width} × {height} px, {kb} kB att ladda upp",
+  "Preparing…": "Förbereder…",
+  "Keep the image": "Behåll bilden",
+  "Permanently (catbox.moe)": "Permanent (catbox.moe)",
+  "{n} hours (litterbox.catbox.moe)": "{n} h (litterbox.catbox.moe)",
+  "The image will be public: anyone with the link can open it, and a permanent one can't be deleted. The link is put into your message; recipients need internet to open it.": "Bilden blir offentlig: alla med länken kan öppna den, och en permanent kan inte tas bort. Länken läggs i ditt meddelande; mottagarna behöver internet för att öppna den.",
+  "Uploading…": "Laddar upp…",
+  "Upload": "Ladda upp",
+  "Images": "Bilder",
+  "Show previews of image links in messages": "Visa förhandsvisningar av bildlänkar i meddelanden",
+  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "En förhandsvisning hämtas från servern där bilden ligger, som då ser den här webbläsarens adress. Endast i den här webbläsaren."
 }

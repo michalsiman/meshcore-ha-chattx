@@ -642,5 +642,19 @@
   "Copied": "Скопійовано",
   "{shown} of {total} countries, the list scrolls": "{shown} з {total} країн, список прокручується",
   "Public key unknown: the sender is not among the contacts.": "Відкритий ключ невідомий: відправника немає серед контактів.",
-  "Several contacts have this name.": "Кілька контактів мають це ім’я."
+  "Several contacts have this name.": "Кілька контактів мають це ім’я.",
+  "Send an image": "Надіслати зображення",
+  "This file can't be read as an image.": "Цей файл не вдається прочитати як зображення.",
+  "Uploading the image failed: {message}": "Не вдалося завантажити зображення: {message}",
+  "{width} × {height} px, {kb} kB to upload": "{width} × {height} px, {kb} КБ для завантаження",
+  "Preparing…": "Підготовка…",
+  "Keep the image": "Зберігати зображення",
+  "Permanently (catbox.moe)": "Назавжди (catbox.moe)",
+  "{n} hours (litterbox.catbox.moe)": "{n} год (litterbox.catbox.moe)",
+  "The image will be public: anyone with the link can open it, and a permanent one can't be deleted. The link is put into your message; recipients need internet to open it.": "Зображення буде публічним: його може відкрити кожен, хто має посилання, а постійне не можна видалити. Посилання вставляється у ваше повідомлення; одержувачам потрібен інтернет, щоб його відкрити.",
+  "Uploading…": "Завантаження…",
+  "Upload": "Завантажити",
+  "Images": "Зображення",
+  "Show previews of image links in messages": "Показувати попередній перегляд посилань на зображення в повідомленнях",
+  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Попередній перегляд завантажується із сервера, де лежить зображення, тож він бачить адресу цього браузера. Лише в цьому браузері."
 }

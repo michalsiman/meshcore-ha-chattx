@@ -642,5 +642,19 @@
   "Copied": "Kopiert",
   "{shown} of {total} countries, the list scrolls": "{shown} von {total} Ländern, die Liste ist scrollbar",
   "Public key unknown: the sender is not among the contacts.": "Öffentlicher Schlüssel unbekannt: Der Absender ist nicht unter den Kontakten.",
-  "Several contacts have this name.": "Mehrere Kontakte tragen diesen Namen."
+  "Several contacts have this name.": "Mehrere Kontakte tragen diesen Namen.",
+  "Send an image": "Bild senden",
+  "This file can't be read as an image.": "Diese Datei lässt sich nicht als Bild lesen.",
+  "Uploading the image failed: {message}": "Hochladen des Bildes fehlgeschlagen: {message}",
+  "{width} × {height} px, {kb} kB to upload": "{width} × {height} px, {kb} kB zum Hochladen",
+  "Preparing…": "Wird vorbereitet…",
+  "Keep the image": "Bild behalten",
+  "Permanently (catbox.moe)": "Dauerhaft (catbox.moe)",
+  "{n} hours (litterbox.catbox.moe)": "{n} Std. (litterbox.catbox.moe)",
+  "The image will be public: anyone with the link can open it, and a permanent one can't be deleted. The link is put into your message; recipients need internet to open it.": "Das Bild wird öffentlich: Jeder mit dem Link kann es öffnen, ein dauerhaftes lässt sich nicht löschen. Der Link kommt in Ihre Nachricht; Empfänger brauchen zum Öffnen Internet.",
+  "Uploading…": "Wird hochgeladen…",
+  "Upload": "Hochladen",
+  "Images": "Bilder",
+  "Show previews of image links in messages": "Vorschauen von Bildlinks in Nachrichten anzeigen",
+  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Eine Vorschau wird vom Server des Bildes geladen, der so die Adresse dieses Browsers sieht. Nur in diesem Browser."
 }

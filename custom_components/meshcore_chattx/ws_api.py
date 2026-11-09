@@ -39,6 +39,7 @@ from .const import (
 from .message_store import MessageStore
 from .offline_map import async_register_offline_map_commands
 from .blocklist import async_register_blocklist_commands
+from .image_upload import async_register_image_upload_commands
 from .sensor import SIGNAL_TOTAL_EXCLUSIONS_CHANGED
 from .radio_compat import (
     cache_self_info,
@@ -434,6 +435,7 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     """Register all MeshCore Chattx WebSocket commands."""
     async_register_offline_map_commands(hass)
     async_register_blocklist_commands(hass)
+    async_register_image_upload_commands(hass)
     # Device / contact / channel read commands
     websocket_api.async_register_command(hass, ws_get_devices)
     websocket_api.async_register_command(hass, ws_get_contacts)

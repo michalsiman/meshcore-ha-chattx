@@ -642,5 +642,19 @@
   "Copied": "Zkopírováno",
   "{shown} of {total} countries, the list scrolls": "{shown} z {total} států, seznam se posouvá",
   "Public key unknown: the sender is not among the contacts.": "Veřejný klíč neznámý: odesílatel není mezi kontakty.",
-  "Several contacts have this name.": "Toto jméno má více kontaktů."
+  "Several contacts have this name.": "Toto jméno má více kontaktů.",
+  "Send an image": "Poslat obrázek",
+  "This file can't be read as an image.": "Tento soubor nejde načíst jako obrázek.",
+  "Uploading the image failed: {message}": "Nahrání obrázku se nepovedlo: {message}",
+  "{width} × {height} px, {kb} kB to upload": "{width} × {height} px, k nahrání {kb} kB",
+  "Preparing…": "Připravuji…",
+  "Keep the image": "Ponechat obrázek",
+  "Permanently (catbox.moe)": "Trvale (catbox.moe)",
+  "{n} hours (litterbox.catbox.moe)": "{n} h (litterbox.catbox.moe)",
+  "The image will be public: anyone with the link can open it, and a permanent one can't be deleted. The link is put into your message; recipients need internet to open it.": "Obrázek bude veřejný: otevře ho každý, kdo má odkaz, a trvalý nejde smazat. Odkaz se vloží do zprávy; příjemci potřebují k otevření internet.",
+  "Uploading…": "Nahrávám…",
+  "Upload": "Nahrát",
+  "Images": "Obrázky",
+  "Show previews of image links in messages": "Zobrazovat náhledy odkazů na obrázky ve zprávách",
+  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Náhled se načítá ze serveru, kde obrázek leží, a ten tak uvidí adresu tohoto prohlížeče. Platí jen pro tento prohlížeč."
 }

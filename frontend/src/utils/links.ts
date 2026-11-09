@@ -41,3 +41,15 @@ export function longLink(text: string): { url: string; label: string } | null {
   }
   return null;
 }
+
+const IMAGE = /^https:\/\/[^\s]+\.(?:jpe?g|png|gif|webp)(?:\?[^\s]*)?$/i;
+
+/** Web addresses in the text that point straight to an image (https only), at most `limit`. */
+export function imageLinks(text: string, limit = 3): string[] {
+  const urls: string[] = [];
+  for (const part of splitLinks(text)) {
+    if ('url' in part && IMAGE.test(part.url) && !urls.includes(part.url)) urls.push(part.url);
+    if (urls.length >= limit) break;
+  }
+  return urls;
+}

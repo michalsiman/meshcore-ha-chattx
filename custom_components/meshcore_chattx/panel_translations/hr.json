@@ -642,5 +642,19 @@
   "Copied": "Kopirano",
   "{shown} of {total} countries, the list scrolls": "{shown} od {total} država, popis se pomiče",
   "Public key unknown: the sender is not among the contacts.": "Javni ključ nepoznat: pošiljatelj nije među kontaktima.",
-  "Several contacts have this name.": "Više kontakata ima ovo ime."
+  "Several contacts have this name.": "Više kontakata ima ovo ime.",
+  "Send an image": "Pošalji sliku",
+  "This file can't be read as an image.": "Ova datoteka se ne može pročitati kao slika.",
+  "Uploading the image failed: {message}": "Prijenos slike nije uspio: {message}",
+  "{width} × {height} px, {kb} kB to upload": "{width} × {height} px, {kb} kB za prijenos",
+  "Preparing…": "Pripremam…",
+  "Keep the image": "Zadrži sliku",
+  "Permanently (catbox.moe)": "Trajno (catbox.moe)",
+  "{n} hours (litterbox.catbox.moe)": "{n} h (litterbox.catbox.moe)",
+  "The image will be public: anyone with the link can open it, and a permanent one can't be deleted. The link is put into your message; recipients need internet to open it.": "Slika će biti javna: može je otvoriti svatko s poveznicom, a trajna se ne može izbrisati. Poveznica se umeće u poruku; primatelji trebaju internet da je otvore.",
+  "Uploading…": "Prenosim…",
+  "Upload": "Prenesi",
+  "Images": "Slike",
+  "Show previews of image links in messages": "Prikaži preglede poveznica na slike u porukama",
+  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Pregled se učitava s poslužitelja na kojem je slika, koji tako vidi adresu ovog preglednika. Samo u ovom pregledniku."
 }
