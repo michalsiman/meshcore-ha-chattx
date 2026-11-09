@@ -1228,3 +1228,27 @@ export const panelStyles = css`
     outline-offset: 2px;
   }
 `;
+
+/**
+ * One frame for every window in the panel (dialogs, modal cards, the
+ * message dialog): the primary-colour border of the message dialog.
+ * Put it last in a component's styles so it wins over local rules.
+ */
+export const modalFrameStyles = css`
+  .dialog,
+  .modal-card,
+  .message-dialog {
+    border: 2px solid var(--primary-color, #03a9f4);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(var(--rgb-primary-color, 3, 169, 244), 0.3);
+    box-sizing: border-box;
+  }
+
+  :host([narrow]) .dialog {
+    border-radius: 12px;
+  }
+
+  :host([narrow]) .dialog-overlay {
+    padding: 8px;
+  }
+`;

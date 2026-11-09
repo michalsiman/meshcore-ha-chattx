@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { setChannel, getFloodScopes } from '../api';
 import { sha256 } from '../chat/message-parser';
-import { panelStyles } from '../styles';
+import { modalFrameStyles, panelStyles } from '../styles';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 
 /**
@@ -85,6 +85,7 @@ export class ChannelDialog extends LitElement {
         margin-top: 4px;
       }
     `,
+    modalFrameStyles,
   ];
 
   private _initialized = false;

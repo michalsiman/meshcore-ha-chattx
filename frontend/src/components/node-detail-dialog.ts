@@ -1,3 +1,4 @@
+import { modalFrameStyles } from '../styles';
 import { getLocale, t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -52,7 +53,7 @@ export class NodeDetailDialog extends LitElement {
     });
   }
 
-  static styles = css`
+  static styles = [css`
     :host {
       display: contents;
     }
@@ -300,7 +301,7 @@ export class NodeDetailDialog extends LitElement {
       cursor: pointer;
     }
 
-  `;
+  `, modalFrameStyles];
 
   protected updated() {
     const prefix = this.open && !this.loginOnly && this.node ? this.node.pubkey_prefix ?? null : null;

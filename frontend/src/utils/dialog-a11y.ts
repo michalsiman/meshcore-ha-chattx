@@ -70,6 +70,7 @@
  */
 
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
+import { closeStep, openStep } from './back-stack';
 
 /** CSS selector matching elements that participate in the Tab order. */
 const FOCUSABLE_SELECTOR = [
@@ -93,6 +94,12 @@ export interface DialogA11yOptions {
    * whole page.
    */
   getScope?: () => Element | DocumentFragment | null | undefined;
+  /**
+   * Give the open dialog its own history entry, so the phone's back
+   * gesture closes it (via `onEscape`) instead of leaving the panel.
+   * Default true.
+   */
+  backGesture?: boolean;
 }
 
 type Host = ReactiveControllerHost & HTMLElement;
@@ -124,6 +131,8 @@ export class DialogA11yController implements ReactiveController {
   private _wasOpen = false;
   private _previousActive: Element | null = null;
   private _inStack = false;
+  /** History step of the open dialog (see back-stack.ts). */
+  private _step: string | null = null;
 
   constructor(private host: Host, private opts: DialogA11yOptions) {
     this.host.addController(this);
@@ -140,6 +149,8 @@ export class DialogA11yController implements ReactiveController {
     if (this._inStack) {
       this._popStack();
     }
+    closeStep(this._step);
+    this._step = null;
     this._previousActive = null;
     this._wasOpen = false;
   }
@@ -150,8 +161,16 @@ export class DialogA11yController implements ReactiveController {
       this._previousActive = this._currentDocumentActive();
       this._pushStack();
       this._focusFirstSoon();
+      if (this.opts.backGesture !== false) {
+        this._step = openStep(() => {
+          this._step = null;
+          this.opts.onEscape();
+        });
+      }
     } else if (!open && this._wasOpen) {
       this._popStack();
+      closeStep(this._step);
+      this._step = null;
       const prev = this._previousActive as HTMLElement | null;
       this._previousActive = null;
       if (prev && prev.isConnected && typeof prev.focus === 'function') {

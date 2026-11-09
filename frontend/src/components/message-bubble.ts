@@ -6,6 +6,7 @@ import type { ChatMessage, MessageGroup, DeliveryStatus, LateEcho, HomeAssistant
 import './path-map';
 import { hasMapPath } from './path-map';
 import { fewestHops, formatHopLabel, formatTimestamp } from '../chat/message-parser';
+import { closeStep, openStep } from '../utils/back-stack';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
 import { splitLinks } from '../utils/links';
@@ -471,60 +472,41 @@ export class MessageBubble extends LitElement {
   }
 
   // ── Phone back gesture ──────────────────────────────────────────────
-  // The open dialog and the open map each get a history entry, so the
-  // system back gesture first hides the map, then closes the dialog,
-  // instead of leaving the conversation. The URL stays the same.
+  // The dialog gets its history step from attachDialogA11y; the map is
+  // one more step above it, so the back gesture first hides the map,
+  // then closes the dialog (see utils/back-stack.ts).
 
-  private _historyState(): Record<string, unknown> {
-    return (history.state as Record<string, unknown> | null) ?? {};
-  }
+  private _mapStep: string | null = null;
 
   private _openDialog(msg: ChatMessage) {
     this._selectedMessage = msg;
-    if (!this._historyState().chattxMessageDialog) {
-      history.pushState({ ...this._historyState(), chattxMessageDialog: true }, '');
-    }
   }
 
   private _toggleMap() {
     if (!this._showMap) {
       this._showMap = true;
-      history.pushState({ ...this._historyState(), chattxMessageMap: true }, '');
-    } else if (this._historyState().chattxMessageMap) {
-      history.back(); // _onPopState hides the map
+      this._mapStep = openStep(() => {
+        this._mapStep = null;
+        this._showMap = false;
+      });
     } else {
-      this._showMap = false;
+      this._hideMap();
     }
+  }
+
+  private _hideMap() {
+    closeStep(this._mapStep);
+    this._mapStep = null;
+    this._showMap = false;
   }
 
   private _closeDialog() {
-    const st = this._historyState();
-    const entries = (st.chattxMessageMap ? 1 : 0) + (st.chattxMessageDialog ? 1 : 0);
-    if (this._selectedMessage && entries > 0) {
-      history.go(-entries); // _onPopState closes the dialog
-    } else {
-      this._selectedMessage = null;
-    }
-  }
-
-  private _onPopState = () => {
-    const st = this._historyState();
-    if (this._showMap && !st.chattxMessageMap) this._showMap = false;
-    if (this._selectedMessage && !st.chattxMessageDialog) this._selectedMessage = null;
-  };
-
-  connectedCallback() {
-    super.connectedCallback();
-    window.addEventListener('popstate', this._onPopState);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    window.removeEventListener('popstate', this._onPopState);
+    this._hideMap();
+    this._selectedMessage = null;
   }
 
   willUpdate(changed: Map<string, unknown>) {
-    if (changed.has('_selectedMessage')) this._showMap = false;
+    if (changed.has('_selectedMessage') && this._showMap) this._hideMap();
   }
 
   private _renderMessageDialog(msg: ChatMessage) {

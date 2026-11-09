@@ -1,3 +1,4 @@
+import { modalFrameStyles } from '../styles';
 import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -65,7 +66,7 @@ export class ManageDialog extends LitElement {
   @state() private _editingChannel: Channel | null = null;
   @state() private _maxChannels = 4;
 
-  static styles = css`
+  static styles = [css`
     :host {
       position: fixed;
       top: 0;
@@ -551,7 +552,7 @@ export class ManageDialog extends LitElement {
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-  `;
+  `, modalFrameStyles];
 
   connectedCallback() {
     super.connectedCallback();

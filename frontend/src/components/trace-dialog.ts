@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { TraceResult } from '../api';
 import type { TracePathMode } from '../api';
 import type { Contact } from '../types';
-import { panelStyles } from '../styles';
+import { modalFrameStyles, panelStyles } from '../styles';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 
 /**
@@ -387,6 +387,7 @@ export class TraceDialog extends LitElement {
       color: var(--secondary-text-color, #727272);
     }
   `,
+    modalFrameStyles,
   ];
 
   /**

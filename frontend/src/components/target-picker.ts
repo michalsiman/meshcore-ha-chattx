@@ -1,7 +1,7 @@
 import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { panelStyles } from '../styles';
+import { modalFrameStyles, panelStyles } from '../styles';
 import type { Contact } from '../types';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 
@@ -188,6 +188,7 @@ export class TargetPicker extends LitElement {
         font-size: 13px;
       }
     `,
+    modalFrameStyles,
   ];
 
   // Escape handling moved to DialogA11yController above.

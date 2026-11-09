@@ -22,7 +22,7 @@ import '../components/node-summary';
 import '../components/quick-messages-editor';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import type { CompanionDeviceDescriptor } from '../components/node-summary';
-import { panelStyles } from '../styles';
+import { modalFrameStyles, panelStyles } from '../styles';
 import { loadMeshcoreEntityRegistry, type EntityInfo } from '../utils/classify-entity';
 
 interface ConfirmAction {
@@ -701,6 +701,7 @@ export class SettingsPage extends LitElement {
         }
       }
     `,
+    modalFrameStyles,
   ];
 
   connectedCallback() {

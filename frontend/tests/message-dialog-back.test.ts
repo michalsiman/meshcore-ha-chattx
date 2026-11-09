@@ -10,6 +10,8 @@ function message(): ChatMessage {
   } as ChatMessage;
 }
 
+const steps = () => ((history.state as { chattxSteps?: string[] } | null)?.chattxSteps ?? []);
+
 async function popTo(el: HTMLElement, state: unknown) {
   history.replaceState(state, '');
   window.dispatchEvent(new PopStateEvent('popstate', { state }));
@@ -23,17 +25,21 @@ describe('phone back gesture in the message dialog', () => {
     el.message = message();
     el.hass = { states: {} };
     document.body.appendChild(el);
-    await (el as unknown as { updateComplete: Promise<unknown> }).updateComplete;
+    const done = () => (el as unknown as { updateComplete: Promise<unknown> }).updateComplete;
+    await done();
 
     (el as unknown as { _openDialog(m: ChatMessage): void })._openDialog(message());
-    expect(history.state).toMatchObject({ chattxConversation: true, chattxMessageDialog: true });
-    await (el as unknown as { updateComplete: Promise<unknown> }).updateComplete;
+    await done();
+    expect(history.state).toMatchObject({ chattxConversation: true });
+    expect(steps()).toHaveLength(1);
+    const dialogState = history.state;
+
     (el as unknown as { _toggleMap(): void })._toggleMap();
-    expect(history.state).toMatchObject({ chattxMessageDialog: true, chattxMessageMap: true });
-    await (el as unknown as { updateComplete: Promise<unknown> }).updateComplete;
+    await done();
+    expect(steps()).toHaveLength(2);
     expect(el._showMap).toBe(true);
 
-    await popTo(el, { chattxConversation: true, chattxMessageDialog: true });
+    await popTo(el, dialogState);
     expect(el._showMap).toBe(false);
     expect(el._selectedMessage).not.toBeNull();
 

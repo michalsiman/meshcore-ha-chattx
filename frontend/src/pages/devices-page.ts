@@ -1,7 +1,7 @@
 import { t } from '../i18n';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { panelStyles } from '../styles';
+import { modalFrameStyles, panelStyles } from '../styles';
 import type { HomeAssistant, PanelConfig, ManagedDevice, MeshCoreDevice, NeighborInfo, Contact } from '../types';
 import { getManagedDevices, executeRemote, getNeighbors, getContacts } from '../api';
 import '../components/sensor-tile';
@@ -670,6 +670,7 @@ export class DevicesPage extends LitElement {
         overflow-x: auto;
       }
     `,
+    modalFrameStyles,
   ];
 
   connectedCallback() {

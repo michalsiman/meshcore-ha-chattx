@@ -5,7 +5,7 @@ import type { HomeAssistant, CommandDef, CommandParam, HassEvent } from '../type
 import { executeLocal, executeRemote } from '../api';
 import { LOCAL_COMMANDS } from '../commands/local-commands';
 import { REMOTE_COMMANDS } from '../commands/remote-commands';
-import { panelStyles } from '../styles';
+import { modalFrameStyles, panelStyles } from '../styles';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import {
   ENUMS,
@@ -133,6 +133,7 @@ export class CommandDialog extends LitElement {
         margin-right: 6px;
       }
     `,
+    modalFrameStyles,
   ];
 
   render() {
