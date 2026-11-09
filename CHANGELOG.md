@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-09
+
+### Changed
+
+- All windows (message details, node details, trace, manage contacts and channels, channel settings, confirmations, the repeater command window and the windows in Settings and Devices) share one look: the coloured border of the message dialog. On a phone, windows that filled the whole screen keep a small margin so the border shows.
+- The phone's back gesture now closes only the topmost open window, one step at a time, in every window — for example the channel settings first, then Manage, and the map before the message details. Search in a conversation closes the same way. Only when no window is open does back leave the conversation. Closing a window with ✕, a tap outside or Escape leaves no empty step behind in the history.
+
 ## [0.9.0] - 2026-11-08
 
 ### Added
