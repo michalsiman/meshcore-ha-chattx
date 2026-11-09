@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-09
+
+### Added
+
+- Images in messages: paste an image into the message field (Ctrl+V) or pick one with the 📎 button. A dialog shows a preview and shrinks the image to at most 1600 px (JPEG); on Upload, Home Assistant puts it on catbox.moe (kept) or litterbox.catbox.moe (deleted after 1, 12, 24 or 72 hours; the choice is remembered per browser) and inserts the link into the message. The dialog warns that the image is public.
+- Messages with a link to an image (https, ending in .jpg, .png, .gif or .webp, such as these uploads) show a small preview under the text; a tap opens the image. Settings → Images turns the previews off in a browser, as loading a preview shows the browser's address to the image's server.
+
 ## [0.13.1] - 2026-11-09
 
 ### Added
