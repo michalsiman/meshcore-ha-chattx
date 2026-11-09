@@ -603,5 +603,9 @@
   "Zoom out": "Zooma ut",
   "Show all": "Visa alla",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown} av {total} noder har en känd position"
+  "{shown} of {total} nodes have a known position": "{shown} av {total} noder har en känd position",
+  "Log in to sensor": "Logga in på sensor",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Sensorn bekräftade inte inloggningen. Lösenordet kan vara fel, eller så är sensorn utom räckhåll.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Sensorn svarade inte. En sensor svarar först när du loggar in med dess lösenord, och den kan vara utom räckhåll.",
+  "The sensor reports no values.": "Sensorn rapporterar inga värden."
 }

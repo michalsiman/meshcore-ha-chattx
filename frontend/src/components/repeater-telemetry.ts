@@ -71,6 +71,8 @@ export class RepeaterTelemetry extends LitElement {
   @property({ type: String }) prefix = '';
   @property({ type: String }) entryId?: string;
   @property({ type: Boolean }) canLoad = false;
+  /** The node is a sensor, not a repeater (only changes the wording). */
+  @property({ type: Boolean }) sensor = false;
 
   @state() private _sensors: TelemetrySensor[] | null = null;
   @state() private _readAt: string | null = null;
@@ -157,7 +159,9 @@ export class RepeaterTelemetry extends LitElement {
         this._sensors = result.sensors ?? [];
         this._readAt = new Date().toISOString();
       } else if (result.reason === 'no_response') {
-        this._error = t('The repeater did not answer. It may be out of reach, or it may no longer accept this login. In that case, log in again.');
+        this._error = this.sensor
+          ? t('The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.')
+          : t('The repeater did not answer. It may be out of reach, or it may no longer accept this login. In that case, log in again.');
       } else {
         this._error = result.message ?? t('Reading telemetry failed.');
       }
@@ -187,7 +191,7 @@ export class RepeaterTelemetry extends LitElement {
         </button>
       </div>
       ${loaded && this._sensors!.length === 0
-        ? html`<div class="hint">${t('The repeater reports no sensors.')}</div>`
+        ? html`<div class="hint">${this.sensor ? t('The sensor reports no values.') : t('The repeater reports no sensors.')}</div>`
         : html`<div class="fields">${loaded
           ? [...this._sensors!]
             .sort((a, b) => a.channel - b.channel)

@@ -603,5 +603,9 @@
   "Zoom out": "Verkleinern",
   "Show all": "Alle zeigen",
   "Room server": "Room Server",
-  "{shown} of {total} nodes have a known position": "{shown} von {total} Nodes haben eine bekannte Position"
+  "{shown} of {total} nodes have a known position": "{shown} von {total} Nodes haben eine bekannte Position",
+  "Log in to sensor": "Am Sensor anmelden",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Der Sensor hat die Anmeldung nicht bestätigt. Das Passwort ist vielleicht falsch, oder der Sensor ist außer Reichweite.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Der Sensor hat nicht geantwortet. Ein Sensor antwortet erst nach der Anmeldung mit seinem Passwort, und er ist vielleicht außer Reichweite.",
+  "The sensor reports no values.": "Der Sensor meldet keine Werte."
 }

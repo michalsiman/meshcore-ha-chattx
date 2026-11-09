@@ -603,5 +603,9 @@
   "Zoom out": "Loitonna",
   "Show all": "Näytä kaikki",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown}/{total} nodella on tunnettu sijainti"
+  "{shown} of {total} nodes have a known position": "{shown}/{total} nodella on tunnettu sijainti",
+  "Log in to sensor": "Kirjaudu anturiin",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Anturi ei vahvistanut kirjautumista. Salasana voi olla väärä tai anturi kantaman ulkopuolella.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Anturi ei vastannut. Anturi vastaa vasta, kun kirjaudut sen salasanalla, ja se voi olla kantaman ulkopuolella.",
+  "The sensor reports no values.": "Anturi ei ilmoita arvoja."
 }

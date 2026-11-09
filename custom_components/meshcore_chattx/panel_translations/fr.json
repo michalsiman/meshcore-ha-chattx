@@ -603,5 +603,9 @@
   "Zoom out": "Zoom arrière",
   "Show all": "Tout afficher",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown} nodes sur {total} ont une position connue"
+  "{shown} of {total} nodes have a known position": "{shown} nodes sur {total} ont une position connue",
+  "Log in to sensor": "Se connecter au capteur",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Le capteur n’a pas confirmé la connexion. Le mot de passe est peut-être erroné, ou le capteur est hors de portée.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Le capteur n’a pas répondu. Un capteur ne répond qu’après une connexion avec son mot de passe, et il est peut-être hors de portée.",
+  "The sensor reports no values.": "Le capteur ne signale aucune valeur."
 }

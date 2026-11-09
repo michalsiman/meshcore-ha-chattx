@@ -603,5 +603,9 @@
   "Zoom out": "Zoom ud",
   "Show all": "Vis alle",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown} af {total} noder har en kendt position"
+  "{shown} of {total} nodes have a known position": "{shown} af {total} noder har en kendt position",
+  "Log in to sensor": "Log ind på sensor",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Sensoren bekræftede ikke login. Adgangskoden kan være forkert, eller sensoren kan være uden for rækkevidde.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Sensoren svarede ikke. En sensor svarer først, når du logger ind med dens adgangskode, og den kan være uden for rækkevidde.",
+  "The sensor reports no values.": "Sensoren rapporterer ingen værdier."
 }

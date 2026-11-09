@@ -10,6 +10,8 @@ export class RepeaterLogin extends LitElement {
   @property({ type: Object }) hass?: HomeAssistant;
   @property({ type: String }) prefix = '';
   @property({ type: String }) entryId?: string;
+  /** The node is a sensor, not a repeater (only changes the wording). */
+  @property({ type: Boolean }) sensor = false;
 
   @state() private _password = '';
   @state() private _remember = false;
@@ -87,7 +89,9 @@ export class RepeaterLogin extends LitElement {
     } else if (result.reason === 'rate_limited') {
       this._error = t('Too much mesh traffic right now. Try again in {retry_after} seconds.', { retry_after: result.retry_after ?? 0 });
     } else if (result.reason === 'no_response') {
-      this._error = t('The repeater did not confirm the login. The password may be wrong, or the repeater may be out of reach.');
+      this._error = this.sensor
+        ? t('The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.')
+        : t('The repeater did not confirm the login. The password may be wrong, or the repeater may be out of reach.');
     } else {
       this._error = result.message ?? t('Login failed.');
     }

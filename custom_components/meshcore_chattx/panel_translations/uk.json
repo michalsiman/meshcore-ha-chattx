@@ -603,5 +603,9 @@
   "Zoom out": "Віддалити",
   "Show all": "Показати все",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown} з {total} нодів мають відоме розташування"
+  "{shown} of {total} nodes have a known position": "{shown} з {total} нодів мають відоме розташування",
+  "Log in to sensor": "Вхід на сенсор",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Сенсор не підтвердив вхід. Можливо, пароль неправильний або сенсор поза зоною досяжності.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Сенсор не відповів. Сенсор відповідає лише після входу з його паролем, і він може бути поза зоною досяжності.",
+  "The sensor reports no values.": "Сенсор не повідомляє жодних значень."
 }

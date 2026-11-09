@@ -603,5 +603,9 @@
   "Zoom out": "Oddialiť",
   "Show all": "Zobraziť všetko",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown} z {total} nodov má známu polohu"
+  "{shown} of {total} nodes have a known position": "{shown} z {total} nodov má známu polohu",
+  "Log in to sensor": "Prihlásenie k senzoru",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Senzor nepotvrdil prihlásenie. Heslo môže byť nesprávne alebo je senzor mimo dosahu.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Senzor neodpovedal. Senzor odpovedá až po prihlásení jeho heslom a môže byť mimo dosahu.",
+  "The sensor reports no values.": "Senzor nehlási žiadne hodnoty."
 }

@@ -603,5 +603,9 @@
   "Zoom out": "Oddal",
   "Show all": "Pokaż wszystko",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown} z {total} nodów ma znaną pozycję"
+  "{shown} of {total} nodes have a known position": "{shown} z {total} nodów ma znaną pozycję",
+  "Log in to sensor": "Logowanie do czujnika",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Czujnik nie potwierdził logowania. Hasło może być błędne lub czujnik jest poza zasięgiem.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Czujnik nie odpowiedział. Czujnik odpowiada dopiero po zalogowaniu się jego hasłem i może być poza zasięgiem.",
+  "The sensor reports no values.": "Czujnik nie zgłasza żadnych wartości."
 }

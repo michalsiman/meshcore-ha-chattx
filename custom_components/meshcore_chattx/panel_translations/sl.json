@@ -603,5 +603,9 @@
   "Zoom out": "Pomanjšaj",
   "Show all": "Pokaži vse",
   "Room server": "Room server",
-  "{shown} of {total} nodes have a known position": "{shown} od {total} nodov ima znan položaj"
+  "{shown} of {total} nodes have a known position": "{shown} od {total} nodov ima znan položaj",
+  "Log in to sensor": "Prijava v senzor",
+  "The sensor did not confirm the login. The password may be wrong, or the sensor may be out of reach.": "Senzor ni potrdil prijave. Geslo je morda napačno ali pa je senzor izven dosega.",
+  "The sensor did not answer. A sensor answers only after you log in with its password, and it may be out of reach.": "Senzor ni odgovoril. Senzor odgovori šele po prijavi z njegovim geslom, morda pa je izven dosega.",
+  "The sensor reports no values.": "Senzor ne poroča nobenih vrednosti."
 }

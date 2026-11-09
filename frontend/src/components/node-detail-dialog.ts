@@ -327,7 +327,7 @@ export class NodeDetailDialog extends LitElement {
     const prefix = isContact ? (this.node as Contact).pubkey_prefix : (this.node as ManagedDevice).pubkey_prefix;
     // Only contacts stored on the radio can be logged in to, and the backend
     // command is admin-only.
-    const canLogin = isRepeater && !!prefix && !!this.hass?.user?.is_admin
+    const canLogin = (isRepeater || isSensor) && !!prefix && !!this.hass?.user?.is_admin
       && (!isContact || (this.node as Contact).added_to_node);
 
     let avatarSvg = html`<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>`;
@@ -360,11 +360,12 @@ export class NodeDetailDialog extends LitElement {
             ${this._showLogin || this.loginOnly
               ? html`
                   <div class="section">
-                    <div class="section-header">${t('Log in to repeater')}</div>
+                    <div class="section-header">${isSensor ? t('Log in to sensor') : t('Log in to repeater')}</div>
                     <chattx-repeater-login
                       .hass=${this.hass}
                       .prefix=${prefix}
                       .entryId=${this.entryId}
+                      .sensor=${isSensor}
                       @repeater-logged-in=${(e: CustomEvent<{ role: string }>) => {
                         // A login without a known role is an older firmware; let
                         // the repeater itself refuse if it isn't an admin session.
@@ -378,9 +379,10 @@ export class NodeDetailDialog extends LitElement {
                       .hass=${this.hass}
                       .prefix=${prefix}
                       .entryId=${this.entryId}
-                      .canLoad=${this._canLoadSettings}></chattx-repeater-telemetry>
+                      .sensor=${isSensor}
+                      .canLoad=${this._canLoadSettings || isSensor}></chattx-repeater-telemetry>
                   </div>
-                  <div class="section">
+                  ${isSensor ? '' : html`<div class="section">
                     <div class="section-header">${t('Neighbours')}</div>
                     <chattx-repeater-neighbours
                       .hass=${this.hass}
@@ -411,7 +413,7 @@ export class NodeDetailDialog extends LitElement {
                       .prefix=${prefix}
                       .entryId=${this.entryId}
                       .canSend=${this._canLoadSettings}></chattx-repeater-terminal>
-                  </div>
+                  </div>`}
                   ${this.loginOnly ? '' : html`<button class="back-btn" @click=${() => { this._showLogin = false; this._canLoadSettings = false; }}>‹ Back</button>`}
                 `
               : this._confirming
@@ -454,6 +456,18 @@ export class NodeDetailDialog extends LitElement {
                         : html``}
                     </div>
                   </div>
+
+                  ${canLogin && isSensor ? html`
+                    <div class="section">
+                      <div class="section-header">${t('Telemetry')}</div>
+                      <chattx-repeater-telemetry
+                        .hass=${this.hass}
+                        .prefix=${prefix}
+                        .entryId=${this.entryId}
+                        .sensor=${true}
+                        .canLoad=${true}></chattx-repeater-telemetry>
+                    </div>
+                  ` : html``}
 
                   <div class="section">
                     <div class="section-header">${t('Information')}</div>
