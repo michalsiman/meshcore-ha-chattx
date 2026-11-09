@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { isBlockedMessage } from '../utils/blocklist';
 import type {
   PanelConfig,
   ChatMessage,
@@ -28,6 +29,10 @@ const ERROR_POLL_INTERVAL_MS = 60_000;
  * text parsing, delivery caches, localStorage caching, and carry-forward
  * merge logic.
  */
+
+/** A received message repeated by its sender within this time is one message (backend RESEND_WINDOW). */
+const RESEND_WINDOW_MS = 5 * 60 * 1000;
+
 export class MessageStore {
   private _messages: ChatMessage[] = [];
   private _loading = false;
@@ -77,7 +82,8 @@ export class MessageStore {
   }
 
   get messages(): ChatMessage[] {
-    return this._messages;
+    // Messages of blocked senders, stored before blocking or arriving live, stay hidden.
+    return this._messages.some(isBlockedMessage) ? this._messages.filter((m) => !isBlockedMessage(m)) : this._messages;
   }
 
   get loading(): boolean {
@@ -775,7 +781,24 @@ export class MessageStore {
       const alreadyExists = this._messages.some(
         (m) => m.id === id || m.id === baseId,
       );
-      if (!alreadyExists) {
+      // The sender's client sent the same text again (as the backend
+      // keeps it on the first copy, see _find_resend_original): count it
+      // on the bubble shown already instead of adding another one.
+      const firstCopy = alreadyExists ? undefined : this._messages.find((m) =>
+        !m.isOutgoing && m.sender === sender && m.text === displayText
+        && timestamp.getTime() - m.timestamp.getTime() >= 0
+        && timestamp.getTime() - m.timestamp.getTime() <= RESEND_WINDOW_MS);
+      if (firstCopy) {
+        const rx = (eventData.rx_log_data as Array<Record<string, unknown>> | undefined)?.[0];
+        firstCopy.resends = [...(firstCopy.resends ?? []), {
+          received_at: timestampStr,
+          hop_count: rx?.hop_count as number | undefined,
+          snr: rx?.snr as number | undefined,
+          rssi: rx?.rssi as number | undefined,
+          path_nodes: rx?.path_nodes as string[] | undefined,
+        }];
+        this._notify();
+      } else if (!alreadyExists) {
         const mentions = extractMentions(displayText);
         const rxLogData = eventData.rx_log_data as Array<Record<string, unknown>> | undefined;
 

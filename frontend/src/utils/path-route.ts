@@ -11,6 +11,8 @@
  * position always known.
  */
 
+import { formatLength } from './units';
+
 export interface MapNode {
   key: string;
   name: string;
@@ -188,4 +190,68 @@ export function unproject(x: number, y: number, zoom: number): { lat: number; lo
   const n = Math.PI - (2 * Math.PI * y) / size;
   const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   return { lat, lon };
+}
+
+// ── Distance between the end repeaters of a path ────────────────────────
+
+const nodeCache = new WeakMap<object, MapNode[]>();
+
+/** knownNodes, computed once per states object. */
+export function cachedKnownNodes(states: Record<string, StateLike>): MapNode[] {
+  let nodes = nodeCache.get(states);
+  if (!nodes) {
+    nodes = knownNodes(states);
+    nodeCache.set(states, nodes);
+  }
+  return nodes;
+}
+
+/** The shortest repeater path among the heard copies of a message. */
+export function shortestPath(rxLogData: Array<Record<string, unknown>> | undefined): string[] | null {
+  let best: string[] | null = null;
+  for (const entry of rxLogData ?? []) {
+    const nodes = entry.path_nodes as string[] | undefined;
+    if (nodes && nodes.length > 0 && (!best || nodes.length < best.length)) best = nodes;
+  }
+  return best;
+}
+
+/**
+ * Straight-line distance between the first and the last repeater of a
+ * path, when both have a known position, and the length of the route
+ * itself: the legs between consecutive repeaters added up (repeaters
+ * without a position are skipped, which makes it approximate). `approx`
+ * when a prefix is shared by several known repeaters, so the nearest one
+ * was taken.
+ */
+export function edgeDistance(
+  pathNodes: string[] | null,
+  nodes: MapNode[],
+): { km: number; approx: boolean; routeKm: number; routeApprox: boolean } | null {
+  if (!pathNodes || pathNodes.length < 2) return null;
+  const repeaters = resolveRoute({ pathNodes, nodes, me: null, outgoing: false })
+    .filter((p) => p.kind === 'repeater');
+  const first = repeaters[0];
+  const last = repeaters[repeaters.length - 1];
+  if (first.lat === null || first.lon === null || last.lat === null || last.lon === null) return null;
+  let routeKm = 0;
+  let prev: RoutePoint | null = null;
+  for (const p of repeaters) {
+    if (p.lat === null || p.lon === null) continue;
+    if (prev) routeKm += distanceKm(prev.lat!, prev.lon!, p.lat, p.lon);
+    prev = p;
+  }
+  return {
+    km: distanceKm(first.lat, first.lon, last.lat, last.lon),
+    approx: first.ambiguous || last.ambiguous,
+    routeKm,
+    routeApprox: repeaters.some((p) => p.ambiguous || p.lat === null),
+  };
+}
+
+/** "↔ 241 km (∑ 530 km)": straight line between the end repeaters, then the route's length. */
+export function formatDistance(d: { km: number; approx: boolean; routeKm: number; routeApprox: boolean }): string {
+  const straight = `↔ ${formatLength(d.km, d.approx)}`;
+  // With two repeaters the route is the straight line.
+  return d.routeKm - d.km > 0.5 ? `${straight} (∑ ${formatLength(d.routeKm, d.routeApprox)})` : straight;
 }

@@ -13,6 +13,8 @@ export interface HomeAssistant {
   callService: (domain: string, service: string, data?: Record<string, unknown>) => Promise<void>;
   callWS: <T>(msg: Record<string, unknown>) => Promise<T>;
   user?: { is_admin: boolean };
+  /** Home Assistant's own settings; `country` is an ISO 3166-1 alpha-2 code. */
+  config?: { country?: string | null; unit_system?: { length?: string } };
   connection: {
     subscribeEvents: (
       callback: (event: HassEvent) => void,
@@ -109,6 +111,11 @@ export interface StoredMessage {
    * them as new received messages.
    */
   late_echoes?: LateEcho[];
+  /**
+   * Later copies of this received message that the sender's client sent
+   * again (same text within minutes), kept on the first copy.
+   */
+  resends?: LateEcho[];
   /** Present on search results only */
   entity_id?: string;
   /** Present on search results only */
@@ -153,6 +160,8 @@ export interface ChatMessage {
   repeaterCount?: number;
   /** Late copies of an own message that came back through the mesh. */
   lateEchoes?: LateEcho[];
+  /** Copies the sender sent again, kept on this message. */
+  resends?: LateEcho[];
   /**
    * Inbound region scope for a received channel message. "*" renders as
    * "🌐 all regions", a region name renders verbatim, absent renders

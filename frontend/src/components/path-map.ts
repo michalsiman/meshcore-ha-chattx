@@ -4,10 +4,13 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { ChatMessage, HomeAssistant } from '../types';
 import { getDeviceConfig } from '../api';
 import { MapTilesController } from '../utils/map-tiles';
+import { formatLength } from '../utils/units';
 import { offlineMapLayer, offlineMapStyles } from '../utils/offline-map';
 import {
   TILE_SIZE,
+  distanceKm,
   fitZoom,
+  formatDistance,
   knownNodes,
   project,
   resolveRoute,
@@ -69,6 +72,12 @@ export class PathMap extends LitElement {
   @state() private _me: { lat: number; lon: number } | null = null;
   @state() private _meLoaded = false;
   @state() private _pathIndex = 0;
+  /** Zoom and centre (world pixels) after the user moved the map; null: fitted to the route. */
+  @state() private _view: { zoom: number; cx: number; cy: number } | null = null;
+  private _fittedView: { zoom: number; cx: number; cy: number } | null = null;
+  private _pointers = new Map<number, { x: number; y: number }>();
+  private _pinchStart = 0;
+  private _lastWheel = 0;
   private _tiles = new MapTilesController(this, () => this.hass);
 
   static styles = [offlineMapStyles, css`
@@ -96,12 +105,39 @@ export class PathMap extends LitElement {
       border-color: var(--primary-color, #03a9f4);
       color: var(--text-primary-color, #fff);
     }
+    .wrap {
+      position: relative;
+      margin-top: 6px;
+      /* Fingers move and zoom the map instead of scrolling the dialog. */
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+    }
+    .wrap:active { cursor: grabbing; }
     svg {
       display: block;
       width: 100%;
       height: auto;
       background: #aad3df;
-      margin-top: 6px;
+    }
+    .controls {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .controls button {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--divider-color, #ccc);
+      border-radius: 6px;
+      background: var(--card-background-color, #fff);
+      color: var(--primary-text-color, #222);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
     }
     .label {
       font: 600 10px sans-serif;
@@ -121,6 +157,15 @@ export class PathMap extends LitElement {
     }
     .prefix {
       font-family: monospace;
+    }
+    .leg {
+      color: var(--secondary-text-color);
+      opacity: 0.8;
+      font-size: 11px;
+    }
+    .note.distance {
+      font-size: 12px;
+      color: var(--primary-text-color);
     }
     .note {
       padding: 0 12px 8px;
@@ -159,7 +204,7 @@ export class PathMap extends LitElement {
     return html`
       ${paths.length > 1
         ? html`<div class="tabs">
-            ${paths.map((p, i) => html`<button class=${i === index ? 'active' : ''} @click=${(e: Event) => { e.stopPropagation(); this._pathIndex = i; }}>
+            ${paths.map((p, i) => html`<button class=${i === index ? 'active' : ''} @click=${(e: Event) => { e.stopPropagation(); this._pathIndex = i; this._view = null; }}>
               ${t('Path {n}', { n: i + 1 })} · ${p.length} hops
             </button>`)}
           </div>`
@@ -169,17 +214,97 @@ export class PathMap extends LitElement {
     `;
   }
 
+  willUpdate(changed: Map<string, unknown>) {
+    if (changed.has('message')) this._view = null;
+  }
+
+  private _current() {
+    return this._view ?? this._fittedView ?? { zoom: 8, cx: 0, cy: 0 };
+  }
+
+  /** Zoom to a level keeping the point (sx, sy) of the view, in SVG units, in place. */
+  private _zoomAt(zoom: number, sx = WIDTH / 2, sy = HEIGHT / 2) {
+    const v = this._current();
+    const z = Math.max(2, Math.min(17, zoom));
+    if (z === v.zoom) return;
+    const scale = 2 ** (z - v.zoom);
+    const wx = v.cx - WIDTH / 2 + sx;
+    const wy = v.cy - HEIGHT / 2 + sy;
+    this._view = { zoom: z, cx: wx * scale - (sx - WIDTH / 2), cy: wy * scale - (sy - HEIGHT / 2) };
+  }
+
+  /** Pointer position in SVG units (the SVG is scaled to the dialog's width). */
+  private _local(e: PointerEvent | WheelEvent) {
+    const r = (this.renderRoot.querySelector('.wrap svg') as SVGElement).getBoundingClientRect();
+    const k = r.width > 0 ? WIDTH / r.width : 1;
+    return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k };
+  }
+
+  private _onWheel(e: WheelEvent) {
+    e.preventDefault();
+    const now = Date.now();
+    if (now - this._lastWheel < 120) return;
+    this._lastWheel = now;
+    const p = this._local(e);
+    this._zoomAt(this._current().zoom + (e.deltaY < 0 ? 1 : -1), p.x, p.y);
+  }
+
+  private _onPointerDown(e: PointerEvent) {
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    this._pointers.set(e.pointerId, this._local(e));
+    if (this._pointers.size === 2) this._pinchStart = this._pinchDistance();
+  }
+
+  private _pinchDistance(): number {
+    const [a, b] = [...this._pointers.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
+  private _onPointerMove(e: PointerEvent) {
+    const prev = this._pointers.get(e.pointerId);
+    if (!prev) return;
+    const cur = this._local(e);
+    this._pointers.set(e.pointerId, cur);
+    if (this._pointers.size === 1) {
+      const v = this._current();
+      if (cur.x !== prev.x || cur.y !== prev.y) {
+        this._view = { zoom: v.zoom, cx: v.cx - (cur.x - prev.x), cy: v.cy - (cur.y - prev.y) };
+      }
+    } else if (this._pointers.size === 2 && this._pinchStart > 0) {
+      const d = this._pinchDistance();
+      const [a, b] = [...this._pointers.values()];
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      if (d / this._pinchStart > 1.5) {
+        this._zoomAt(this._current().zoom + 1, mid.x, mid.y);
+        this._pinchStart = d;
+      } else if (d / this._pinchStart < 0.67) {
+        this._zoomAt(this._current().zoom - 1, mid.x, mid.y);
+        this._pinchStart = d;
+      }
+    }
+  }
+
+  private _onPointerUp(e: PointerEvent) {
+    this._pointers.delete(e.pointerId);
+    if (this._pointers.size < 2) this._pinchStart = 0;
+  }
+
   private _renderMap(route: RoutePoint[]) {
     const known = route.filter((p) => p.lat !== null && p.lon !== null) as Array<RoutePoint & { lat: number; lon: number }>;
     if (known.length === 0) {
       return html`<div class="note">${t('No repeater on this path has a known position.')}</div>`;
     }
-    const zoom = fitZoom(known, WIDTH, HEIGHT);
-    const px = known.map((p) => project(p.lat, p.lon, zoom));
-    const xs = px.map((p) => p[0]);
-    const ys = px.map((p) => p[1]);
-    const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-    const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+    const fitted = (() => {
+      const z = fitZoom(known, WIDTH, HEIGHT);
+      const px = known.map((p) => project(p.lat, p.lon, z));
+      const xs = px.map((p) => p[0]);
+      const ys = px.map((p) => p[1]);
+      return { zoom: z, cx: (Math.min(...xs) + Math.max(...xs)) / 2, cy: (Math.min(...ys) + Math.max(...ys)) / 2 };
+    })();
+    // The fitted view until the user drags or zooms.
+    const view = this._view ?? fitted;
+    this._fittedView = fitted;
+    const { zoom, cx, cy } = view;
     const left = cx - WIDTH / 2;
     const top = cy - HEIGHT / 2;
     const tiles = [];
@@ -235,12 +360,25 @@ export class PathMap extends LitElement {
           stroke=${color} stroke-width="3" />
         <text class="label" x=${x + 10} y=${y + 4}>${label}</text>`;
     });
-    return html`<svg viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label=${t('Route on the map')}>
-      ${tiles}
-      ${segments}
-      ${markers}
-      <text class="attribution" x=${WIDTH - 4} y=${HEIGHT - 4} text-anchor="end">${offline ? '© geoBoundaries, GeoNames' : '© OpenStreetMap'}</text>
-    </svg>
+    return html`<div class="wrap"
+        @wheel=${this._onWheel}
+        @pointerdown=${this._onPointerDown}
+        @pointermove=${this._onPointerMove}
+        @pointerup=${this._onPointerUp}
+        @pointercancel=${this._onPointerUp}
+        @click=${(e: Event) => e.stopPropagation()}>
+      <svg viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label=${t('Route on the map')}>
+        ${tiles}
+        ${segments}
+        ${markers}
+        <text class="attribution" x=${WIDTH - 4} y=${HEIGHT - 4} text-anchor="end">${offline ? '© geoBoundaries, GeoNames' : '© OpenStreetMap'}</text>
+      </svg>
+      <div class="controls" @pointerdown=${(e: Event) => e.stopPropagation()}>
+        <button aria-label=${t('Zoom in')} @click=${() => this._zoomAt(zoom + 1)}>+</button>
+        <button aria-label=${t('Zoom out')} @click=${() => this._zoomAt(zoom - 1)}>−</button>
+        <button aria-label=${t('Show all')} @click=${() => { this._view = null; }}>⤢</button>
+      </div>
+    </div>
     ${offline && this._tiles.offlineLoaded && !this._tiles.offlineMap
       ? html`<div class="note">${t('No offline map downloaded. Download it in Settings → Map.')}</div>`
       : nothing}`;
@@ -249,16 +387,40 @@ export class PathMap extends LitElement {
   private _renderList(route: RoutePoint[]) {
     let hop = 0;
     const uncertain = route.some((p) => p.ambiguous);
+    const repeaters = route.filter((p) => p.kind === 'repeater');
+    // Each repeater's leg from the previous repeater with a known position.
+    let prev: RoutePoint | null = null;
+    const legs = repeaters.map((p) => {
+      if (p.lat === null || p.lon === null) return null;
+      const leg = prev ? distanceKm(prev.lat!, prev.lon!, p.lat, p.lon) : null;
+      prev = p;
+      return leg;
+    });
+    // The same repeaters as drawn: straight line between the ends, and the legs added up.
+    const first = repeaters[0];
+    const last = repeaters[repeaters.length - 1];
+    const total = repeaters.length >= 2 && first.lat !== null && first.lon !== null && last.lat !== null && last.lon !== null
+      ? {
+          km: distanceKm(first.lat, first.lon, last.lat, last.lon),
+          approx: first.ambiguous || last.ambiguous,
+          routeKm: legs.reduce<number>((sum, leg) => sum + (leg ?? 0), 0),
+          routeApprox: repeaters.some((p) => p.ambiguous || p.lat === null),
+        }
+      : null;
     return html`
       <ol>
-        ${route.filter((p) => p.kind === 'repeater').map((p) => {
+        ${repeaters.map((p, i) => {
           hop++;
+          const leg = legs[i];
           return html`<li value=${hop}>
             <span class="prefix">${p.prefix}</span>
-            ${p.name ? html` ${p.name}` : html` – ${t('no known position')}`}${p.ambiguous ? ' (?)' : ''}
+            ${p.name ? html` ${p.name}` : html` – ${t('no known position')}`}${p.ambiguous ? ' (?)' : ''}${leg !== null
+              ? html` <span class="leg">+${formatLength(leg)}</span>`
+              : nothing}
           </li>`;
         })}
       </ol>
+      ${total ? html`<div class="note distance">${formatDistance(total)}</div>` : nothing}
       ${uncertain
         ? html`<div class="note">${t('(?) Several repeaters share this prefix; the one nearest to the route is shown.')}</div>`
         : nothing}

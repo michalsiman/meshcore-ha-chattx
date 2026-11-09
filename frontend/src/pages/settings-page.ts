@@ -21,6 +21,7 @@ import '../components/sensor-tile';
 import '../components/node-summary';
 import '../components/quick-messages-editor';
 import '../components/offline-map-settings';
+import '../components/blocklist-settings';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import type { CompanionDeviceDescriptor } from '../components/node-summary';
 import { modalFrameStyles, panelStyles } from '../styles';
@@ -830,7 +831,8 @@ export class SettingsPage extends LitElement {
                 <div class="form-group-inline">
                   <label class="form-label" for="chattx-heard-reply">${t('Reply text in the message dialog')}</label>
                   <input id="chattx-heard-reply" class="form-input" type="text" .value=${loadHeardReply()} placeholder=${defaultHeardReply()} ?disabled=${!this.hass?.user?.is_admin} @change=${this._onHeardReplyChanged} />
-                  <div class="form-description">${t('{hops} is replaced with the hop count, for example 3 hops. The sender\'s name is added at the start. Leave empty for the default text.')}</div>
+                  <div class="form-description">${t('{hops} is replaced with the hop count, for example 3 hops. The sender\'s name is added at the start. Leave empty for the default text.')}
+                    ${t('{km} is replaced with the straight-line distance between the first and the last repeater, {route} with the length of the route through all repeaters, for example 241 km; "? km" when a repeater\'s position is unknown.')}</div>
                 </div>
               </div>
             </div>
@@ -847,6 +849,12 @@ export class SettingsPage extends LitElement {
                   <div class="form-description">${t('On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).')}</div>
                 </div>
               </div>
+            </div>
+
+            <!-- Senders whose messages are not shown -->
+            <div class="device-section">
+              <div class="card-title">${t('Blocked contacts')}</div>
+              <chattx-blocklist-settings .hass=${this.hass}></chattx-blocklist-settings>
             </div>
 
             <!-- Simplified offline map for the route map and the nodes map -->

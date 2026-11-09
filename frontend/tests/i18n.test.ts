@@ -158,3 +158,12 @@ describe('language files', () => {
     expect(entries.filter(([key]) => !known.has(key)).map(([key]) => key)).toEqual([]);
   });
 });
+
+describe('heard reply with distances', () => {
+  it('fills in {km} and {route}, or "? km" when unknown', () => {
+    setSharedHeardReply('Heard {hops}, {km} ({route})');
+    expect(formatHeardReply(9, { km: 241.2, approx: false, routeKm: 530.4, routeApprox: true })).toBe('Heard 9 hops, 241 km (~530 km)');
+    expect(formatHeardReply(1, null)).toBe('Heard 1 hop, ? km (? km)');
+    setSharedHeardReply('');
+  });
+});

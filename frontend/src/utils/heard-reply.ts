@@ -1,5 +1,6 @@
 import { t } from '../i18n';
 import type { HomeAssistant } from '../types';
+import { formatLength, unknownLength } from './units';
 
 /** Where versions before 0.5.2 kept the text, separately in each browser. */
 const LEGACY_STORAGE_KEY = 'chattx-heard-reply';
@@ -65,8 +66,25 @@ export async function saveHeardReply(hass: HomeAssistant, text: string): Promise
   }
 }
 
-/** The reply for a message that took this many hops. */
-export function formatHeardReply(hops: number): string {
+/** Distance as written into the reply: "241 km", "~241 km", or "? km" when unknown. */
+function replyKm(km: number | null | undefined, approx = false): string {
+  if (km === null || km === undefined) return unknownLength();
+  return formatLength(km, approx);
+}
+
+/**
+ * The reply for a message that took this many hops. {hops} becomes
+ * "3 hops"; {km} the straight-line distance between the first and the
+ * last repeater and {route} the length of the route through all of them,
+ * when their positions are known.
+ */
+export function formatHeardReply(
+  hops: number,
+  distance?: { km: number; approx: boolean; routeKm: number; routeApprox: boolean } | null,
+): string {
   const count = `${hops} ${hops === 1 ? 'hop' : 'hops'}`;
-  return (loadHeardReply() || defaultHeardReply()).replace(/\{hops\}/g, count);
+  return (loadHeardReply() || defaultHeardReply())
+    .replace(/\{hops\}/g, count)
+    .replace(/\{km\}/g, replyKm(distance?.km, distance?.approx))
+    .replace(/\{route\}/g, replyKm(distance?.routeKm, distance?.routeApprox));
 }

@@ -6,6 +6,7 @@ import type { ChatMessage, MessageGroup, DeliveryStatus, LateEcho, HomeAssistant
 import './path-map';
 import { hasMapPath } from './path-map';
 import { fewestHops, formatHopLabel, formatTimestamp } from '../chat/message-parser';
+import { cachedKnownNodes, edgeDistance, formatDistance, shortestPath } from '../utils/path-route';
 import { closeStep, openStep } from '../utils/back-stack';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
@@ -267,6 +268,9 @@ export class MessageBubble extends LitElement {
     .message-dialog-top .message-dialog-preview {
       flex: 1;
       min-width: 0;
+      /* Fill the bar, so the close button sits at the right edge also in
+         the wider dialog with the map. */
+      max-width: none;
       border-bottom: none;
     }
 
@@ -388,7 +392,13 @@ export class MessageBubble extends LitElement {
 
     const statusLabel = msg.isOutgoing && msg.deliveryStatus ? this._getStatusLabel(msg.deliveryStatus) : '';
     const hopLabel = !msg.isOutgoing && !msg.isSystem ? formatHopLabel(msg.rxLogData) : '';
-    const ts = formatTimestamp(msg.timestamp, this.timestampFormat) + (hopLabel ? ` · ${hopLabel}` : '');
+    // Straight-line distance between the first and the last repeater, when known.
+    const edge = !msg.isOutgoing && !msg.isSystem && this.hass
+      ? edgeDistance(shortestPath(msg.rxLogData), cachedKnownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>))
+      : null;
+    const ts = formatTimestamp(msg.timestamp, this.timestampFormat) + (hopLabel ? ` · ${hopLabel}` : '')
+      + (edge ? ` · ${formatDistance(edge)}` : '')
+      + (msg.resends ? ` · ×${msg.resends.length + 1}` : '');
     // Inbound region scope — incoming bubbles only. "*" → "🌐 all regions",
     // a region name renders verbatim, absent renders nothing. The outbound
     // scope is shown by the thread-header chip, so outgoing is unaffected.
@@ -511,6 +521,9 @@ export class MessageBubble extends LitElement {
 
   private _renderMessageDialog(msg: ChatMessage) {
     const hasRoute = msg.rxLogData && msg.rxLogData.length > 0;
+    const knownForRoute = this.hass
+      ? cachedKnownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>)
+      : [];
     const routeText = hasRoute
       ? msg.rxLogData!
           .map((e) => {
@@ -532,6 +545,9 @@ export class MessageBubble extends LitElement {
             }
             if (snr !== undefined) parts.push(`SNR: ${snr}`);
             if (rssi !== undefined) parts.push(`RSSI: ${rssi}`);
+            // Distances between the repeaters, when their positions are known.
+            const distance = nodes ? edgeDistance(nodes, knownForRoute) : null;
+            if (distance) parts.push(formatDistance(distance));
             return parts.join(' · ');
           })
           .join(' | ')
@@ -547,7 +563,10 @@ export class MessageBubble extends LitElement {
       second: '2-digit',
     });
     const hops = fewestHops(msg.rxLogData);
-    const heardText = hops === null ? '' : formatHeardReply(hops);
+    const distance = this.hass
+      ? edgeDistance(shortestPath(msg.rxLogData), cachedKnownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>))
+      : null;
+    const heardText = hops === null ? '' : formatHeardReply(hops, distance);
     const footerStyle = 'padding: 8px 16px; font-size: 12px; color: var(--secondary-text-color); border-top: 1px solid var(--divider-color, #e0e0e0);';
 
     return html`
@@ -608,6 +627,13 @@ export class MessageBubble extends LitElement {
                     : t('No repeaters responded')}${msg.deliveryStatus.ackReceived ? ` · ${t('ACK received')}` : ''}${msg.deliveryStatus.roundTripMs ? ` · ${msg.deliveryStatus.roundTripMs}ms RTT` : ''}
                 </div>
               `
+            : html``}
+          ${!msg.isOutgoing && msg.resends
+            ? msg.resends.map((copy) => html`
+                <div class="message-dialog-route" @click=${() => this._copyText(resendText(msg, copy))}>
+                  ${resendText(msg, copy)}
+                </div>
+              `)
             : html``}
           ${msg.isOutgoing && msg.lateEchoes
             ? msg.lateEchoes.map((echo) => html`
@@ -676,5 +702,18 @@ export function lateEchoText(msg: ChatMessage, echo: LateEcho): string {
     ? t('Came back through the mesh after {minutes} min, {hops} hops', { minutes, hops: echo.hop_count })
     : t('Came back through the mesh after {minutes} min', { minutes });
   const path = echo.path_nodes?.length ? ` · ${echo.path_nodes.map((n) => n.substring(0, 4).toUpperCase()).join(' > ')}` : '';
+  return head + path;
+}
+
+/**
+ * One line for a copy the sender sent again: how much later and how it
+ * came. Shown in the dialog of the first copy, which the chat shows once.
+ */
+export function resendText(msg: ChatMessage, copy: LateEcho): string {
+  const seconds = Math.max(0, Math.round((new Date(copy.received_at).getTime() - msg.timestamp.getTime()) / 1000));
+  const head = typeof copy.hop_count === 'number'
+    ? t('Sent again by the sender after {seconds} s, {hops} hops', { seconds, hops: copy.hop_count })
+    : t('Sent again by the sender after {seconds} s', { seconds });
+  const path = copy.path_nodes?.length ? ` · ${copy.path_nodes.map((n) => n.substring(0, 4).toUpperCase()).join(' > ')}` : '';
   return head + path;
 }

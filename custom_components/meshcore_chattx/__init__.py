@@ -45,6 +45,7 @@ from .channel_scopes import ChannelScopeStore
 from .channel_total_exclusions import ChannelTotalExclusionStore
 from .message_store import MessageStore
 from .panel import async_register_panel, async_remove_panel
+from .blocklist import BlocklistStore
 from .quick_messages import HeardReplyStore, QuickMessageStore
 from .repeater_credentials import (
     RepeaterCredentialStore,
@@ -230,6 +231,11 @@ async def async_setup_entry(
         credentials = RepeaterCredentialStore(hass)
         await credentials.async_load()
         bucket["repeater_credentials"] = credentials
+
+    if "blocklist" not in bucket:
+        blocklist = BlocklistStore(hass)
+        await blocklist.async_load()
+        bucket["blocklist"] = blocklist
 
     if "heard_reply" not in bucket:
         heard_reply = HeardReplyStore(hass)
@@ -517,10 +523,22 @@ def _make_message_handler(hass: HomeAssistant, entry_id: str):
         else:
             record.setdefault("delivery_status", "sent")
 
+        # A blocked sender: neither stored nor counted as unread.
+        blocklist = hass.data.get(DOMAIN, {}).get("blocklist")
+        if blocklist is not None and blocklist.is_blocked(record):
+            _LOGGER.debug("Message from a blocked sender in %s not stored", entity_id)
+            return
+
         # A late copy of our own channel message (a flood that looped
         # through the mesh) belongs to the message we sent, not to the chat.
         if await store.attach_late_echo(entity_id, record):
             _LOGGER.debug("Late echo of an own message in %s kept on the original", entity_id)
+            return
+
+        # The same text from the same sender again within minutes: the
+        # sender's client sent it again. Keep it on the first copy.
+        if await store.attach_resend(entity_id, record):
+            _LOGGER.debug("Repeated copy of a received message in %s kept on the first", entity_id)
             return
 
         await store.store_message(entity_id, record)

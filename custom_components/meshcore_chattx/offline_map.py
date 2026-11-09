@@ -27,7 +27,9 @@ _LOGGER = logging.getLogger(__name__)
 
 STORAGE_KEY = "meshcore_chattx.offline_map"
 STORAGE_VERSION = 1
-BASE_URL = "https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/offline_maps"
+# A branch of its own, so the data (several MB, rebuilt now and then) stays
+# out of the code's history.
+BASE_URL = "https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/offline-maps"
 MAX_FILE_BYTES = 5 * 1024 * 1024
 _COUNTRY = re.compile(r"^[A-Z]{2}$")
 
@@ -36,6 +38,26 @@ def _valid_country(data: Any, code: str) -> bool:
     if not isinstance(data, dict) or data.get("v") != 1 or data.get("country") != code:
         return False
     return all(isinstance(data.get(k), list) for k in ("border", "regions", "places", "peaks"))
+
+
+def _valid_world(data: Any) -> bool:
+    return isinstance(data, dict) and data.get("v") == 1 \
+        and isinstance(data.get("borders"), dict) and isinstance(data.get("capitals"), list)
+
+
+async def _fetch_json(session, url: str, label: str) -> Any:
+    import aiohttp
+
+    async with session.get(url, timeout=aiohttp.ClientTimeout(total=120)) as resp:
+        resp.raise_for_status()
+        # read(n) returns what has arrived so far, so collect the chunks
+        # until the end, with a size limit.
+        body = bytearray()
+        async for chunk in resp.content.iter_chunked(64 * 1024):
+            body += chunk
+            if len(body) > MAX_FILE_BYTES:
+                raise ValueError(f"Offline map of {label} is too large")
+    return json.loads(body)
 
 
 class OfflineMapStore:
@@ -61,35 +83,36 @@ class OfflineMapStore:
                 code: {"name": c.get("name", code), "built": c.get("built")}
                 for code, c in countries.items()
             },
+            "world": bool(data.get("world")),
             "downloaded_at": data.get("downloaded_at"),
             "places": sum(len(c["places"]) for c in countries.values()),
             "peaks": sum(len(c["peaks"]) for c in countries.values()),
         }
 
-    async def countries(self) -> dict:
-        return (await self._load())["countries"]
+    async def map_data(self) -> dict:
+        data = await self._load()
+        return {"countries": data["countries"], "world": data.get("world")}
 
     async def download(self, codes: list[str]) -> dict:
-        """Replace the stored countries with fresh copies of `codes`."""
+        """Replace the stored map with the world layer and fresh copies of `codes`."""
         from homeassistant.helpers.aiohttp_client import async_get_clientsession
-        import aiohttp
 
         session = async_get_clientsession(self._hass)
         fetched: dict[str, dict] = {}
         async with self._lock:
+            world = await _fetch_json(session, f"{BASE_URL}/world.json", "the world")
+            if not _valid_world(world):
+                raise ValueError("World map is not valid")
             for code in codes:
-                async with session.get(
-                    f"{BASE_URL}/{code}.json", timeout=aiohttp.ClientTimeout(total=60)
-                ) as resp:
-                    resp.raise_for_status()
-                    body = await resp.content.read(MAX_FILE_BYTES + 1)
-                if len(body) > MAX_FILE_BYTES:
-                    raise ValueError(f"Offline map of {code} is too large")
-                data = json.loads(body)
+                data = await _fetch_json(session, f"{BASE_URL}/{code}.json", code)
                 if not _valid_country(data, code):
                     raise ValueError(f"Offline map of {code} is not valid")
                 fetched[code] = data
-            self._data = {"countries": fetched, "downloaded_at": dt_util.utcnow().isoformat()}
+            self._data = {
+                "countries": fetched,
+                "world": world,
+                "downloaded_at": dt_util.utcnow().isoformat(),
+            }
             await self._store.async_save(self._data)
         return await self.status()
 
@@ -122,11 +145,18 @@ async def ws_offline_map_index(hass, connection, msg):
             resp.raise_for_status()
             index = await resp.json(content_type=None)
         countries = {
-            code: {"name": str(c.get("name", code)), "size": int(c.get("size", 0))}
+            code: {
+                "name": str(c.get("name", code)),
+                "size": int(c.get("size", 0)),
+                "neighbours": [n for n in c.get("neighbours") or [] if isinstance(n, str) and _COUNTRY.match(n)],
+            }
             for code, c in (index.get("countries") or {}).items()
             if _COUNTRY.match(code) and isinstance(c, dict)
         }
-        connection.send_result(msg["id"], {"success": True, "countries": countries})
+        world_size = int((index.get("world") or {}).get("size", 0))
+        connection.send_result(
+            msg["id"], {"success": True, "countries": countries, "world_size": world_size}
+        )
     except Exception as ex:  # no internet, GitHub down
         _LOGGER.debug("Offline map index not available: %s", ex)
         connection.send_result(msg["id"], {"success": False, "countries": {}})
@@ -142,15 +172,15 @@ async def ws_offline_map_status(hass, connection, msg):
 @websocket_api.websocket_command({vol.Required("type"): "meshcore_chattx/offline_map_data"})
 @websocket_api.async_response
 async def ws_offline_map_data(hass, connection, msg):
-    """The downloaded countries, for drawing."""
-    connection.send_result(msg["id"], {"countries": await _store(hass).countries()})
+    """The downloaded countries and the world layer, for drawing."""
+    connection.send_result(msg["id"], await _store(hass).map_data())
 
 
 @websocket_api.websocket_command(
     {
         vol.Required("type"): "meshcore_chattx/offline_map_download",
         vol.Required("countries"): vol.All(
-            [vol.All(str, vol.Upper, vol.Match(_COUNTRY))], vol.Length(max=30)
+            [vol.All(str, vol.Upper, vol.Match(_COUNTRY))], vol.Length(max=60)
         ),
     }
 )

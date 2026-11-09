@@ -36,6 +36,13 @@ interface Label {
   minZoom: number;
 }
 
+interface WorldData {
+  /** Country code → border rings. */
+  borders: Record<string, number[][]>;
+  /** [lon, lat, name, country code] */
+  capitals: Array<[number, number, string, string]>;
+}
+
 export interface OfflineMap {
   borders: Float64Array[];
   regions: Float64Array[];
@@ -91,10 +98,24 @@ function peakMinZoom(ele: number): number {
   return 11;
 }
 
-export function decodeOfflineMap(countries: Record<string, CountryData>): OfflineMap {
+export function decodeOfflineMap(countries: Record<string, CountryData>, world?: WorldData | null): OfflineMap {
   const borders: Float64Array[] = [];
   const regions: Float64Array[] = [];
   const labels: Label[] = [];
+  // The flat world layer, where no country is downloaded in detail.
+  if (world) {
+    for (const [code, rings] of Object.entries(world.borders ?? {})) {
+      if (countries[code]) continue;
+      for (const r of rings) borders.push(decodeRing(r));
+    }
+    for (const [lon, lat, name, code] of world.capitals ?? []) {
+      if (countries[code]) continue;
+      labels.push({
+        lon: lon / SCALE, lat: lat / SCALE, text: name,
+        priority: 5_000_000, kind: 'capital', minZoom: 3,
+      });
+    }
+  }
   for (const c of Object.values(countries)) {
     for (const r of c.border) borders.push(decodeRing(r));
     for (const r of c.regions) regions.push(decodeRing(r));
@@ -124,8 +145,8 @@ let loaded: Promise<OfflineMap | null> | null = null;
 /** The downloaded offline map, or null when none is downloaded. */
 export function loadOfflineMap(hass: HomeAssistant): Promise<OfflineMap | null> {
   loaded ??= hass
-    .callWS<{ countries: Record<string, CountryData> }>({ type: 'meshcore_chattx/offline_map_data' })
-    .then((r) => (Object.keys(r.countries ?? {}).length ? decodeOfflineMap(r.countries) : null))
+    .callWS<{ countries: Record<string, CountryData>; world?: WorldData | null }>({ type: 'meshcore_chattx/offline_map_data' })
+    .then((r) => (Object.keys(r.countries ?? {}).length || r.world ? decodeOfflineMap(r.countries ?? {}, r.world) : null))
     .catch(() => {
       loaded = null;
       return null;
@@ -174,6 +195,13 @@ function paths(map: OfflineMap, zoom: number) {
 
 const MAX_LABELS = 160;
 
+/** Rough label width: CJK and other wide characters take about a full em. */
+function textWidth(text: string, size: number): number {
+  let em = 0;
+  for (const ch of text) em += ch.codePointAt(0)! >= 0x2e80 ? 1 : 0.56;
+  return em * size;
+}
+
 /**
  * The offline map for a view: `left`/`top` are the view's corner in world
  * pixels at `zoom`, `width` × `height` its size.
@@ -199,7 +227,7 @@ export function offlineMapLayer(
     const y = wy - top;
     if (x < -4 || y < -4 || x > width + 4 || y > height + 4) continue;
     const size = l.kind === 'capital' ? 13 : l.kind === 'seat' ? 12 : l.kind === 'peak' ? 10 : 11;
-    const w = l.text.length * size * 0.56 + 10;
+    const w = textWidth(l.text, size) + 10;
     const box: [number, number, number, number] = [x - 4, y - size, x + w, y + 4];
     if (boxes.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
     boxes.push(box);

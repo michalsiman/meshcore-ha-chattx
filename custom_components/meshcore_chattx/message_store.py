@@ -231,6 +231,53 @@ def _fold_late_echoes(messages: list[dict]) -> bool:
     return changed
 
 
+# Some clients send a message again when they don't hear it repeated: the
+# same text from the same sender, as a new packet, seconds later.
+RESEND_WINDOW = timedelta(minutes=5)
+
+
+def _find_resend_original(messages: list[dict], record: dict) -> dict | None:
+    """The received message that ``record`` repeats, or None.
+
+    Same sender, same text, not ours, received at most ``RESEND_WINDOW``
+    after the first copy (other messages may lie between them).
+    """
+    if record.get("outgoing"):
+        return None
+    sender = record.get("sender") or ""
+    text = record.get("text") or ""
+    received = _parse_time(record.get("timestamp"))
+    if not sender or not text or received is None:
+        return None
+    for m in reversed(messages):
+        if m is record:
+            continue
+        when = _parse_time(m.get("timestamp"))
+        if when is None or when > received:
+            continue
+        if received - when > RESEND_WINDOW:
+            return None
+        if not m.get("outgoing") and m.get("sender") == sender and m.get("text") == text:
+            return m
+    return None
+
+
+def _fold_resends(messages: list[dict]) -> bool:
+    """Move stored repeats of a received message onto the first copy."""
+    keep: list[dict] = []
+    changed = False
+    for m in messages:
+        original = _find_resend_original(keep, m)
+        if original is not None:
+            original.setdefault("resends", []).append(_echo_entry(m, _parse_time(m.get("timestamp"))))
+            changed = True
+            continue
+        keep.append(m)
+    if changed:
+        messages[:] = keep
+    return changed
+
+
 def _echo_entry(record: dict, received: datetime) -> dict:
     """What a late echo keeps: when, how far and how strong."""
     entry: dict[str, Any] = {"received_at": received.isoformat()}
@@ -346,7 +393,10 @@ class MessageStore:
             )
             self._conversation_dirty.add(entity_id)
             self._schedule_conversation_save(entity_id)
-        if messages and _fold_late_echoes(messages):
+        folded_resends = bool(messages) and _fold_resends(messages)
+        if folded_resends:
+            _LOGGER.debug("Moved repeated copies of received messages onto the first in %s", entity_id)
+        if messages and (_fold_late_echoes(messages) or folded_resends):
             _LOGGER.debug("Moved late copies of own messages onto the originals in %s", entity_id)
             self._conversation_dirty.add(entity_id)
             self._schedule_conversation_save(entity_id)
@@ -471,6 +521,24 @@ class MessageStore:
         if original is None:
             return False
         original.setdefault("late_echoes", []).append(
+            _echo_entry(record, _parse_time(record.get("timestamp")))
+        )
+        self._conversation_dirty.add(entity_id)
+        self._schedule_conversation_save(entity_id)
+        return True
+
+    async def attach_resend(self, entity_id: str, record: dict) -> bool:
+        """Keep a repeat of a just-received message on the first copy.
+
+        Returns True when ``record`` repeats a message received shortly
+        before (see ``_find_resend_original``), so the caller does not
+        store it as a new message.
+        """
+        messages = await self._ensure_loaded(entity_id)
+        original = _find_resend_original(messages, record)
+        if original is None:
+            return False
+        original.setdefault("resends", []).append(
             _echo_entry(record, _parse_time(record.get("timestamp")))
         )
         self._conversation_dirty.add(entity_id)

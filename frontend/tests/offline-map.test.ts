@@ -53,3 +53,24 @@ describe('offline map', () => {
     expect(div.querySelector('text')).toBeNull();
   });
 });
+
+describe('world layer and country choice', () => {
+  it('draws world borders and capitals only where no country is downloaded', async () => {
+    const world = {
+      borders: { T: [[0, 0, 10, 0, 0, 10]], XX: [[500000, 0, 10, 0, 0, 10]] },
+      capitals: [[133800, 497500, 'Duplicate', 'T'], [500000, 0, 'Elsewhere', 'XX']],
+    };
+    const map = decodeOfflineMap({ T: country as never }, world as never);
+    // T's own border plus XX's world border.
+    expect(map.borders).toHaveLength(2);
+    expect(map.labels.map((l) => l.text)).toContain('Elsewhere');
+    expect(map.labels.map((l) => l.text)).not.toContain('Duplicate');
+  });
+
+  it('suggests Home Assistant\'s country and its neighbours', async () => {
+    const { suggestedCountries } = await import('../src/components/offline-map-settings');
+    const index = { CZ: { name: 'Czechia', size: 1, neighbours: ['PL', 'DE', 'XX'] }, PL: { name: 'Poland', size: 1 }, DE: { name: 'Germany', size: 1 } };
+    expect(suggestedCountries('cz', index)).toEqual(['CZ', 'PL', 'DE']);
+    expect(suggestedCountries(null, index)).toEqual([]);
+  });
+});

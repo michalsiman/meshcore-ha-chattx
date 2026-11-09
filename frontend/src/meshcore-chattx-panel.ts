@@ -1,7 +1,9 @@
 import './define-guard';
+import { setHassLengthUnit } from './utils/units';
 import { t, tn, setHassLanguage, loadTranslations } from './i18n';
 import { isOutdated, panelModuleUrl } from './utils/update-check';
 import { setSharedHeardReply, syncHeardReply } from './utils/heard-reply';
+import { setBlocklist, syncBlocklist, type BlockEntry } from './utils/blocklist';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice } from './types';
@@ -780,6 +782,19 @@ export class MeshCorePanel extends LitElement {
     }).catch(() => {
       // Users who may not subscribe to it see a change on the next load.
     });
+
+    // The blocked contacts changed in another browser.
+    this.hass.connection.subscribeEvents(
+      (event: { data?: { entries?: BlockEntry[] } }) => {
+        setBlocklist(event.data?.entries);
+        this.requestUpdate();
+      },
+      'meshcore_chattx_blocklist_updated'
+    ).then(unsubscribe => {
+      this._unsubscribeList.push(unsubscribe);
+    }).catch(() => {
+      // Users who may not subscribe to it see a change on the next load.
+    });
   }
 
   /**
@@ -807,6 +822,7 @@ export class MeshCorePanel extends LitElement {
 
   protected willUpdate() {
     setHassLanguage(this.hass?.language);
+    setHassLengthUnit(this.hass?.config?.unit_system?.length);
   }
 
   render() {
@@ -1097,7 +1113,8 @@ export class MeshCorePanel extends LitElement {
 
     try {
       setHassLanguage(this.hass.language);
-      await Promise.all([loadTranslations(), syncHeardReply(this.hass)]);
+      setHassLengthUnit(this.hass.config?.unit_system?.length);
+      await Promise.all([loadTranslations(), syncHeardReply(this.hass), syncBlocklist(this.hass)]);
       const devices = await getDevices(this.hass);
       this._devices = devices;
 
