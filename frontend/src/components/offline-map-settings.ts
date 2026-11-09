@@ -57,17 +57,27 @@ export class OfflineMapSettings extends LitElement {
   private _loaded = false;
 
   static styles = [panelStyles, css`
-    :host { display: block; }
+    /* panelStyles sizes the panel's own host to the screen; a settings card is as tall as its content. */
+    :host { display: block; width: auto; height: auto; }
     .search { margin-top: 10px; max-width: 320px; }
     .unit { max-width: 260px; display: block; margin-top: 4px; }
     .countries {
       display: flex;
       flex-wrap: wrap;
       gap: 4px 14px;
-      margin: 8px 0;
-      max-height: 260px;
-      overflow-y: auto;
+      margin: 8px 0 4px;
+      padding: 8px 10px;
+      max-height: 240px;
+      /* A frame and an always visible scrollbar show that the list scrolls. */
+      overflow-y: scroll;
+      border: 1px solid var(--divider-color, #e0e0e0);
+      border-radius: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--secondary-text-color, #888) transparent;
     }
+    .countries::-webkit-scrollbar { width: 8px; }
+    .countries::-webkit-scrollbar-thumb { background: var(--secondary-text-color, #888); border-radius: 4px; }
+    .count { font-size: 11px; color: var(--secondary-text-color); }
     .countries label { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--primary-text-color); cursor: pointer; }
     .size { color: var(--secondary-text-color); font-size: 11px; }
     .actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
@@ -176,6 +186,7 @@ export class OfflineMapSettings extends LitElement {
       <input class="form-input search" type="search" .value=${this._filter}
         placeholder=${t('Search country')}
         @input=${(e: Event) => { this._filter = (e.target as HTMLInputElement).value; }} />
+      <div class="count">${t('{shown} of {total} countries, the list scrolls', { shown: entries.length, total: Object.keys(index).length })}</div>
       <div class="countries">
         ${entries.map((c) => html`<label>
           <input type="checkbox" .checked=${this._selected.has(c.code)} ?disabled=${this._busy}

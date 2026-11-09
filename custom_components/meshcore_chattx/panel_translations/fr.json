@@ -636,5 +636,11 @@
   "Unknown name": "Nom inconnu",
   "Contact name or public key": "Nom du contact ou clé publique",
   "Block": "Bloquer",
-  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Choisissez un contact dans la liste ou saisissez sa clé publique (au moins 6 chiffres hexadécimaux)."
+  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Choisissez un contact dans la liste ou saisissez sa clé publique (au moins 6 chiffres hexadécimaux).",
+  "Public key": "Clé publique",
+  "Copy": "Copier",
+  "Copied": "Copié",
+  "{shown} of {total} countries, the list scrolls": "{shown} sur {total} pays, la liste défile",
+  "Public key unknown: the sender is not among the contacts.": "Clé publique inconnue : l’expéditeur n’est pas parmi les contacts.",
+  "Several contacts have this name.": "Plusieurs contacts portent ce nom."
 }

@@ -636,5 +636,11 @@
   "Unknown name": "Nepoznato ime",
   "Contact name or public key": "Ime kontakta ili javni ključ",
   "Block": "Blokiraj",
-  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Odaberite kontakt s popisa ili unesite njegov javni ključ (barem 6 heksadecimalnih znamenki)."
+  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Odaberite kontakt s popisa ili unesite njegov javni ključ (barem 6 heksadecimalnih znamenki).",
+  "Public key": "Javni ključ",
+  "Copy": "Kopiraj",
+  "Copied": "Kopirano",
+  "{shown} of {total} countries, the list scrolls": "{shown} od {total} država, popis se pomiče",
+  "Public key unknown: the sender is not among the contacts.": "Javni ključ nepoznat: pošiljatelj nije među kontaktima.",
+  "Several contacts have this name.": "Više kontakata ima ovo ime."
 }

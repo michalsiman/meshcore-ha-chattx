@@ -636,5 +636,11 @@
   "Unknown name": "Neznáme meno",
   "Contact name or public key": "Meno kontaktu alebo verejný kľúč",
   "Block": "Blokovať",
-  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Vyberte kontakt zo zoznamu alebo zadajte jeho verejný kľúč (aspoň 6 hexadecimálnych znakov)."
+  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Vyberte kontakt zo zoznamu alebo zadajte jeho verejný kľúč (aspoň 6 hexadecimálnych znakov).",
+  "Public key": "Verejný kľúč",
+  "Copy": "Kopírovať",
+  "Copied": "Skopírované",
+  "{shown} of {total} countries, the list scrolls": "{shown} z {total} štátov, zoznam sa posúva",
+  "Public key unknown: the sender is not among the contacts.": "Verejný kľúč neznámy: odosielateľ nie je medzi kontaktmi.",
+  "Several contacts have this name.": "Toto meno má viac kontaktov."
 }

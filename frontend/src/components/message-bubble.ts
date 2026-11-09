@@ -37,6 +37,7 @@ export class MessageBubble extends LitElement {
   @property({ attribute: false, hasChanged: (value: unknown, old: unknown) => !old && !!value }) hass?: HomeAssistant;
   @property({ type: String }) nodeName = '';
   @state() private _showMap = false;
+  @state() private _copiedKey = '';
 
   constructor() {
     super();
@@ -327,6 +328,24 @@ export class MessageBubble extends LitElement {
       width: min(560px, 94vw);
     }
 
+    .sender-key {
+      margin-top: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      word-break: break-all;
+      cursor: pointer;
+    }
+    .sender-key.unknown {
+      font-family: inherit;
+      cursor: default;
+      opacity: 0.8;
+    }
+    .copy-hint {
+      margin-left: 6px;
+      font-family: sans-serif;
+      color: var(--primary-color, #03a9f4);
+    }
+
     .message-dialog-route {
       padding: 12px 16px;
       font-size: 12px;
@@ -613,6 +632,7 @@ export class MessageBubble extends LitElement {
                   : html``}
               `
             : html``}
+          ${!msg.isOutgoing && !msg.isSystem ? this._renderSender(msg, footerStyle) : html``}
           <div style=${footerStyle}>
             ${msg.isOutgoing ? t('Sent') : t('Received')}: ${fullDateTime}
           </div>
@@ -645,6 +665,25 @@ export class MessageBubble extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  /**
+   * The sender's name and public key. A channel message carries only the
+   * name, so the key is looked up among the contacts by name; several
+   * contacts with that name are all listed.
+   */
+  private _renderSender(msg: ChatMessage, footerStyle: string) {
+    const contacts = this.hass ? senderKeys(this.hass.states, msg.sender) : [];
+    return html`<div style=${footerStyle}>
+      ${t('Sender')}: <b>${msg.sender}</b>
+      ${contacts.length === 0
+        ? html`<div class="sender-key unknown">${t('Public key unknown: the sender is not among the contacts.')}</div>`
+        : contacts.map((key) => html`<div class="sender-key" title=${t('Copy')}
+            @click=${() => { void this._copyText(key); this._copiedKey = key; setTimeout(() => { this._copiedKey = ''; }, 1500); }}>
+            ${key} <span class="copy-hint">${this._copiedKey === key ? t('Copied') : t('Copy')}</span>
+          </div>`)}
+      ${contacts.length > 1 ? html`<div class="sender-key unknown">${t('Several contacts have this name.')}</div>` : html``}
+    </div>`;
   }
 
   private async _copyText(text: string) {
@@ -716,4 +755,15 @@ export function resendText(msg: ChatMessage, copy: LateEcho): string {
     : t('Sent again by the sender after {seconds} s', { seconds });
   const path = copy.path_nodes?.length ? ` · ${copy.path_nodes.map((n) => n.substring(0, 4).toUpperCase()).join(' > ')}` : '';
   return head + path;
+}
+
+/** Public keys of the contacts named `name`, from the core integration's contact sensors. */
+export function senderKeys(states: HomeAssistant['states'], name: string): string[] {
+  const keys: string[] = [];
+  for (const [entityId, state] of Object.entries(states)) {
+    if (!entityId.startsWith('binary_sensor.meshcore_') || !entityId.endsWith('_contact')) continue;
+    const a = state.attributes as Record<string, unknown>;
+    if (a.adv_name === name && typeof a.public_key === 'string' && a.public_key) keys.push(a.public_key.toLowerCase());
+  }
+  return keys;
 }

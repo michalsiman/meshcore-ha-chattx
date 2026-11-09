@@ -636,5 +636,11 @@
   "Unknown name": "Okänt namn",
   "Contact name or public key": "Kontaktnamn eller publik nyckel",
   "Block": "Blockera",
-  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Välj en kontakt i listan eller ange dess publika nyckel (minst 6 hexsiffror)."
+  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Välj en kontakt i listan eller ange dess publika nyckel (minst 6 hexsiffror).",
+  "Public key": "Publik nyckel",
+  "Copy": "Kopiera",
+  "Copied": "Kopierat",
+  "{shown} of {total} countries, the list scrolls": "{shown} av {total} länder, listan går att rulla",
+  "Public key unknown: the sender is not among the contacts.": "Publik nyckel okänd: avsändaren finns inte bland kontakterna.",
+  "Several contacts have this name.": "Flera kontakter har det här namnet."
 }

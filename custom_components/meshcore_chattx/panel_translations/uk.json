@@ -636,5 +636,11 @@
   "Unknown name": "Невідоме ім’я",
   "Contact name or public key": "Ім’я контакту або відкритий ключ",
   "Block": "Заблокувати",
-  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Виберіть контакт зі списку або введіть його відкритий ключ (щонайменше 6 шістнадцяткових цифр)."
+  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Виберіть контакт зі списку або введіть його відкритий ключ (щонайменше 6 шістнадцяткових цифр).",
+  "Public key": "Відкритий ключ",
+  "Copy": "Копіювати",
+  "Copied": "Скопійовано",
+  "{shown} of {total} countries, the list scrolls": "{shown} з {total} країн, список прокручується",
+  "Public key unknown: the sender is not among the contacts.": "Відкритий ключ невідомий: відправника немає серед контактів.",
+  "Several contacts have this name.": "Кілька контактів мають це ім’я."
 }

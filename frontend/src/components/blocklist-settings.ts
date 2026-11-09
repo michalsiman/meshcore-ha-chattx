@@ -49,7 +49,8 @@ export class BlocklistSettings extends LitElement {
   @state() private _busy = false;
 
   static styles = [panelStyles, css`
-    :host { display: block; }
+    /* panelStyles sizes the panel's own host to the screen; a settings card is as tall as its content. */
+    :host { display: block; width: auto; height: auto; }
     ul { list-style: none; margin: 8px 0; padding: 0; }
     li { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: var(--primary-text-color); }
     .key { font-family: monospace; font-size: 12px; color: var(--secondary-text-color); }

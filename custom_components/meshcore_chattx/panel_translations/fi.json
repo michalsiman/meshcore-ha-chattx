@@ -636,5 +636,11 @@
   "Unknown name": "Tuntematon nimi",
   "Contact name or public key": "Yhteystiedon nimi tai julkinen avain",
   "Block": "Estä",
-  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Valitse yhteystieto luettelosta tai anna sen julkinen avain (vähintään 6 heksanumeroa)."
+  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Valitse yhteystieto luettelosta tai anna sen julkinen avain (vähintään 6 heksanumeroa).",
+  "Public key": "Julkinen avain",
+  "Copy": "Kopioi",
+  "Copied": "Kopioitu",
+  "{shown} of {total} countries, the list scrolls": "{shown}/{total} maata, luetteloa voi vierittää",
+  "Public key unknown: the sender is not among the contacts.": "Julkinen avain tuntematon: lähettäjä ei ole yhteystiedoissa.",
+  "Several contacts have this name.": "Usealla yhteystiedolla on tämä nimi."
 }

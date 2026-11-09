@@ -30,6 +30,22 @@ export class NodeDetailDialog extends LitElement {
   @state() private _showLogin = false;
   @state() private _canLoadSettings = false;
   @state() private _loggedIn = false;
+  @state() private _keyCopied = false;
+
+  private async _copyKey(key: string) {
+    try {
+      await navigator.clipboard.writeText(key);
+    } catch {
+      const area = document.createElement('textarea');
+      area.value = key;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      area.remove();
+    }
+    this._keyCopied = true;
+    setTimeout(() => { this._keyCopied = false; }, 1500);
+  }
   private _loginStatePrefix: string | null = null;
 
   constructor() {
@@ -232,6 +248,26 @@ export class NodeDetailDialog extends LitElement {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+    }
+
+    .info-item.wide {
+      grid-column: 1 / -1;
+    }
+
+    .info-value.key {
+      font-size: 12px;
+      user-select: all;
+    }
+
+    .copy-key {
+      float: right;
+      padding: 0 8px;
+      border: 1px solid var(--divider-color, #e0e0e0);
+      border-radius: 4px;
+      background: none;
+      color: var(--primary-color, #03a9f4);
+      font-size: 11px;
+      cursor: pointer;
     }
 
     .info-item {
@@ -480,6 +516,17 @@ export class NodeDetailDialog extends LitElement {
                         <div class="info-label">${t('Type')}</div>
                         <div class="info-value">${typeLabel}</div>
                       </div>
+                      ${isContact && (this.node as Contact).public_key ? html`
+                        <div class="info-item wide">
+                          <div class="info-label">
+                            ${t('Public key')}
+                            <button class="copy-key" @click=${() => this._copyKey((this.node as Contact).public_key)}>
+                              ${this._keyCopied ? t('Copied') : t('Copy')}
+                            </button>
+                          </div>
+                          <div class="info-value key">${(this.node as Contact).public_key}</div>
+                        </div>
+                      ` : html``}
                       ${isContact ? html`
                         <div class="info-item">
                           <div class="info-label">${t('Last Advert')}</div>

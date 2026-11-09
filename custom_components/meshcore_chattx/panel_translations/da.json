@@ -636,5 +636,11 @@
   "Unknown name": "Ukendt navn",
   "Contact name or public key": "Kontaktnavn eller offentlig nøgle",
   "Block": "Bloker",
-  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Vælg en kontakt fra listen, eller indtast dens offentlige nøgle (mindst 6 hex-cifre)."
+  "Choose a contact from the list or enter its public key (at least 6 hex digits).": "Vælg en kontakt fra listen, eller indtast dens offentlige nøgle (mindst 6 hex-cifre).",
+  "Public key": "Offentlig nøgle",
+  "Copy": "Kopiér",
+  "Copied": "Kopieret",
+  "{shown} of {total} countries, the list scrolls": "{shown} af {total} lande, listen kan rulles",
+  "Public key unknown: the sender is not among the contacts.": "Offentlig nøgle ukendt: afsenderen er ikke blandt kontakterne.",
+  "Several contacts have this name.": "Flere kontakter har dette navn."
 }

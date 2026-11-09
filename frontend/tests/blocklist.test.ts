@@ -25,3 +25,16 @@ describe('blocked senders', () => {
     expect(resolveBlockInput('abc', contacts)).toBeNull();
   });
 });
+
+describe('sender key in the message dialog', () => {
+  it('finds the keys of the contacts with the sender\'s name', async () => {
+    const { senderKeys } = await import('../src/components/message-bubble');
+    const states = {
+      'binary_sensor.meshcore_a_contact': { attributes: { adv_name: 'mt_t096', public_key: 'ABCDEF01' } },
+      'binary_sensor.meshcore_b_contact': { attributes: { adv_name: 'Other', public_key: '12345678' } },
+      'sensor.meshcore_x': { attributes: { adv_name: 'mt_t096', public_key: 'ffff' } },
+    } as never;
+    expect(senderKeys(states, 'mt_t096')).toEqual(['abcdef01']);
+    expect(senderKeys(states, 'Nobody')).toEqual([]);
+  });
+});
