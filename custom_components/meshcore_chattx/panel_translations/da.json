@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nye beskeder i denne kanal vises stadig på dens eget badge, men tallet på Chat-fanen tæller dem ikke med. Praktisk til travle kanaler som test- eller bot-kanaler.",
   "Browser tab": "Browserfane",
   "Show unread messages in the browser tab title": "Vis ulæste beskeder i browserfanens titel",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "På alle Home Assistant-sider i denne browser starter fanens titel med tallet fra Chat-fanen, for eksempel (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Kom tilbage gennem meshen efter {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Kom tilbage gennem meshen efter {minutes} min",
   "Saved for every browser": "Gemt for alle browsere",
@@ -656,5 +655,15 @@
   "Upload": "Upload",
   "Images": "Billeder",
   "Show previews of image links in messages": "Vis forhåndsvisninger af billedlinks i beskeder",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "En forhåndsvisning hentes fra serveren med billedet, som dermed ser denne browsers adresse. Kun i denne browser."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "På hver Home Assistant-side starter fanens titel med tallet fra Chat-fanen, fx (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Forhåndsvisninger og åbnede billeder går gennem Home Assistant, så billedets server aldrig ser denne enhed, og et netværk, der blokerer den, er ligegyldigt.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Chattx-indstillingerne gemmes én gang i Home Assistant, ens for alle, i alle browsere og på alle enheder.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} t (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "{service} er ude af drift lige nu. Vælg en anden tjeneste ovenfor, og upload igen.",
+  "The image could not be downloaded.": "Billedet kunne ikke hentes.",
+  "Image": "Billede",
+  "{n}m": "{n} min",
+  "{n}h": "{n} t",
+  "Send again": "Send igen"
 }

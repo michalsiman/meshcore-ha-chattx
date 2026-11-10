@@ -297,9 +297,9 @@ export function formatRelativeTime(date: Date): string {
   const diffMin = Math.floor(diffSec / 60);
   const diffHour = Math.floor(diffMin / 60);
 
-  if (diffSec < 60) return 'now';
-  if (diffMin < 60) return `${diffMin}m`;
-  if (diffHour < 24) return `${diffHour}h`;
+  if (diffSec < 60) return t('now');
+  if (diffMin < 60) return t('{n}m', { n: diffMin });
+  if (diffHour < 24) return t('{n}h', { n: diffHour });
   return date.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
 }
 

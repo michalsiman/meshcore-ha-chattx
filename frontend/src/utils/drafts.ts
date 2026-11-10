@@ -1,6 +1,8 @@
+import * as settings from './user-settings';
 /**
- * Unsent message drafts, one per conversation, kept in this browser so a
- * message being written survives a visit to another Home Assistant page.
+ * Unsent message drafts, one per conversation, kept with the settings in
+ * Home Assistant (see user-settings.ts), so a message being written survives
+ * a visit to another page and can be finished on another device.
  * A draft untouched for an hour is forgotten: by then nobody continues it.
  */
 const STORAGE_KEY = 'chattx-drafts';
@@ -10,7 +12,7 @@ type Drafts = Record<string, { text: string; at: number }>;
 
 function read(now: number): Drafts {
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') as Drafts;
+    const raw = JSON.parse(settings.getItem(STORAGE_KEY) ?? '{}') as Drafts;
     const fresh: Drafts = {};
     for (const [key, draft] of Object.entries(raw ?? {})) {
       if (draft && typeof draft.text === 'string' && typeof draft.at === 'number' && now - draft.at < DRAFT_MAX_AGE_MS) {
@@ -25,8 +27,8 @@ function read(now: number): Drafts {
 
 function write(drafts: Drafts): void {
   try {
-    if (Object.keys(drafts).length === 0) localStorage.removeItem(STORAGE_KEY);
-    else localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
+    if (Object.keys(drafts).length === 0) settings.removeItem(STORAGE_KEY);
+    else settings.setItem(STORAGE_KEY, JSON.stringify(drafts));
   } catch {
     // Storage unavailable: the draft lives only while the page is open.
   }

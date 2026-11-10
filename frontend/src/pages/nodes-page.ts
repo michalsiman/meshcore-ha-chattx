@@ -13,6 +13,7 @@ import '../components/node-card';
 import '../components/node-detail-dialog';
 import '../components/nodes-map';
 import { loadOwnPosition } from '../components/path-map';
+import * as settings from '../utils/user-settings';
 
 const PAGE_SIZE = 50;
 
@@ -70,7 +71,7 @@ export class NodesPage extends LitElement {
   @state() private _sortBy: 'last_heard' | 'name' | 'prefix' = 'last_heard';
   /** List of cards or map; remembered in this browser. */
   @state() private _view: 'list' | 'map' = (() => {
-    try { return localStorage.getItem('chattx-nodes-view') === 'map' ? 'map' : 'list'; } catch { return 'list'; }
+    try { return settings.getItem('chattx-nodes-view') === 'map' ? 'map' : 'list'; } catch { return 'list'; }
   })();
   /** Every node matching the filters, for the map (not paged). */
   @state() private _mapContacts: Contact[] = [];
@@ -635,7 +636,7 @@ export class NodesPage extends LitElement {
 
   private _setView(view: 'list' | 'map') {
     this._view = view;
-    try { localStorage.setItem('chattx-nodes-view', view); } catch { /* storage unavailable */ }
+    try { settings.setItem('chattx-nodes-view', view); } catch { /* storage unavailable */ }
     if (view === 'map') void this._loadMap();
   }
 

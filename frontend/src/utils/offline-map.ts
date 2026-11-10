@@ -11,6 +11,7 @@
 import { css, svg, type SVGTemplateResult } from 'lit';
 import type { HomeAssistant } from '../types';
 import { project } from './path-route';
+import * as settings from './user-settings';
 
 const SCALE = 10_000;
 const OFFLINE_ONLY_KEY = 'chattx-map-offline-only';
@@ -52,7 +53,7 @@ export interface OfflineMap {
 /** Offline map instead of online tiles even when the internet works (per browser). */
 export function offlineOnly(): boolean {
   try {
-    return localStorage.getItem(OFFLINE_ONLY_KEY) === '1';
+    return settings.getItem(OFFLINE_ONLY_KEY) === '1';
   } catch {
     return false;
   }
@@ -60,8 +61,8 @@ export function offlineOnly(): boolean {
 
 export function setOfflineOnly(on: boolean): void {
   try {
-    if (on) localStorage.setItem(OFFLINE_ONLY_KEY, '1');
-    else localStorage.removeItem(OFFLINE_ONLY_KEY);
+    if (on) settings.setItem(OFFLINE_ONLY_KEY, '1');
+    else settings.removeItem(OFFLINE_ONLY_KEY);
   } catch {
     /* private mode */
   }

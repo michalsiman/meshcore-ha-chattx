@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nova sporočila v tem kanalu še vedno kaže njegova lastna značka, število na zavihku Chat pa jih ne šteje. Uporabno za živahne kanale, na primer testne ali kanale z boti.",
   "Browser tab": "Zavihek brskalnika",
   "Show unread messages in the browser tab title": "Prikaži neprebrana sporočila v naslovu zavihka brskalnika",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na vsaki strani Home Assistanta v tem brskalniku se naslov zavihka začne s številom z zavihka Chat, na primer (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Vrnilo se je skozi omrežje po {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Vrnilo se je skozi omrežje po {minutes} min",
   "Saved for every browser": "Shranjeno za vse brskalnike",
@@ -656,5 +655,15 @@
   "Upload": "Naloži",
   "Images": "Slike",
   "Show previews of image links in messages": "Prikaži predoglede povezav do slik v sporočilih",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Predogled se naloži s strežnika, kjer je slika, ta pa tako vidi naslov tega brskalnika. Samo v tem brskalniku."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "Na vsaki strani Home Assistanta se naslov zavihka začne s številom z zavihka Klepet, na primer (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Predogledi in odprte slike gredo prek Home Assistanta, zato strežnik slike nikoli ne vidi te naprave, omrežje, ki ga blokira, pa ne moti.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Nastavitve Chattxa so shranjene enkrat v Home Assistantu, enake za vse, v vseh brskalnikih in na vseh napravah.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} h (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "Storitev {service} trenutno ne deluje. Zgoraj izberite drugo storitev in znova naložite.",
+  "The image could not be downloaded.": "Slike ni bilo mogoče prenesti.",
+  "Image": "Slika",
+  "{n}m": "{n} min",
+  "{n}h": "{n} h",
+  "Send again": "Pošlji znova"
 }

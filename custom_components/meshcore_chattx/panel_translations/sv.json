@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nya meddelanden i den här kanalen syns fortfarande på dess egen bricka, men siffran på Chat-fliken räknar inte med dem. Bra för livliga kanaler som test- eller bot-kanaler.",
   "Browser tab": "Webbläsarflik",
   "Show unread messages in the browser tab title": "Visa olästa meddelanden i webbläsarflikens titel",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "På varje Home Assistant-sida i den här webbläsaren börjar flikens titel med siffran från Chat-fliken, till exempel (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Kom tillbaka genom meshen efter {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Kom tillbaka genom meshen efter {minutes} min",
   "Saved for every browser": "Sparat för alla webbläsare",
@@ -656,5 +655,15 @@
   "Upload": "Ladda upp",
   "Images": "Bilder",
   "Show previews of image links in messages": "Visa förhandsvisningar av bildlänkar i meddelanden",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "En förhandsvisning hämtas från servern där bilden ligger, som då ser den här webbläsarens adress. Endast i den här webbläsaren."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "På varje Home Assistant-sida börjar flikens titel med siffran från Chatt-fliken, till exempel (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Förhandsvisningar och öppnade bilder går via Home Assistant, så bildens server ser aldrig den här enheten och ett nät som blockerar den spelar ingen roll.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Chattx-inställningarna sparas en gång i Home Assistant, desamma för alla, i alla webbläsare och på alla enheter.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} h (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "{service} fungerar inte just nu. Välj en annan tjänst ovan och ladda upp igen.",
+  "The image could not be downloaded.": "Bilden kunde inte hämtas.",
+  "Image": "Bild",
+  "{n}m": "{n} min",
+  "{n}h": "{n} h",
+  "Send again": "Skicka igen"
 }

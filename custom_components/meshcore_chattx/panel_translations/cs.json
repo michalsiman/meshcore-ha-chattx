@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nové zprávy v tomto kanálu dál ukazuje jeho vlastní bublina, ale číslo na záložce Chat je nepočítá. Hodí se pro rušné kanály, třeba testovací nebo s boty.",
   "Browser tab": "Záložka prohlížeče",
   "Show unread messages in the browser tab title": "Zobrazit nepřečtené zprávy v titulku záložky prohlížeče",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na každé stránce Home Assistantu v tomto prohlížeči začne titulek záložky číslem ze záložky Chat, například (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Vrátila se sítí po {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Vrátila se sítí po {minutes} min",
   "Saved for every browser": "Uloženo pro všechny prohlížeče",
@@ -656,5 +655,15 @@
   "Upload": "Nahrát",
   "Images": "Obrázky",
   "Show previews of image links in messages": "Zobrazovat náhledy odkazů na obrázky ve zprávách",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Náhled se načítá ze serveru, kde obrázek leží, a ten tak uvidí adresu tohoto prohlížeče. Platí jen pro tento prohlížeč."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "Na každé stránce Home Assistantu začne titulek záložky číslem ze záložky Chat, například (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Náhledy i otevřené obrázky jdou přes Home Assistant, takže server s obrázkem toto zařízení nevidí a nevadí ani síť, která ho blokuje.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Nastavení Chattx je uložené jednou v Home Assistantu, stejné pro všechny, ve všech prohlížečích a na všech zařízeních.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} h (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "Služba {service} teď nefunguje (mimo provoz). Vyberte výše jinou službu a nahrajte znovu.",
+  "The image could not be downloaded.": "Obrázek se nepodařilo stáhnout.",
+  "Image": "Obrázek",
+  "{n}m": "{n} min",
+  "{n}h": "{n} h",
+  "Send again": "Odeslat znovu"
 }

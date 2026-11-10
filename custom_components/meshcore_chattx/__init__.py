@@ -46,6 +46,7 @@ from .channel_total_exclusions import ChannelTotalExclusionStore
 from .message_store import MessageStore
 from .panel import async_register_panel, async_remove_panel
 from .blocklist import BlocklistStore
+from .ui_settings import UiSettingsStore
 from .quick_messages import HeardReplyStore, QuickMessageStore
 from .repeater_credentials import (
     RepeaterCredentialStore,
@@ -231,6 +232,11 @@ async def async_setup_entry(
         credentials = RepeaterCredentialStore(hass)
         await credentials.async_load()
         bucket["repeater_credentials"] = credentials
+
+    if "ui_settings" not in bucket:
+        ui_settings = UiSettingsStore(hass)
+        await ui_settings.async_load()
+        bucket["ui_settings"] = ui_settings
 
     if "blocklist" not in bucket:
         blocklist = BlocklistStore(hass)

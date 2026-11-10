@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nové správy v tomto kanáli ďalej ukazuje jeho vlastná bublina, ale číslo na záložke Chat ich nepočíta. Hodí sa pre rušné kanály, napríklad testovacie alebo s botmi.",
   "Browser tab": "Záložka prehliadača",
   "Show unread messages in the browser tab title": "Zobraziť neprečítané správy v názve záložky prehliadača",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na každej stránke Home Assistanta v tomto prehliadači začne názov záložky číslom zo záložky Chat, napríklad (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Vrátila sa sieťou po {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Vrátila sa sieťou po {minutes} min",
   "Saved for every browser": "Uložené pre všetky prehliadače",
@@ -656,5 +655,15 @@
   "Upload": "Nahrať",
   "Images": "Obrázky",
   "Show previews of image links in messages": "Zobrazovať náhľady odkazov na obrázky v správach",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Náhľad sa načítava zo servera, kde je obrázok uložený, a ten tak uvidí adresu tohto prehliadača. Platí len pre tento prehliadač."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "Na každej stránke Home Assistanta začne titulok karty číslom zo záložky Chat, napríklad (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Náhľady aj otvorené obrázky idú cez Home Assistant, takže server s obrázkom toto zariadenie nevidí a nevadí ani sieť, ktorá ho blokuje.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Nastavenia Chattx sú uložené raz v Home Assistante, rovnaké pre všetkých, vo všetkých prehliadačoch a na všetkých zariadeniach.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} h (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "Služba {service} teraz nefunguje (mimo prevádzky). Vyberte vyššie inú službu a nahrajte znova.",
+  "The image could not be downloaded.": "Obrázok sa nepodarilo stiahnuť.",
+  "Image": "Obrázok",
+  "{n}m": "{n} min",
+  "{n}h": "{n} h",
+  "Send again": "Odoslať znova"
 }

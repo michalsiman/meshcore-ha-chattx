@@ -1,20 +1,16 @@
 // Unread Chattx messages in the browser tab title, e.g. "(3) Home Assistant",
 // on every Home Assistant page. The number is the state of the Chattx unread
-// sensor, the same total as on the panel's Chat tab. Switched off per browser
-// in Chattx Settings (localStorage "chattx-tab-badge" = "false").
+// sensor, the same total as on the panel's Chat tab. Switched off in Chattx
+// Settings ("chattx-tab-badge" = "false" in the panel's shared settings, the
+// same for everyone on every device).
 (() => {
   const STORAGE_KEY = "chattx-tab-badge";
   const DEFAULT_ENTITY = "sensor.meshcore_chattx_unread";
   const PREFIX = /^\(\d+\+?\) /;
   let count = 0;
 
-  const enabled = () => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) !== "false";
-    } catch {
-      return true;
-    }
-  };
+  let setting = null;
+  const enabled = () => setting !== "false";
 
   const apply = () => {
     const base = document.title.replace(PREFIX, "");
@@ -27,9 +23,6 @@
     childList: true,
     subtree: true,
     characterData: true,
-  });
-  window.addEventListener("storage", (e) => {
-    if (e.key === STORAGE_KEY) apply();
   });
   window.addEventListener("chattx-tab-badge-changed", apply);
 
@@ -47,6 +40,14 @@
   };
 
   const subscribe = (hass) => {
+    // The setting, from the panel's shared settings, kept up to date.
+    hass.connection.subscribeMessage(
+      (msg) => {
+        setting = msg?.values?.[STORAGE_KEY] ?? null;
+        apply();
+      },
+      { type: "meshcore_chattx/subscribe_settings" }
+    ).catch(() => {});
     const id = entityId(hass);
     hass.connection.subscribeMessage(
       (msg) => {

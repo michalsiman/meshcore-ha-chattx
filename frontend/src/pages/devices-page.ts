@@ -14,6 +14,7 @@ import { loadMeshcoreEntityRegistry, type EntityInfo } from '../utils/classify-e
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { isMissingState, lastKnownFromHistory, oldestSubstitute, withLastKnown, type LastKnown } from '../utils/last-known';
 import '../components/read-age-note';
+import * as settings from '../utils/user-settings';
 
 @customElement('chattx-devices-page')
 export class DevicesPage extends LitElement {
@@ -54,7 +55,7 @@ export class DevicesPage extends LitElement {
   private _lastKnownRequested = new Set<string>();
 
   // Hidden sensors: device identifier key → set of hidden entity_ids
-  // Persisted to localStorage under 'chattx-hidden-sensors'
+  // Persisted with the settings in Home Assistant under 'chattx-hidden-sensors'
   @state() private _hiddenSensors: Record<string, string[]> = {};
 
   // Context menu modal state (right-click / long-press on tile)
@@ -1378,7 +1379,7 @@ export class DevicesPage extends LitElement {
 
   private _loadHiddenSensors() {
     try {
-      const stored = localStorage.getItem('chattx-hidden-sensors');
+      const stored = settings.getItem('chattx-hidden-sensors');
       if (stored) {
         this._hiddenSensors = JSON.parse(stored);
       }
@@ -1389,9 +1390,9 @@ export class DevicesPage extends LitElement {
 
   private _saveHiddenSensors() {
     try {
-      localStorage.setItem('chattx-hidden-sensors', JSON.stringify(this._hiddenSensors));
+      settings.setItem('chattx-hidden-sensors', JSON.stringify(this._hiddenSensors));
     } catch {
-      // localStorage full or unavailable — silent fail
+      // settings unavailable — silent fail
     }
   }
 

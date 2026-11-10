@@ -1,3 +1,4 @@
+import * as settings from './user-settings';
 /**
  * Distance unit for the distances shown in the panel: kilometres or miles.
  * "auto" follows Home Assistant's unit system (US customary → miles).
@@ -17,7 +18,7 @@ export function setHassLengthUnit(unit: string | undefined): void {
 
 export function loadDistanceSetting(): DistanceSetting {
   try {
-    const v = localStorage.getItem(KEY);
+    const v = settings.getItem(KEY);
     return v === 'km' || v === 'mi' ? v : 'auto';
   } catch {
     return 'auto';
@@ -26,8 +27,8 @@ export function loadDistanceSetting(): DistanceSetting {
 
 export function saveDistanceSetting(setting: DistanceSetting): void {
   try {
-    if (setting === 'auto') localStorage.removeItem(KEY);
-    else localStorage.setItem(KEY, setting);
+    if (setting === 'auto') settings.removeItem(KEY);
+    else settings.setItem(KEY, setting);
   } catch {
     /* private mode */
   }

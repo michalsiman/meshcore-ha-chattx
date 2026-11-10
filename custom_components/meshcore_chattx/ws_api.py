@@ -38,8 +38,10 @@ from .const import (
 )
 from .message_store import MessageStore
 from .offline_map import async_register_offline_map_commands
-from .blocklist import async_register_blocklist_commands
+from .blocklist import async_register_blocklist_commands, get_blocklist
 from .image_upload import async_register_image_upload_commands
+from .image_proxy import async_register_image_proxy
+from .ui_settings import async_register_ui_settings_commands
 from .sensor import SIGNAL_TOTAL_EXCLUSIONS_CHANGED
 from .radio_compat import (
     cache_self_info,
@@ -436,6 +438,8 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     async_register_offline_map_commands(hass)
     async_register_blocklist_commands(hass)
     async_register_image_upload_commands(hass)
+    async_register_image_proxy(hass)
+    async_register_ui_settings_commands(hass)
     # Device / contact / channel read commands
     websocket_api.async_register_command(hass, ws_get_devices)
     websocket_api.async_register_command(hass, ws_get_contacts)
@@ -1767,6 +1771,24 @@ async def ws_get_conversation_activity(hass, connection, msg):
         for entity_id, entry in index.items()
         if entry.get("last_preview")
     }
+    # A blocked sender's message stored before blocking may be the newest:
+    # use the newest message of someone else for the list instead.
+    blocklist = get_blocklist(hass)
+    if blocklist is not None and store is not None:
+        for entity_id, entry in index.items():
+            last = {"sender": entry.get("last_sender", ""), "text": entry.get("last_preview", ""), "outgoing": False}
+            if not blocklist.is_blocked(last):
+                continue
+            activity.pop(entity_id, None)
+            previews.pop(entity_id, None)
+            for m in reversed(await store._load_for_search(entity_id)):
+                if blocklist.is_blocked(m):
+                    continue
+                if m.get("timestamp"):
+                    activity[entity_id] = m["timestamp"]
+                if m.get("text"):
+                    previews[entity_id] = {"sender": m.get("sender", ""), "text": (m.get("text") or "")[:50]}
+                break
     connection.send_result(msg["id"], {"activity": activity, "previews": previews})
 
 

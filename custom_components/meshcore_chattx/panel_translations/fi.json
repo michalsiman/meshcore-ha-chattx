@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Tämän kanavan uudet viestit näkyvät edelleen sen omassa merkissä, mutta Chat-välilehden luku ei laske niitä mukaan. Kätevä vilkkaille kanaville, kuten testi- tai bottikanaville.",
   "Browser tab": "Selaimen välilehti",
   "Show unread messages in the browser tab title": "Näytä lukemattomat viestit selaimen välilehden otsikossa",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Jokaisella Home Assistant -sivulla tässä selaimessa välilehden otsikko alkaa Chat-välilehden luvulla, esimerkiksi (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Palasi meshin kautta {minutes} min jälkeen, {hops} hops",
   "Came back through the mesh after {minutes} min": "Palasi meshin kautta {minutes} min jälkeen",
   "Saved for every browser": "Tallennettu kaikille selaimille",
@@ -656,5 +655,15 @@
   "Upload": "Lähetä",
   "Images": "Kuvat",
   "Show previews of image links in messages": "Näytä viestien kuvalinkkien esikatselut",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Esikatselu ladataan palvelimelta, jolla kuva on, ja se näkee näin tämän selaimen osoitteen. Vain tässä selaimessa."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "Jokaisella Home Assistantin sivulla välilehden otsikko alkaa Chat-välilehden luvulla, esimerkiksi (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Esikatselut ja avatut kuvat tulevat Home Assistantin kautta, joten kuvan palvelin ei koskaan näe tätä laitetta eikä sen estävä verkko haittaa.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Chattxin asetukset tallennetaan kerran Home Assistantiin, samoina kaikille, kaikissa selaimissa ja laitteissa.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} t (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "{service} ei ole juuri nyt toiminnassa. Valitse yllä toinen palvelu ja lähetä uudelleen.",
+  "The image could not be downloaded.": "Kuvaa ei voitu ladata.",
+  "Image": "Kuva",
+  "{n}m": "{n} min",
+  "{n}h": "{n} t",
+  "Send again": "Lähetä uudelleen"
 }

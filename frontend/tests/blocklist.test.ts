@@ -38,3 +38,14 @@ describe('sender key in the message dialog', () => {
     expect(senderKeys(states, 'Nobody')).toEqual([]);
   });
 });
+
+describe('blocked sender of a live message', () => {
+  afterEach(() => setBlocklist([]));
+  it('matches by name or by key prefix', async () => {
+    const { isBlockedSender } = await import('../src/utils/blocklist');
+    setBlocklist([{ key: '9dda04d81214', names: ['PiPin89🤖'] }]);
+    expect(isBlockedSender('PiPin89🤖')).toBe(true);
+    expect(isBlockedSender('Other', '9dda04d81214')).toBe(true);
+    expect(isBlockedSender('Other', 'aaaaaaaaaaaa')).toBe(false);
+  });
+});

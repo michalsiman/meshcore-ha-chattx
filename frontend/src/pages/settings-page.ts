@@ -27,6 +27,7 @@ import { attachDialogA11y } from '../utils/dialog-a11y';
 import type { CompanionDeviceDescriptor } from '../components/node-summary';
 import { modalFrameStyles, panelStyles } from '../styles';
 import { loadMeshcoreEntityRegistry, type EntityInfo } from '../utils/classify-entity';
+import * as settings from '../utils/user-settings';
 
 interface ConfirmAction {
   title: string;
@@ -815,6 +816,7 @@ export class SettingsPage extends LitElement {
             <!-- Language of the panel and the quick reply text, per browser -->
             <div class="device-section">
               <div class="card-title">${t('Language')}</div>
+              <div class="form-description" style="margin-bottom: 8px">${t('Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.')}</div>
               <div class="section-row">
                 <div class="form-group-inline">
                   <label class="form-label" for="chattx-language">${t('Panel language')}</label>
@@ -847,7 +849,7 @@ export class SettingsPage extends LitElement {
                     <input type="checkbox" .checked=${loadTabBadge()} @change=${this._onTabBadgeChanged} />
                     <span class="form-toggle-label">${t('Show unread messages in the browser tab title')}</span>
                   </label>
-                  <div class="form-description">${t('On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).')}</div>
+                  <div class="form-description">${t('On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).')}</div>
                 </div>
               </div>
             </div>
@@ -874,7 +876,7 @@ export class SettingsPage extends LitElement {
                       @change=${(e: Event) => { saveImagePreviews((e.target as HTMLInputElement).checked); this.requestUpdate(); }} />
                     <span class="form-toggle-label">${t('Show previews of image links in messages')}</span>
                   </label>
-                  <div class="form-description">${t('A preview is loaded from the server where the image is, which then sees this browser\'s address. In this browser only.')}</div>
+                  <div class="form-description">${t('Previews and opened images come through Home Assistant, so the image\'s server never sees this device and a network that blocks it doesn\'t matter.')}</div>
                 </div>
               </div>
             </div>
@@ -2125,7 +2127,7 @@ export class SettingsPage extends LitElement {
 
   private _loadHiddenSensors() {
     try {
-      const stored = localStorage.getItem('chattx-hidden-sensors');
+      const stored = settings.getItem('chattx-hidden-sensors');
       if (stored) {
         this._hiddenSensors = JSON.parse(stored);
       }
@@ -2136,9 +2138,9 @@ export class SettingsPage extends LitElement {
 
   private _saveHiddenSensors() {
     try {
-      localStorage.setItem('chattx-hidden-sensors', JSON.stringify(this._hiddenSensors));
+      settings.setItem('chattx-hidden-sensors', JSON.stringify(this._hiddenSensors));
     } catch {
-      // localStorage full or unavailable
+      // settings unavailable
     }
   }
 

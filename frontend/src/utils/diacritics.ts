@@ -1,3 +1,4 @@
+import * as settings from './user-settings';
 const STORAGE_KEY = 'chattx-strip-diacritics';
 
 function stripLatinDiacritics(text: string): string {
@@ -20,7 +21,7 @@ export function stripDiacritics(text: string): string {
 
 export function loadStripDiacritics(): boolean {
   try {
-    return localStorage.getItem(STORAGE_KEY) === 'true';
+    return settings.getItem(STORAGE_KEY) === 'true';
   } catch {
     return false;
   }
@@ -28,7 +29,7 @@ export function loadStripDiacritics(): boolean {
 
 export function saveStripDiacritics(enabled: boolean): void {
   try {
-    localStorage.setItem(STORAGE_KEY, String(enabled));
+    settings.setItem(STORAGE_KEY, String(enabled));
   } catch {
     // Storage unavailable: the choice lasts until the page reloads.
   }

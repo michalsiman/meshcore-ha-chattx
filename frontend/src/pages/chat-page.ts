@@ -1024,7 +1024,7 @@ export class ChatPage extends LitElement {
     const remaining = this._remainingBytes();
     const diacriticsLabel = t('Send without diacritics. The text changes when it is sent.');
     return html`
-      <div class="chat-container" @reply-to-sender=${this._onReplyToSender} @scroll=${this._onChatScroll}>
+      <div class="chat-container" @reply-to-sender=${this._onReplyToSender} @resend-message=${this._onResendMessage} @scroll=${this._onChatScroll}>
         ${this._messageStore.loadingOlder
           ? html`<div class="loading-older"><div class="loading-spinner"></div></div>`
           : html``}
@@ -1460,10 +1460,22 @@ export class ChatPage extends LitElement {
       return;
     }
 
-    this._sending = true;
     const text = this._outgoingText().trim();
     this._inputText = '';
+    if (!(await this._deliver(text))) this._inputText = text; // Restore text on error
+  }
 
+  /** "Send again" in the message dialog: the same text to this conversation, as a new message. */
+  private _onResendMessage(e: CustomEvent<{ text: string }>) {
+    const text = e.detail?.text?.trim();
+    if (!text || this._sending || !this._conversationResolved) return;
+    void this._deliver(text);
+  }
+
+  /** Send a text to the open conversation; false when it failed. */
+  private async _deliver(text: string): Promise<boolean> {
+    if (!this.selectedId || !this.hass || !this.config) return false;
+    this._sending = true;
     try {
       // Add optimistic message
       if (this._messageStore) {
@@ -1484,8 +1496,7 @@ export class ChatPage extends LitElement {
         const idx = parseInt(this.selectedId, 10);
         if (isNaN(idx) || idx < 0 || idx > 255) {
           console.error('Invalid channel index:', this.selectedId);
-          this._inputText = text;
-          return;
+          return false;
         }
         // Thread the channel's persisted region scope into the send so
         // the upstream service applies (and then resets) the flood
@@ -1495,9 +1506,10 @@ export class ChatPage extends LitElement {
           this._getActiveChannelScope() ?? undefined,
         );
       }
+      return true;
     } catch (err) {
       console.error('Failed to send message:', err);
-      this._inputText = text; // Restore text on error
+      return false;
     } finally {
       this._sending = false;
     }

@@ -1,12 +1,13 @@
 import './define-guard';
 import { setHassLengthUnit } from './utils/units';
+import { initUserSettings, SETTINGS_CHANGED } from './utils/user-settings';
 import { t, tn, setHassLanguage, loadTranslations } from './i18n';
 import { isOutdated, panelModuleUrl } from './utils/update-check';
 import { setSharedHeardReply, syncHeardReply } from './utils/heard-reply';
-import { setBlocklist, syncBlocklist, type BlockEntry } from './utils/blocklist';
+import { isBlockedSender, setBlocklist, syncBlocklist, type BlockEntry } from './utils/blocklist';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice } from './types';
+import type { HomeAssistant, PanelConfig, Contact, Channel, MeshCoreDevice, HassEvent } from './types';
 import type { TraceResult } from './api';
 import { panelStyles } from './styles';
 import { MESHCORE_PRESET, DEFAULT_PANEL_CONFIG } from './constants';
@@ -607,7 +608,13 @@ export class MeshCorePanel extends LitElement {
     this._releaseKeyboardViewport = keepAboveKeyboard(this);
     (this.hass?.connection as unknown as EventTarget | undefined)?.addEventListener?.('ready', this._onReconnect);
     void this._checkForUpdate();
+    window.addEventListener(SETTINGS_CHANGED, this._onSettingsChanged);
   }
+
+  /** A setting changed, here or on another device: the language may be another one. */
+  private _onSettingsChanged = () => {
+    void loadTranslations().then(() => this.requestUpdate());
+  };
 
   /** Compare the running bundle with the one Home Assistant serves now, after a restart for example. */
   private async _checkForUpdate() {
@@ -633,6 +640,7 @@ export class MeshCorePanel extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._teardownSubscriptions();
+    window.removeEventListener(SETTINGS_CHANGED, this._onSettingsChanged);
     document.removeEventListener('visibilitychange', this._onVisibilityChange);
     this._unsubscribeTabBadge?.();
     this._unsubscribeTabBadge = null;
@@ -741,6 +749,12 @@ export class MeshCorePanel extends LitElement {
         ) {
           return;
         }
+        // A blocked sender's message is not shown, so it is not the newest activity either.
+        if (!data.outgoing && isBlockedSender(
+          String(data.sender_name ?? data.sender ?? ''), data.pubkey_prefix as string | undefined,
+        )) {
+          return;
+        }
         this._conversationActivity = mergeActivity(this._conversationActivity, {
           [entityId]: new Date().toISOString(),
         });
@@ -772,8 +786,8 @@ export class MeshCorePanel extends LitElement {
 
     // The quick reply text changed in another browser.
     this.hass.connection.subscribeEvents(
-      (event: { data?: { text?: string } }) => {
-        setSharedHeardReply(event.data?.text);
+      (event: HassEvent) => {
+        setSharedHeardReply((event.data as { text?: string } | undefined)?.text);
         this.requestUpdate();
       },
       'meshcore_chattx_heard_reply_updated'
@@ -785,8 +799,8 @@ export class MeshCorePanel extends LitElement {
 
     // The blocked contacts changed in another browser.
     this.hass.connection.subscribeEvents(
-      (event: { data?: { entries?: BlockEntry[] } }) => {
-        setBlocklist(event.data?.entries);
+      (event: HassEvent) => {
+        setBlocklist((event.data as { entries?: BlockEntry[] } | undefined)?.entries);
         this.requestUpdate();
       },
       'meshcore_chattx_blocklist_updated'
@@ -1114,6 +1128,8 @@ export class MeshCorePanel extends LitElement {
     try {
       setHassLanguage(this.hass.language);
       setHassLengthUnit(this.hass.config?.unit_system?.length);
+      // Settings first: the language is one of them.
+      await initUserSettings(this.hass);
       await Promise.all([loadTranslations(), syncHeardReply(this.hass), syncBlocklist(this.hass)]);
       const devices = await getDevices(this.hass);
       this._devices = devices;

@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Les nouveaux messages de ce canal restent affichés sur son propre badge, mais le nombre sur l'onglet Chat ne les compte pas. Utile pour les canaux très actifs, comme les canaux de test ou de bots.",
   "Browser tab": "Onglet du navigateur",
   "Show unread messages in the browser tab title": "Afficher les messages non lus dans le titre de l'onglet",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Sur chaque page de Home Assistant dans ce navigateur, le titre de l'onglet commence par le nombre de l'onglet Chat, par exemple (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Revenu par le mesh après {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Revenu par le mesh après {minutes} min",
   "Saved for every browser": "Enregistré pour tous les navigateurs",
@@ -656,5 +655,15 @@
   "Upload": "Envoyer",
   "Images": "Images",
   "Show previews of image links in messages": "Afficher un aperçu des liens d’images dans les messages",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "L’aperçu est chargé depuis le serveur de l’image, qui voit ainsi l’adresse de ce navigateur. Dans ce navigateur uniquement."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "Sur chaque page de Home Assistant, le titre de l’onglet commence par le nombre de l’onglet Chat, par exemple (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Les aperçus et les images ouvertes passent par Home Assistant : le serveur de l’image ne voit jamais cet appareil, et un réseau qui le bloque ne gêne pas.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Les réglages de Chattx sont enregistrés une seule fois dans Home Assistant, les mêmes pour tous, dans chaque navigateur et sur chaque appareil.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} h (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "{service} est hors service pour le moment. Choisissez un autre service ci-dessus et réessayez.",
+  "The image could not be downloaded.": "L’image n’a pas pu être téléchargée.",
+  "Image": "Image",
+  "{n}m": "{n} min",
+  "{n}h": "{n} h",
+  "Send again": "Renvoyer"
 }

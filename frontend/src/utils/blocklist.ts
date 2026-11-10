@@ -24,6 +24,19 @@ export function blocklist(): BlockEntry[] {
   return entries;
 }
 
+/** A received message's sender is blocked: by key prefix (direct messages) or by name (channels). */
+export function isBlockedSender(name: string | undefined, pubkeyPrefix?: string | undefined): boolean {
+  if (entries.length === 0) return false;
+  const prefix = (pubkeyPrefix ?? '').toLowerCase();
+  if (prefix.length >= 6 && entries.some((e) => {
+    const n = Math.min(e.key.length, prefix.length);
+    return e.key.slice(0, n) === prefix.slice(0, n);
+  })) {
+    return true;
+  }
+  return !!name && names.has(name);
+}
+
 export function isBlockedMessage(msg: ChatMessage): boolean {
   return names.size > 0 && !msg.isOutgoing && !msg.isSystem && names.has(msg.sender);
 }

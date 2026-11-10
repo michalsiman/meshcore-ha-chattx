@@ -4,12 +4,13 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types';
 import { modalFrameStyles, panelStyles } from '../styles';
 import { attachDialogA11y } from '../utils/dialog-a11y';
+import * as settings from '../utils/user-settings';
 
 /** Longest side of the uploaded image; enough for a phone screen, small to send. */
 const MAX_SIDE = 1600;
 const EXPIRY_KEY = 'chattx-image-expiry';
 
-export type Expiry = 'permanent' | '1h' | '12h' | '24h' | '72h';
+export type Expiry = 'permanent' | '1h' | '12h' | '24h' | '72h' | 'tmpfiles';
 
 /**
  * Shrink an image to at most MAX_SIDE pixels and encode it as JPEG (PNG
@@ -45,7 +46,7 @@ export class ImageUploadDialog extends LitElement {
 
   @state() private _preview = '';
   @state() private _image: Awaited<ReturnType<typeof shrinkImage>> | null = null;
-  @state() private _expiry: Expiry = (localStorage.getItem(EXPIRY_KEY) as Expiry | null) ?? 'permanent';
+  @state() private _expiry: Expiry = (settings.getItem(EXPIRY_KEY) as Expiry | null) ?? 'permanent';
   @state() private _busy = false;
   @state() private _error = '';
 
@@ -96,7 +97,7 @@ export class ImageUploadDialog extends LitElement {
     this._busy = true;
     this._error = '';
     try {
-      localStorage.setItem(EXPIRY_KEY, this._expiry);
+      settings.setItem(EXPIRY_KEY, this._expiry);
       const result = await this.hass.callWS<{ url: string }>({
         type: 'meshcore_chattx/upload_image',
         data: this._image.data,
@@ -105,7 +106,10 @@ export class ImageUploadDialog extends LitElement {
       });
       this.dispatchEvent(new CustomEvent('image-uploaded', { detail: { url: result.url }, bubbles: true, composed: true }));
     } catch (error) {
-      this._error = t('Uploading the image failed: {message}', { message: (error as { message?: string }).message ?? String(error) });
+      const e = error as { code?: string; message?: string };
+      this._error = e.code === 'service_down'
+        ? t('{service} is out of service right now. Choose another service above and upload again.', { service: (e.message ?? '').split(':')[0] })
+        : t('Uploading the image failed: {message}', { message: e.message ?? String(error) });
     } finally {
       this._busy = false;
     }
@@ -132,6 +136,7 @@ export class ImageUploadDialog extends LitElement {
               <option value="12h" ?selected=${this._expiry === '12h'}>${t('{n} hours (litterbox.catbox.moe)', { n: 12 })}</option>
               <option value="24h" ?selected=${this._expiry === '24h'}>${t('{n} hours (litterbox.catbox.moe)', { n: 24 })}</option>
               <option value="72h" ?selected=${this._expiry === '72h'}>${t('{n} hours (litterbox.catbox.moe)', { n: 72 })}</option>
+              <option value="tmpfiles" ?selected=${this._expiry === 'tmpfiles'}>${t('{n} minutes (tmpfiles.org)', { n: 60 })}</option>
             </select>
             <div class="warning">${t('The image will be public: anyone with the link can open it, and a permanent one can\'t be deleted. The link is put into your message; recipients need internet to open it.')}</div>
             ${this._error ? html`<div class="error" role="alert">${this._error}</div>` : nothing}

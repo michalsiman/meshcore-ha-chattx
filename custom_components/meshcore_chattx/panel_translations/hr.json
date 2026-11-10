@@ -576,7 +576,6 @@
   "New messages in this channel still show on its own badge, but the number on the Chat tab does not count them. Useful for busy channels such as test or bot channels.": "Nove poruke u ovom kanalu i dalje prikazuje njegova vlastita značka, ali ih broj na kartici Chat ne broji. Korisno za prometne kanale, na primjer testne ili s botovima.",
   "Browser tab": "Kartica preglednika",
   "Show unread messages in the browser tab title": "Prikaži nepročitane poruke u naslovu kartice preglednika",
-  "On every Home Assistant page in this browser, the tab title starts with the number from the Chat tab, for example (3).": "Na svakoj stranici Home Assistanta u ovom pregledniku naslov kartice počinje brojem s kartice Chat, na primjer (3).",
   "Came back through the mesh after {minutes} min, {hops} hops": "Vratila se kroz mrežu nakon {minutes} min, {hops} hops",
   "Came back through the mesh after {minutes} min": "Vratila se kroz mrežu nakon {minutes} min",
   "Saved for every browser": "Spremljeno za sve preglednike",
@@ -656,5 +655,15 @@
   "Upload": "Prenesi",
   "Images": "Slike",
   "Show previews of image links in messages": "Prikaži preglede poveznica na slike u porukama",
-  "A preview is loaded from the server where the image is, which then sees this browser's address. In this browser only.": "Pregled se učitava s poslužitelja na kojem je slika, koji tako vidi adresu ovog preglednika. Samo u ovom pregledniku."
+  "On every Home Assistant page, the tab title starts with the number from the Chat tab, for example (3).": "Na svakoj stranici Home Assistanta naslov kartice počinje brojem s kartice Chat, na primjer (3).",
+  "Previews and opened images come through Home Assistant, so the image's server never sees this device and a network that blocks it doesn't matter.": "Pregledi i otvorene slike idu preko Home Assistanta, pa poslužitelj slike nikad ne vidi ovaj uređaj, a mreža koja ga blokira ne smeta.",
+  "Chattx settings are saved once in Home Assistant, the same for everyone, in every browser and on every device.": "Postavke Chattxa spremljene su jednom u Home Assistantu, iste za sve, u svakom pregledniku i na svakom uređaju.",
+  "{n} minutes (tmpfiles.org)": "{n} min (tmpfiles.org)",
+  "{n} hours (0x0.st)": "{n} h (0x0.st)",
+  "{service} is out of service right now. Choose another service above and upload again.": "Usluga {service} trenutačno ne radi. Odaberite gore drugu uslugu i ponovno prenesite.",
+  "The image could not be downloaded.": "Sliku nije bilo moguće preuzeti.",
+  "Image": "Slika",
+  "{n}m": "{n} min",
+  "{n}h": "{n} h",
+  "Send again": "Pošalji ponovno"
 }

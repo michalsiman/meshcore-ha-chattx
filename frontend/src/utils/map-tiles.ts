@@ -6,8 +6,8 @@
  * now wants an API key. Home Assistant 2026.11 fetches OpenStreetMap tiles
  * on the server for its own maps (`/api/map_tiles`), authorised by a short
  * token from `map_tiles/access_token` that rotates every 30 minutes and
- * stays valid for at least 30 more. Older Home Assistant versions without
- * the proxy fall back to openstreetmap.org directly.
+ * stays valid for at least 30 more. Without the proxy (older Home Assistant)
+ * the offline map is drawn: the browser never fetches tiles itself.
  */
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
 import type { HomeAssistant } from '../types';
@@ -72,6 +72,9 @@ export class MapTilesController implements ReactiveController {
   get offline(): boolean {
     return offlineOnly()
       || (typeof navigator !== 'undefined' && navigator.onLine === false)
+      // No tile proxy in Home Assistant (older version): the browser would have
+      // to fetch the tiles itself, so draw the offline map instead.
+      || (this.ready && this._token === null)
       || (this._tileErrors > 0 && this._tileLoads === 0)
       || this._tileErrors >= 3;
   }

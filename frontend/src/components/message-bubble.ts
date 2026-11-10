@@ -12,6 +12,8 @@ import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
 import { imageLinks, splitLinks } from '../utils/links';
 import { loadImagePreviews } from '../utils/image-previews';
+import { imageFailed, markImageFailed, proxiedImage } from '../utils/image-proxy';
+import './image-viewer';
 
 /**
  * Generate a deterministic color from a string (e.g., pubkey prefix).
@@ -39,6 +41,8 @@ export class MessageBubble extends LitElement {
   @property({ type: String }) nodeName = '';
   @state() private _showMap = false;
   @state() private _copiedKey = '';
+  /** The image shown large over the conversation. */
+  @state() private _viewer: { src: string; url: string } | null = null;
 
   constructor() {
     super();
@@ -235,6 +239,28 @@ export class MessageBubble extends LitElement {
       margin-top: 6px;
     }
 
+    .image-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      width: 140px;
+      height: 140px;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(127, 127, 127, 0.2);
+      font-size: 11px;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .image-open {
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: zoom-in;
+    }
+
     .message-images img {
       display: block;
       height: 140px;
@@ -385,6 +411,10 @@ export class MessageBubble extends LitElement {
       return html`
         ${this._renderGroup()}
         ${this._selectedMessage ? this._renderMessageDialog(this._selectedMessage) : html``}
+        ${this._viewer
+          ? html`<chattx-image-viewer .src=${this._viewer.src} .original=${this._viewer.url}
+              @close=${() => { this._viewer = null; }}></chattx-image-viewer>`
+          : html``}
       `;
     }
     return html``;
@@ -506,20 +536,34 @@ export class MessageBubble extends LitElement {
 
   /**
    * Small previews of image links (catbox.moe uploads and any other https
-   * address of an image). A fixed height keeps the conversation from
+   * address of an image), loaded through Home Assistant: the browser never
+   * contacts the image's server. A tap shows the image large over the
+   * conversation (chattx-image-viewer). A fixed height keeps the conversation from
    * jumping while they load; one that fails to load is hidden. A tap opens
    * the image in the browser, not the message dialog.
    */
   private _renderImages(text: string) {
-    if (!loadImagePreviews()) return html``;
+    if (!loadImagePreviews() || !this.hass) return html``;
     const urls = imageLinks(text);
     if (urls.length === 0) return html``;
+    const hass = this.hass;
+    // Every state has the same size, so the conversation never jumps.
     return html`<div class="message-images">
-      ${urls.map((url) => html`<a href=${url} target="_blank" rel="noopener noreferrer"
-          @click=${(e: Event) => e.stopPropagation()}>
-        <img src=${url} alt="" loading="lazy" referrerpolicy="no-referrer"
-          @error=${(e: Event) => { ((e.target as HTMLElement).parentElement as HTMLElement).style.display = 'none'; }} />
-      </a>`)}
+      ${urls.map((url) => {
+        const failed = html`<span class="image-box image-failed" title=${url}>${t('The image could not be downloaded.')}</span>`;
+        if (imageFailed(url)) return failed;
+        const src = proxiedImage(hass, url, () => this.requestUpdate());
+        if (src === undefined) return html`<span class="image-box"></span>`;
+        if (src === null) {
+          markImageFailed(url);
+          return failed;
+        }
+        return html`<button class="image-open" aria-label=${t('Image')}
+            @click=${(e: Event) => { e.stopPropagation(); this._viewer = { src, url }; }}>
+            <img src=${src} alt="" loading="lazy"
+              @error=${() => { markImageFailed(url); this.requestUpdate(); }} />
+          </button>`;
+      })}
     </div>`;
   }
 
@@ -638,6 +682,13 @@ export class MessageBubble extends LitElement {
           <button class="message-dialog-action" @click=${() => this._copyText(msg.text)}>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>${t('Copy Text')}
           </button>
+          ${msg.isOutgoing && !msg.id.startsWith('optimistic_')
+            ? html`
+                <button class="message-dialog-action" @click=${() => this._resend(msg.text)}>
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>${t('Send again')}
+                </button>
+              `
+            : html``}
           ${!msg.isOutgoing && !msg.isSystem
             ? html`
                 <button class="message-dialog-action" @click=${() => this._replyToSender(msg.sender)}>
@@ -737,6 +788,12 @@ export class MessageBubble extends LitElement {
       document.execCommand('copy');
       document.body.removeChild(textarea);
     }
+    this._closeDialog();
+  }
+
+  /** Send an own message again to the same conversation (the chat page sends it). */
+  private _resend(text: string) {
+    this.dispatchEvent(new CustomEvent('resend-message', { detail: { text }, bubbles: true, composed: true }));
     this._closeDialog();
   }
 

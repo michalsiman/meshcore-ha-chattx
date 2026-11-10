@@ -1,3 +1,4 @@
+import * as settings from '../utils/user-settings';
 /**
  * Translations. English text in the source is the key, so a missing
  * translation falls back to English. The texts live in
@@ -63,7 +64,7 @@ function browserLanguage(): string | undefined {
 /** "auto", or the language picked in this browser. */
 export function loadLanguageSetting(): string {
   try {
-    return supported(localStorage.getItem(STORAGE_KEY) ?? undefined) ?? 'auto';
+    return supported(settings.getItem(STORAGE_KEY) ?? undefined) ?? 'auto';
   } catch {
     return 'auto';
   }
@@ -71,8 +72,8 @@ export function loadLanguageSetting(): string {
 
 export function saveLanguageSetting(setting: string): void {
   try {
-    if (setting === 'auto') localStorage.removeItem(STORAGE_KEY);
-    else localStorage.setItem(STORAGE_KEY, setting);
+    if (setting === 'auto') settings.removeItem(STORAGE_KEY);
+    else settings.setItem(STORAGE_KEY, setting);
   } catch {
     // Storage unavailable: the choice lasts until the page reloads.
   }
