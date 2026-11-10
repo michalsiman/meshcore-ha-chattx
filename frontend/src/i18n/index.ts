@@ -15,11 +15,17 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {};
 export const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English',
   cs: 'Čeština',
+  cy: 'Cymraeg',
   da: 'Dansk',
   de: 'Deutsch',
+  el: 'Ελληνικά',
+  es: 'Español',
   fr: 'Français',
   hr: 'Hrvatski',
+  it: 'Italiano',
   pl: 'Polski',
+  pt: 'Português',
+  'pt-br': 'Português (Brasil)',
   sk: 'Slovenčina',
   sl: 'Slovenščina',
   sr: 'Srpski (latinica)',
@@ -52,6 +58,9 @@ function primary(language: string | undefined): string | undefined {
 }
 
 function supported(language: string | undefined): string | undefined {
+  // A regional variant with its own translation first (pt-BR), then the language.
+  const full = language?.toLowerCase();
+  if (full && full in LANGUAGE_NAMES) return full;
   const code = primary(language);
   const known = code ? ALIASES[code] ?? code : undefined;
   return known && known in LANGUAGE_NAMES ? known : undefined;

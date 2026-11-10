@@ -21,7 +21,7 @@
 | **Emoji and quick messages** | – | ✅ **Pickers next to the message field** |
 | **Hop information** | In the message dialog | ✅ **Hop count and path size on each message** |
 | **Conversation list** | Contact ID or channel number | ✅ **Readable initials, newest first, age of the last message, IDs can be hidden** |
-| **Language** | English | ✅ **13 languages, automatic or chosen in Settings, easy to correct on GitHub** |
+| **Language** | English | ✅ **19 languages, automatic or chosen in Settings, easy to correct on GitHub** |
 | **On a phone** | Keyboard can push the top bar away | ✅ **Top bar stays reachable and the keyboard stays open** |
 | **Chat panel** | ✅ | ✅ |
 | **Message history, search, trace, node discovery** | ✅ | ✅ |

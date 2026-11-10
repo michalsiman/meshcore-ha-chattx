@@ -36,7 +36,7 @@ Not comfortable with this? [Open an issue](https://github.com/michalsiman/meshco
 
 ## Add a language
 
-1. Copy [`cs.json`](custom_components/meshcore_chattx/panel_translations/cs.json), which contains every text, to a new file named with the language code, such as `it.json`, and translate the right side.
+1. Copy [`cs.json`](custom_components/meshcore_chattx/panel_translations/cs.json), which contains every text, to a new file named with the language code, such as `nl.json`, and translate the right side. A regional variant that needs its own wording gets the full code in lower case, such as `pt-br.json` next to `pt.json`; a browser or Home Assistant set to that region picks it, any other region the plain language.
 2. Add the language to `LANGUAGE_NAMES` in [`frontend/src/i18n/index.ts`](frontend/src/i18n/index.ts). If it has more than the forms one and other, add it to `PLURAL_ORDER` there too. The panel then needs rebuilding, so feel free to send only the JSON file and ask for this step in the pull request.
 
 The window for adding the integration in Home Assistant uses separate files in [`translations`](custom_components/meshcore_chattx/translations), so far in English and Czech.

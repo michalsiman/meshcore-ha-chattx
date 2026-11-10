@@ -167,3 +167,25 @@ describe('heard reply with distances', () => {
     setSharedHeardReply('');
   });
 });
+
+describe('regional language variants', () => {
+  it('lists Brazilian Portuguese next to Portuguese', async () => {
+    const { LANGUAGE_NAMES } = await import('../src/i18n');
+    expect(LANGUAGE_NAMES['pt-br']).toBe('Português (Brasil)');
+    expect(LANGUAGE_NAMES.pt).toBe('Português');
+    for (const code of ['es', 'it', 'el', 'cy']) expect(LANGUAGE_NAMES[code]).toBeTruthy();
+  });
+});
+
+describe('language picked from Home Assistant', () => {
+  it('takes the regional variant when there is one, else the language', async () => {
+    const { getLanguage, setHassLanguage } = await import('../src/i18n');
+    setHassLanguage('pt-BR');
+    expect(getLanguage()).toBe('pt-br');
+    setHassLanguage('pt-PT');
+    expect(getLanguage()).toBe('pt');
+    setHassLanguage('es-419');
+    expect(getLanguage()).toBe('es');
+    setHassLanguage(undefined);
+  });
+});
