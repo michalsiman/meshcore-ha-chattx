@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.16.1] - 2026-11-10
+
+### Fixed
+
+- Own direct messages showed the channel status "Unheard" even when the recipient had confirmed them. A direct message now shows "Delivered" when the recipient confirmed it (ACK) and "Not confirmed" otherwise; the details say whether an ACK came.
+- Core MeshCore sends a direct message again when the recipient does not confirm it, and each attempt appeared as its own bubble. The attempts are now one message with their count ("Not confirmed · 2 attempts"); an ACK to any attempt makes it delivered. Attempts stored earlier are merged when the conversation is opened.
+
 ## [0.16.0] - 2026-11-10
 
 ### Added
