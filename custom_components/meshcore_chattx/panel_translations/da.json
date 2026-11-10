@@ -665,5 +665,9 @@
   "Image": "Billede",
   "{n}m": "{n} min",
   "{n}h": "{n} t",
-  "Send again": "Send igen"
+  "Send again": "Send igen",
+  "{n} attempts": "{n} forsøg|{n} forsøg",
+  "Not confirmed": "Ikke bekræftet",
+  "The recipient has not confirmed the message (no ACK).": "Modtageren har ikke bekræftet beskeden (ingen ACK).",
+  "Sent {n} times, retried automatically": "Sendt {n} gange, gentaget automatisk"
 }

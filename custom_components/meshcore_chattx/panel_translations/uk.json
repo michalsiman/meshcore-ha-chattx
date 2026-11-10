@@ -665,5 +665,9 @@
   "Image": "Зображення",
   "{n}m": "{n} хв",
   "{n}h": "{n} год",
-  "Send again": "Надіслати знову"
+  "Send again": "Надіслати знову",
+  "{n} attempts": "{n} спроба|{n} спроби|{n} спроб",
+  "Not confirmed": "Не підтверджено",
+  "The recipient has not confirmed the message (no ACK).": "Одержувач не підтвердив повідомлення (немає ACK).",
+  "Sent {n} times, retried automatically": "Надіслано {n} разів, повторено автоматично"
 }

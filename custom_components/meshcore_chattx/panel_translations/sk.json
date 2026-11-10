@@ -665,5 +665,9 @@
   "Image": "Obrázok",
   "{n}m": "{n} min",
   "{n}h": "{n} h",
-  "Send again": "Odoslať znova"
+  "Send again": "Odoslať znova",
+  "{n} attempts": "{n} pokus|{n} pokusy|{n} pokusov",
+  "Not confirmed": "Nepotvrdené",
+  "The recipient has not confirmed the message (no ACK).": "Príjemca správu nepotvrdil (bez ACK).",
+  "Sent {n} times, retried automatically": "Odoslané {n}×, automaticky opakované"
 }

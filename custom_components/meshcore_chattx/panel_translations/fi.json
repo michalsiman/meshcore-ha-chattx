@@ -665,5 +665,9 @@
   "Image": "Kuva",
   "{n}m": "{n} min",
   "{n}h": "{n} t",
-  "Send again": "Lähetä uudelleen"
+  "Send again": "Lähetä uudelleen",
+  "{n} attempts": "{n} yritys|{n} yritystä",
+  "Not confirmed": "Ei vahvistettu",
+  "The recipient has not confirmed the message (no ACK).": "Vastaanottaja ei ole vahvistanut viestiä (ei ACK:ta).",
+  "Sent {n} times, retried automatically": "Lähetetty {n} kertaa, toistettu automaattisesti"
 }

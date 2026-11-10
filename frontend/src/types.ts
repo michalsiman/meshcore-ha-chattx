@@ -116,6 +116,8 @@ export interface StoredMessage {
    * again (same text within minutes), kept on the first copy.
    */
   resends?: LateEcho[];
+  /** Automatic retries of an own direct message the recipient did not confirm. */
+  retries?: Array<{ id?: string; sent_at?: string }>;
   /** Present on search results only */
   entity_id?: string;
   /** Present on search results only */
@@ -128,8 +130,11 @@ export interface StoredMessage {
 export interface DeliveryStatus {
   status: 'pending' | 'waiting' | 'sent' | 'delivered' | 'unconfirmed' | 'failed';
   repeaterCount?: number;
+  /** Direct messages only (undefined for channel messages): the recipient confirmed. */
   ackReceived?: boolean;
   roundTripMs?: number;
+  /** Direct messages: how many times it was sent (automatic retries included). */
+  attempts?: number;
 }
 
 /**

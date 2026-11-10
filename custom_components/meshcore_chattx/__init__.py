@@ -526,6 +526,9 @@ def _make_message_handler(hass: HomeAssistant, entry_id: str):
                 "delivery_status",
                 "delivered" if ack is True else "sent",
             )
+            # An ACK means delivered, whatever status the event carried.
+            if ack is True:
+                record["delivery_status"] = "delivered"
         else:
             record.setdefault("delivery_status", "sent")
 
@@ -539,6 +542,11 @@ def _make_message_handler(hass: HomeAssistant, entry_id: str):
         # through the mesh) belongs to the message we sent, not to the chat.
         if await store.attach_late_echo(entity_id, record):
             _LOGGER.debug("Late echo of an own message in %s kept on the original", entity_id)
+            return
+
+        # An automatic retry of our own direct message (no ACK yet): one message.
+        if await store.attach_retry(entity_id, record):
+            _LOGGER.debug("Retry of an own direct message in %s kept on the first attempt", entity_id)
             return
 
         # The same text from the same sender again within minutes: the

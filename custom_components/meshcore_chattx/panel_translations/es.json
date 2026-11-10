@@ -665,5 +665,9 @@
   "Image": "Imagen",
   "{n}m": "{n} min",
   "{n}h": "{n} h",
-  "Send again": "Enviar de nuevo"
+  "Send again": "Enviar de nuevo",
+  "{n} attempts": "{n} intento|{n} intentos",
+  "Not confirmed": "No confirmado",
+  "The recipient has not confirmed the message (no ACK).": "El destinatario no ha confirmado el mensaje (sin ACK).",
+  "Sent {n} times, retried automatically": "Enviado {n} veces, repetido automáticamente"
 }

@@ -487,6 +487,15 @@ export class MessageBubble extends LitElement {
   private _getStatusLabel(deliveryStatus: DeliveryStatus): string {
     const status = deliveryStatus.status;
     const repeats = deliveryStatus.repeaterCount ?? 0;
+    // A direct message is confirmed by the recipient (ACK); repeats are a
+    // channel matter. Its automatic retries are counted.
+    if (deliveryStatus.ackReceived !== undefined) {
+      const tries = (deliveryStatus.attempts ?? 1) > 1
+        ? ` · ${tn('{n} attempt', '{n} attempts', deliveryStatus.attempts!)}` : '';
+      if (status === 'pending' || status === 'waiting') return t('Waiting...');
+      if (status === 'failed') return t('Failed') + tries;
+      return (deliveryStatus.ackReceived || status === 'delivered' ? t('Delivered') : t('Not confirmed')) + tries;
+    }
 
     switch (status) {
       case 'pending':
@@ -730,9 +739,15 @@ export class MessageBubble extends LitElement {
           ${msg.isOutgoing && msg.deliveryStatus
             ? html`
                 <div style=${footerStyle}>
-                  ${(msg.deliveryStatus.repeaterCount ?? 0) > 0
-                    ? tn('{n} repeater responded', '{n} repeaters responded', msg.deliveryStatus.repeaterCount ?? 0)
-                    : t('No repeaters responded')}${msg.deliveryStatus.ackReceived ? ` · ${t('ACK received')}` : ''}${msg.deliveryStatus.roundTripMs ? ` · ${msg.deliveryStatus.roundTripMs}ms RTT` : ''}
+                  ${msg.deliveryStatus.ackReceived !== undefined
+                    ? (msg.deliveryStatus.ackReceived
+                      ? t('ACK received')
+                      : t('The recipient has not confirmed the message (no ACK).'))
+                      + ((msg.deliveryStatus.attempts ?? 1) > 1
+                        ? ` · ${t('Sent {n} times, retried automatically', { n: msg.deliveryStatus.attempts ?? 1 })}` : '')
+                    : (msg.deliveryStatus.repeaterCount ?? 0) > 0
+                      ? tn('{n} repeater responded', '{n} repeaters responded', msg.deliveryStatus.repeaterCount ?? 0)
+                      : t('No repeaters responded')}${msg.deliveryStatus.roundTripMs ? ` · ${msg.deliveryStatus.roundTripMs}ms RTT` : ''}
                 </div>
               `
             : html``}

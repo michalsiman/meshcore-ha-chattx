@@ -665,5 +665,9 @@
   "Image": "Εικόνα",
   "{n}m": "{n} λεπ.",
   "{n}h": "{n} ώρ.",
-  "Send again": "Αποστολή ξανά"
+  "Send again": "Αποστολή ξανά",
+  "{n} attempts": "{n} προσπάθεια|{n} προσπάθειες",
+  "Not confirmed": "Δεν επιβεβαιώθηκε",
+  "The recipient has not confirmed the message (no ACK).": "Ο παραλήπτης δεν επιβεβαίωσε το μήνυμα (χωρίς ACK).",
+  "Sent {n} times, retried automatically": "Στάλθηκε {n} φορές, επαναλήφθηκε αυτόματα"
 }

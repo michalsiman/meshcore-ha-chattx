@@ -665,5 +665,9 @@
   "Image": "Delwedd",
   "{n}m": "{n} mun",
   "{n}h": "{n} awr",
-  "Send again": "Anfon eto"
+  "Send again": "Anfon eto",
+  "{n} attempts": "{n} ymgais|{n} ymgais",
+  "Not confirmed": "Heb ei gadarnhau",
+  "The recipient has not confirmed the message (no ACK).": "Nid yw'r derbynnydd wedi cadarnhau'r neges (dim ACK).",
+  "Sent {n} times, retried automatically": "Anfonwyd {n} gwaith, ailadroddwyd yn awtomatig"
 }

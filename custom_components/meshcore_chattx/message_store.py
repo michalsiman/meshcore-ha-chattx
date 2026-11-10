@@ -278,6 +278,70 @@ def _fold_resends(messages: list[dict]) -> bool:
     return changed
 
 
+# Core MeshCore sends a direct message again when the recipient does not
+# confirm it (about every 17 s); each attempt arrives as its own outgoing
+# message. They are one message for the chat.
+RETRY_WINDOW = timedelta(seconds=90)
+
+
+def _find_retry_original(messages: list[dict], record: dict) -> dict | None:
+    """The outgoing direct message that ``record`` is an automatic retry of, or None."""
+    if not record.get("outgoing") or record.get("message_type") != "direct":
+        return None
+    text = record.get("text") or ""
+    sent = _parse_time(record.get("timestamp"))
+    if not text or sent is None:
+        return None
+    for m in reversed(messages):
+        if m is record:
+            continue
+        when = _parse_time(m.get("timestamp"))
+        if when is None or when > sent:
+            continue
+        # Retries follow each other: measure from the newest attempt of the original.
+        last = _parse_time((m.get("retries") or [{}])[-1].get("sent_at")) or when
+        if sent - last > RETRY_WINDOW:
+            if m.get("outgoing") and m.get("text") == text:
+                return None
+            continue
+        if m.get("outgoing") and m.get("message_type") == "direct" and m.get("text") == text:
+            return m
+    return None
+
+
+def _merge_retry(original: dict, record: dict) -> None:
+    """Keep a retry on the original: its id (for late ACKs), time, and any ACK."""
+    original.setdefault("retries", []).append(
+        {"id": record.get("id"), "sent_at": record.get("timestamp")}
+    )
+    if record.get("ack_received"):
+        original["ack_received"] = True
+        original["delivery_status"] = "delivered"
+    for key in ("round_trip_ms",):
+        if record.get(key) is not None:
+            original[key] = record[key]
+
+
+def _fold_retries(messages: list[dict]) -> bool:
+    """Merge stored automatic retries of direct messages into the first attempt."""
+    keep: list[dict] = []
+    changed = False
+    for m in messages:
+        # An ACK means delivered, whatever status the event carried.
+        if m.get("outgoing") and m.get("ack_received") and m.get("delivery_status") != "delivered":
+            m["delivery_status"] = "delivered"
+            changed = True
+        original = _find_retry_original(keep, m)
+        if original is not None:
+            _merge_retry(original, m)
+            changed = True
+            continue
+        keep.append(m)
+    if changed:
+        messages[:] = keep
+    return changed
+
+
 def _echo_entry(record: dict, received: datetime) -> dict:
     """What a late echo keeps: when, how far and how strong."""
     entry: dict[str, Any] = {"received_at": received.isoformat()}
@@ -393,7 +457,7 @@ class MessageStore:
             )
             self._conversation_dirty.add(entity_id)
             self._schedule_conversation_save(entity_id)
-        folded_resends = bool(messages) and _fold_resends(messages)
+        folded_resends = bool(messages) and (_fold_resends(messages) | _fold_retries(messages))
         if folded_resends:
             _LOGGER.debug("Moved repeated copies of received messages onto the first in %s", entity_id)
         if messages and (_fold_late_echoes(messages) or folded_resends):
@@ -545,13 +609,28 @@ class MessageStore:
         self._schedule_conversation_save(entity_id)
         return True
 
+    async def attach_retry(self, entity_id: str, record: dict) -> bool:
+        """Keep an automatic retry of a direct message on its first attempt."""
+        messages = await self._ensure_loaded(entity_id)
+        original = _find_retry_original(messages, record)
+        if original is None:
+            return False
+        _merge_retry(original, record)
+        self._conversation_dirty.add(entity_id)
+        self._schedule_conversation_save(entity_id)
+        return True
+
     async def update_message_delivery(
         self, entity_id: str, message_id: str, status: str, **kwargs: Any
     ) -> None:
         """Update delivery status (and optional extra fields) on a stored message."""
         messages = await self._ensure_loaded(entity_id)
         for m in reversed(messages):
-            if m.get("id") == message_id:
+            retry_ids = [r.get("id") for r in m.get("retries") or []]
+            if m.get("id") == message_id or message_id in retry_ids:
+                # A retry's late result must not undo an ACK already received.
+                if m.get("delivery_status") == "delivered" and status != "delivered":
+                    return
                 m["delivery_status"] = status
                 m.update(kwargs)
                 self._conversation_dirty.add(entity_id)
@@ -576,7 +655,11 @@ class MessageStore:
         """
         for entity_id in list(self._message_index.keys()):
             messages = await self._load_for_search(entity_id)
-            if any(m.get("id") == message_id for m in messages):
+            if any(
+                m.get("id") == message_id
+                or message_id in [r.get("id") for r in m.get("retries") or []]
+                for m in messages
+            ):
                 await self.update_message_delivery(
                     entity_id, message_id, status, **kwargs
                 )

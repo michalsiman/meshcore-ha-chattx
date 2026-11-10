@@ -158,6 +158,7 @@ export function toClientMessage(stored: StoredMessage): ChatMessage {
       ? {
           status: stored.delivery_status as DeliveryStatus['status'],
           ackReceived: stored.ack_received,
+          attempts: 1 + (stored.retries?.length ?? 0),
           repeaterCount: stored.repeater_count,
           roundTripMs: stored.round_trip_ms,
         }

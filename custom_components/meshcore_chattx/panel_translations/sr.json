@@ -665,5 +665,9 @@
   "Image": "Slika",
   "{n}m": "{n} min",
   "{n}h": "{n} h",
-  "Send again": "Pošalji ponovo"
+  "Send again": "Pošalji ponovo",
+  "{n} attempts": "{n} pokušaj|{n} pokušaja|{n} pokušaja",
+  "Not confirmed": "Nije potvrđeno",
+  "The recipient has not confirmed the message (no ACK).": "Primalac nije potvrdio poruku (nema ACK-a).",
+  "Sent {n} times, retried automatically": "Poslato {n}×, automatski ponovljeno"
 }
