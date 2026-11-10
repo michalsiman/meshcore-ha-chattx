@@ -62,8 +62,11 @@ export class ChannelDialog extends LitElement {
   static styles = [
     panelStyles,
     css`
+      /* Rendered inside other dialogs' flex containers (e.g. Manage);
+         the overlay is position: fixed, so the host must not take part
+         in their layout or it pushes the parent dialog aside. */
       :host {
-        display: block;
+        display: contents;
       }
 
       :host([narrow]) .dialog {
@@ -151,7 +154,7 @@ export class ChannelDialog extends LitElement {
           aria-modal="true"
           aria-label=${this.editMode ? t('Edit channel') : t('Add channel')}>
           <div class="dialog-header">
-            <div class="dialog-header-title">${this.editMode ? 'Edit Channel' : 'Add Channel'}</div>
+            <div class="dialog-header-title">${this.editMode ? t('Edit channel') : t('Add channel')}</div>
           </div>
           <div class="dialog-body">
             ${this._error
@@ -179,7 +182,7 @@ export class ChannelDialog extends LitElement {
                       `)}
                     </select>`
               }
-              <div class="form-description">${this.editMode ? 'Channel index cannot be changed' : 'Select an available channel slot'}</div>
+              <div class="form-description">${this.editMode ? t('Channel index cannot be changed') : t('Select an available channel slot')}</div>
             </div>
 
             <!-- Channel Name -->

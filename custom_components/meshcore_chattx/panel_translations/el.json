@@ -669,5 +669,10 @@
   "{n} attempts": "{n} προσπάθεια|{n} προσπάθειες",
   "Not confirmed": "Δεν επιβεβαιώθηκε",
   "The recipient has not confirmed the message (no ACK).": "Ο παραλήπτης δεν επιβεβαίωσε το μήνυμα (χωρίς ACK).",
-  "Sent {n} times, retried automatically": "Στάλθηκε {n} φορές, επαναλήφθηκε αυτόματα"
+  "Sent {n} times, retried automatically": "Στάλθηκε {n} φορές, επαναλήφθηκε αυτόματα",
+  "Channel index cannot be changed": "Ο δείκτης καναλιού δεν μπορεί να αλλάξει",
+  "Select an available channel slot": "Επιλέξτε μια ελεύθερη θέση καναλιού",
+  "Adding…": "Προσθήκη…",
+  "Add contact": "Προσθήκη επαφής",
+  "Logged in": "Συνδεδεμένος"
 }

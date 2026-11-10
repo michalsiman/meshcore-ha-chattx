@@ -472,7 +472,7 @@ export class NodeDetailDialog extends LitElement {
                     <div class="section-header">${t('Quick Actions')}</div>
                     <div class="quick-actions ${isContact ? '' : 'full'}">
                       ${canLogin ? html`
-                        <button class=${this._loggedIn ? 'action-btn logged-in' : 'action-btn'} @click=${() => { this._showLogin = true; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>${this._loggedIn ? 'Logged in' : 'Log in'}</button>
+                        <button class=${this._loggedIn ? 'action-btn logged-in' : 'action-btn'} @click=${() => { this._showLogin = true; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>${this._loggedIn ? t('Logged in') : t('Log in')}</button>
                       ` : html``}
                       ${isContact && (this.node as Contact).added_to_node && (isClient || isRoomServer) ? html`
                         <button class="action-btn" @click=${() => this._dispatchEvent('message')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>${t('Message')}</button>
@@ -487,8 +487,8 @@ export class NodeDetailDialog extends LitElement {
                         : isContact ? html`<button class="action-btn"
                             ?disabled=${this.pendingAction === 'add-contact'}
                             @click=${() => this._dispatchEvent('add-contact')}>${this.pendingAction === 'add-contact'
-                              ? html`Adding…`
-                              : html`<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>Add Contact`}</button>`
+                              ? html`${t('Adding…')}`
+                              : html`<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>${t('Add contact')}`}</button>`
                         : html``}
                     </div>
                   </div>

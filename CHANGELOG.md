@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.16.2] - 2026-11-10
+
+### Fixed
+
+- Opening "Add channel" or "Edit channel" from Manage moved the Manage window to the left edge of the screen, over the Home Assistant sidebar. Manage now stays in place and the channel window opens above it.
+- Some texts were always in English: the title and hints of the channel window, the "+ Add channel" button in Manage, and "Add contact", "Adding…" and "Logged in" in node details. They are now translated in all languages.
+
 ## [0.16.1] - 2026-11-10
 
 ### Fixed

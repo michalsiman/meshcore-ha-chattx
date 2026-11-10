@@ -669,5 +669,10 @@
   "{n} attempts": "{n} pokus|{n} pokusy|{n} pokusů",
   "Not confirmed": "Nepotvrzeno",
   "The recipient has not confirmed the message (no ACK).": "Příjemce zprávu nepotvrdil (bez ACK).",
-  "Sent {n} times, retried automatically": "Odesláno {n}×, automaticky opakováno"
+  "Sent {n} times, retried automatically": "Odesláno {n}×, automaticky opakováno",
+  "Channel index cannot be changed": "Index kanálu nelze změnit",
+  "Select an available channel slot": "Vyberte volný slot kanálu",
+  "Adding…": "Přidávám…",
+  "Add contact": "Přidat kontakt",
+  "Logged in": "Přihlášeno"
 }

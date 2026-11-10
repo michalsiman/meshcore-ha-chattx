@@ -669,5 +669,10 @@
   "{n} attempts": "{n} pokušaj|{n} pokušaja|{n} pokušaja",
   "Not confirmed": "Nije potvrđeno",
   "The recipient has not confirmed the message (no ACK).": "Primalac nije potvrdio poruku (nema ACK-a).",
-  "Sent {n} times, retried automatically": "Poslato {n}×, automatski ponovljeno"
+  "Sent {n} times, retried automatically": "Poslato {n}×, automatski ponovljeno",
+  "Channel index cannot be changed": "Indeks kanala ne može da se promeni",
+  "Select an available channel slot": "Izaberite slobodno mesto kanala",
+  "Adding…": "Dodavanje…",
+  "Add contact": "Dodaj kontakt",
+  "Logged in": "Prijavljen"
 }

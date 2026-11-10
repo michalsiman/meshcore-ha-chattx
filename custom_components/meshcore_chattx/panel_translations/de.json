@@ -669,5 +669,10 @@
   "{n} attempts": "{n} Versuch|{n} Versuche",
   "Not confirmed": "Nicht bestätigt",
   "The recipient has not confirmed the message (no ACK).": "Der Empfänger hat die Nachricht nicht bestätigt (kein ACK).",
-  "Sent {n} times, retried automatically": "{n}× gesendet, automatisch wiederholt"
+  "Sent {n} times, retried automatically": "{n}× gesendet, automatisch wiederholt",
+  "Channel index cannot be changed": "Kanalindex kann nicht geändert werden",
+  "Select an available channel slot": "Freien Kanalplatz auswählen",
+  "Adding…": "Wird hinzugefügt…",
+  "Add contact": "Kontakt hinzufügen",
+  "Logged in": "Angemeldet"
 }

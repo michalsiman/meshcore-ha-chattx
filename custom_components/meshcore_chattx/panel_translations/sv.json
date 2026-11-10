@@ -669,5 +669,10 @@
   "{n} attempts": "{n} försök|{n} försök",
   "Not confirmed": "Inte bekräftat",
   "The recipient has not confirmed the message (no ACK).": "Mottagaren har inte bekräftat meddelandet (ingen ACK).",
-  "Sent {n} times, retried automatically": "Skickat {n} gånger, upprepat automatiskt"
+  "Sent {n} times, retried automatically": "Skickat {n} gånger, upprepat automatiskt",
+  "Channel index cannot be changed": "Kanalindex kan inte ändras",
+  "Select an available channel slot": "Välj en ledig kanalplats",
+  "Adding…": "Lägger till…",
+  "Add contact": "Lägg till kontakt",
+  "Logged in": "Inloggad"
 }

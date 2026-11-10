@@ -771,7 +771,7 @@ export class ManageDialog extends LitElement {
           <div class="empty-text">${t('No channels configured')}</div>
         </div>
         <button class="add-channel-btn" @click=${this._openAddChannel}>
-          + Add Channel
+          + ${t('Add channel')}
         </button>
       `;
     }
@@ -820,7 +820,7 @@ export class ManageDialog extends LitElement {
         `;
       })}
       <button class="add-channel-btn" @click=${this._openAddChannel}>
-        + Add Channel
+        + ${t('Add channel')}
       </button>
     `;
   }

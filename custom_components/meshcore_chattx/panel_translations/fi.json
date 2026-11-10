@@ -669,5 +669,10 @@
   "{n} attempts": "{n} yritys|{n} yritystä",
   "Not confirmed": "Ei vahvistettu",
   "The recipient has not confirmed the message (no ACK).": "Vastaanottaja ei ole vahvistanut viestiä (ei ACK:ta).",
-  "Sent {n} times, retried automatically": "Lähetetty {n} kertaa, toistettu automaattisesti"
+  "Sent {n} times, retried automatically": "Lähetetty {n} kertaa, toistettu automaattisesti",
+  "Channel index cannot be changed": "Kanavan indeksiä ei voi muuttaa",
+  "Select an available channel slot": "Valitse vapaa kanavapaikka",
+  "Adding…": "Lisätään…",
+  "Add contact": "Lisää yhteystieto",
+  "Logged in": "Kirjautunut"
 }
