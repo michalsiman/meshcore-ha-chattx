@@ -4,6 +4,26 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-10
+
+### Fixed
+
+- A blocked sender's message no longer shows as the newest message of a channel in the chat list, nor moves the channel up: neither a live one nor one stored before blocking.
+- Image upload tries again twice when the service answers with a server error or the network fails for a moment. When the service stays down, the dialog says that it is out of service right now and to choose another service, instead of showing the service's whole error page.
+- An image preview that can't be loaded is tried only once: the conversation shows "The image could not be downloaded." in a box of the same size (nothing jumps), and the failure is remembered, so the image isn't tried again, also after a reload or on another device. Before, every redraw of the conversation loaded the preview again and the conversation jumped.
+
+### Added
+
+- Send again: the details of an own message have a "Send again" action that sends the same text to the conversation as a new message, for example when nobody heard it.
+- A tap on an image preview shows the image large over the conversation instead of opening a new browser window; ✕ at the top right, a tap beside the image, Escape or the phone's back gesture closes it.
+- A further image service in the upload dialog: tmpfiles.org (deleted after 60 minutes). Its link opens the file's page; previews take the image from that page through Home Assistant.
+
+### Changed
+
+- The time of recent messages is translated ("now", "5m", "3h" were English everywhere; Czech now shows "teď", "5 min", "3 h").
+- Everything goes through Home Assistant; the browser contacts no other server. Image previews, and the image a tap on one opens, are fetched by Home Assistant (a new image proxy reached by a signed address, like camera images): a mobile network that blocks an image host no longer matters, and the image's server never sees the device. The proxy fetches only public http(s) addresses (nothing in the local network, checked after each redirect), only images up to 10 MB, and keeps recent ones in memory for a day. Without Home Assistant's map tile proxy (before 2026.11) the maps draw the offline map instead of loading tiles from openstreetmap.org in the browser. Link shortening, image upload and the offline map download already went through Home Assistant.
+- Settings are kept once in Home Assistant by the integration, the same for every user, browser and device (there is one MeshCore companion), and a change shows on every open panel right away: language, contact IDs, diacritics, message previews in the chat list, the tab title count, hidden sensors, list or map in Nodes, distance unit, offline map only, image previews, how long uploaded images stay, and message drafts. What a browser kept locally moves into the shared settings on the first start (a shared value wins) and is removed from the browser.
+
 ## [0.14.0] - 2026-11-09
 
 ### Added
