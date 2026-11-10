@@ -1,5 +1,6 @@
 import fs from 'fs';
 import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
@@ -63,6 +64,8 @@ export default {
   },
   plugins: [
     resolve(),
+    // jsQR (QR codes in images, contact import) ships only as CommonJS.
+    commonjs({ include: /node_modules\/jsqr/ }),
     typescript({
       tsconfig: './tsconfig.json',
       declaration: false,

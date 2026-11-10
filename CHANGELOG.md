@@ -4,6 +4,19 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-10
+
+### Added
+
+- Add a contact by hand: "+ Add manually" in the Nodes tab takes a public key, the link from a MeshCore contact QR code (`meshcore://contact/add?...`) or a contact card (`meshcore://<hex>`, as Export contact gives it). A QR code can be read from an image, picked or pasted. Before adding, the dialog shows the name, type and key, whether the mesh already knows the node, and whether it is already added; name and type of a bare key can be filled in. Admins only.
+- "Reset path" in node details forgets the stored path to a contact, so the next message goes by flood and finds a new path.
+- The repeater window opened from a chat shows the stored path and the Reset path button too.
+- The path in node details names the repeaters, one hop per line, with their ID beside. An ID several known repeaters share stays an ID, with the number of possible repeaters.
+
+### Changed
+
+- Node details show the Network section for every contact; a contact without a stored path shows "Flood", a direct neighbour "Direct (neighbour, no repeaters)".
+
 ## [0.16.2] - 2026-11-10
 
 ### Fixed

@@ -8,6 +8,7 @@ import {
 import type {
   PrimaryCategory, TypeCounts, NodeCounts,
 } from '../api';
+import '../components/contact-import-dialog';
 import '../components/contact-card';
 import '../components/node-card';
 import '../components/node-detail-dialog';
@@ -38,6 +39,7 @@ const TYPE_LABELS: Record<NodeType, string> = {
 
 @customElement('chattx-nodes-page')
 export class NodesPage extends LitElement {
+  @state() private _importOpen = false;
   @property({ type: Array }) contacts: Contact[] = [];
   @property({ type: Array }) channels: Channel[] = [];
   // managedDevices removed — devices now live on the Devices tab
@@ -531,6 +533,11 @@ export class NodesPage extends LitElement {
               @click=${() => this._syncAll()}>
               ⟳ ${t('Sync')}
             </button>
+            ${this.hass?.user?.is_admin ? html`<button class="sync-btn"
+              title=${t('Add a contact by public key, MeshCore link or QR code')}
+              @click=${() => { this._importOpen = true; }}>
+              + ${t('Add manually')}
+            </button>` : nothing}
           </div>
         </div>
 
@@ -556,6 +563,14 @@ export class NodesPage extends LitElement {
         @node-add-contact=${() => this._dispatchNodeAction('add-contact')}
         @node-remove-contact=${() => this._dispatchNodeAction('remove-contact')}>
       </chattx-node-detail-dialog>
+
+      <chattx-contact-import-dialog
+        .hass=${this.hass}
+        .entryId=${this.config?.entry_id}
+        ?open=${this._importOpen}
+        @close=${() => { this._importOpen = false; }}
+        @contact-imported=${() => { this._loadPage(true); }}>
+      </chattx-contact-import-dialog>
 
     `;
   }

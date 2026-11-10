@@ -84,6 +84,11 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - The distance between the first and last repeater of a received message, and the length of its route
 - Images: paste or pick an image, Home Assistant uploads it to catbox.moe and puts the link into the message; image links show a preview
 
+**Nodes**
+
+- Add a contact by hand in the Nodes tab: a public key, a MeshCore QR link, a contact card, or a QR code read from an image
+- Node details and the repeater window in Chat show the stored path with repeater names, and can reset it to flood
+
 **Phones**
 
 - The top bar and Back button stay reachable when the keyboard opens
@@ -347,6 +352,8 @@ Contributions and bug reports welcome — file issues at [github.com/michalsiman
 - `frontend/` — the Lit-based sidebar panel (TypeScript). Rolled up into a single bundle that lands at `custom_components/meshcore_chattx/meshcore-chattx-panel.js`.
 - `tests/` — Python test suite (pytest + `pytest-homeassistant-custom-component`).
 - `frontend/tests/` — frontend unit tests (vitest).
+
+QR codes in images are read with [jsQR](https://github.com/cozmo/jsQR) (Apache-2.0), bundled into the panel.
 
 ### Python tests
 

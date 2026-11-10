@@ -1,16 +1,18 @@
 import { modalFrameStyles } from '../styles';
-import { getLocale, t } from '../i18n';
+import { getLocale, t, tn } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, ManagedDevice, HomeAssistant } from '../types';
 import { attachDialogA11y } from '../utils/dialog-a11y';
-import { getRepeaterLoginState } from '../api';
+import { executeLocal, getContacts, getRepeaterLoginState } from '../api';
 import './repeater-login';
 import './repeater-settings';
 import './repeater-telemetry';
 import './repeater-terminal';
 import './repeater-neighbours';
 import './repeater-regions';
+
+let hopNodesCache: { at: number; nodes: Contact[] } | null = null;
 
 @customElement('chattx-node-detail-dialog')
 export class NodeDetailDialog extends LitElement {
@@ -31,6 +33,108 @@ export class NodeDetailDialog extends LitElement {
   @state() private _canLoadSettings = false;
   @state() private _loggedIn = false;
   @state() private _keyCopied = false;
+  /** Path reset: key of the contact and the path it had when reset, so the
+   *  dialog shows flood until the coordinator reports a new path. */
+  @state() private _pathReset: { key: string; from: string } | null = null;
+  @state() private _pathResetting = false;
+  @state() private _pathResetError = '';
+  /** Repeaters and room servers, for naming the hops of a path. */
+  @state() private _hopNodes: Contact[] | null = null;
+  private _hopNodesLoading = false;
+
+  private _loadHopNodes() {
+    if (this._hopNodes || this._hopNodesLoading || !this.hass) return;
+    const cached = hopNodesCache;
+    if (cached && Date.now() - cached.at < 60_000) {
+      this._hopNodes = cached.nodes;
+      return;
+    }
+    this._hopNodesLoading = true;
+    void getContacts(this.hass, this.entryId).then((all) => {
+      const nodes = all.filter((c) => c.type === 2 || c.type === 3);
+      hopNodesCache = { at: Date.now(), nodes };
+      this._hopNodes = nodes;
+    }).finally(() => { this._hopNodesLoading = false; });
+  }
+
+  /** Name a hop: one matching repeater gives its name, several or none keep the hex. */
+  private _hopLabel(hex: string) {
+    const matches = (this._hopNodes ?? []).filter((n) =>
+      (n.public_key || n.pubkey_prefix || '').toLowerCase().startsWith(hex));
+    if (matches.length === 1) {
+      return html`<span class="hop-name">${matches[0].adv_name || hex}</span> <span class="hop-id">${hex}</span>`;
+    }
+    if (matches.length > 1) {
+      const names = matches.map((m) => m.adv_name).filter(Boolean).join(', ');
+      return html`<span class="hop-id" title=${names}>${hex}</span> <span class="hop-ambiguous">${tn('{n} possible repeater', '{n} possible repeaters', matches.length)}</span>`;
+    }
+    return html`<span class="hop-id">${hex}</span>`;
+  }
+
+  private _pathWasReset(c: Contact): boolean {
+    return !!this._pathReset && this._pathReset.key === c.public_key
+      && this._pathReset.from === (c.out_path || '');
+  }
+
+  /** The stored outgoing path split into hops ("a1b2", "c3d4", ...). */
+  private _pathHops(c: Contact): string[] {
+    const len = c.out_path_len ?? -1;
+    const hex = (c.out_path || '').toLowerCase();
+    if (len <= 0 || !hex) return [];
+    const width = ((c.out_path_hash_mode ?? 0) + 1) * 2;
+    const hops: string[] = [];
+    for (let i = 0; i < len && (i + 1) * width <= hex.length; i++) {
+      hops.push(hex.substring(i * width, (i + 1) * width));
+    }
+    return hops.length ? hops : [hex];
+  }
+
+  private _renderPathSection(c: Contact) {
+    const reset = this._pathWasReset(c);
+    const len = c.out_path_len ?? -1;
+    const flood = reset || len < 0;
+    const hops = flood || len <= 0 ? [] : this._pathHops(c);
+    if (hops.length) this._loadHopNodes();
+    const route = flood ? t('Flood')
+      : len === 0 ? t('Direct (neighbour, no repeaters)')
+      : html`<ol class="hop-list">${hops.map((h) => html`<li>${this._hopLabel(h)}</li>`)}</ol>`;
+    return html`
+      <div class="section">
+        <div class="section-header">${t('Network')}</div>
+        <div class="info-item">
+          <div class="info-label">${t('Route (Outgoing Path)')}</div>
+          <div class="info-value path-value">${route}</div>
+        </div>
+        ${!flood && len > 0 ? html`
+          <div class="info-item" style="margin-top: 8px;">
+            <div class="info-label">${t('Path Length')}</div>
+            <div class="info-value">${len} hops</div>
+          </div>` : html``}
+        ${reset || !flood ? html`
+          <div class="path-reset">
+            ${reset
+              ? html`<span class="path-reset-note">${t('Path reset. The next message is sent by flood and finds a new path.')}</span>`
+              : html`<button class="path-reset-btn" ?disabled=${this._pathResetting}
+                  title=${t('Forget the stored path; the next message is sent by flood')}
+                  @click=${() => this._resetPath(c)}>${this._pathResetting ? t('Resetting…') : t('Reset path')}</button>`}
+            ${this._pathResetError ? html`<span class="path-reset-error">${this._pathResetError}</span>` : html``}
+          </div>` : html``}
+      </div>
+    `;
+  }
+
+  private async _resetPath(c: Contact) {
+    if (!this.hass || !c.public_key || this._pathResetting) return;
+    this._pathResetting = true;
+    this._pathResetError = '';
+    const result = await executeLocal(this.hass, 'reset_path', { key: c.public_key }, this.entryId);
+    this._pathResetting = false;
+    if (result.success && !/error/i.test(result.response || '')) {
+      this._pathReset = { key: c.public_key, from: c.out_path || '' };
+    } else {
+      this._pathResetError = t('Error: {error}', { error: result.response || '?' });
+    }
+  }
 
   private async _copyKey(key: string) {
     try {
@@ -328,6 +432,33 @@ export class NodeDetailDialog extends LitElement {
 
     .action-btn.logged-in svg { color: var(--success-color, #43a047); }
 
+    .path-reset {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .path-reset-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--divider-color, #e0e0e0);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--primary-text-color);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .path-reset-btn:hover:not(:disabled) { border-color: var(--primary-color, #03a9f4); }
+    .path-reset-btn:disabled { opacity: 0.6; cursor: default; }
+    .path-value { overflow-wrap: anywhere; }
+    .hop-list { margin: 4px 0 0; padding-left: 22px; }
+    .hop-list li { margin: 2px 0; }
+    .hop-id { font-family: monospace; font-size: 12px; color: var(--secondary-text-color); }
+    .hop-ambiguous { font-size: 12px; color: var(--secondary-text-color); }
+    .path-reset-note { font-size: 12px; color: var(--secondary-text-color); }
+    .path-reset-error { font-size: 12px; color: var(--error-color, #db4437); }
+
     .back-btn {
       padding: 6px 0;
       border: none;
@@ -395,6 +526,7 @@ export class NodeDetailDialog extends LitElement {
           <div class="dialog-content">
             ${this._showLogin || this.loginOnly
               ? html`
+                  ${this.loginOnly && isContact ? this._renderPathSection(this.node as Contact) : html``}
                   <div class="section">
                     <div class="section-header">${isSensor ? t('Log in to sensor') : t('Log in to repeater')}</div>
                     <chattx-repeater-login
@@ -561,23 +693,7 @@ export class NodeDetailDialog extends LitElement {
                         </div>
                       ` : html``}
 
-                  ${isContact && (this.node as Contact).out_path
-                    ? html`
-                        <div class="section">
-                          <div class="section-header">${t('Network')}</div>
-                          <div class="info-item">
-                            <div class="info-label">${t('Route (Outgoing Path)')}</div>
-                            <div class="info-value">${(this.node as Contact).out_path}</div>
-                          </div>
-                          ${(this.node as Contact).out_path_len
-                            ? html`
-                                <div class="info-item" style="margin-top: 8px;">
-                                  <div class="info-label">${t('Path Length')}</div>
-                                  <div class="info-value">${(this.node as Contact).out_path_len} hops</div>
-                                </div>
-                              ` : html``}
-                        </div>
-                      ` : html``}
+                  ${isContact ? this._renderPathSection(this.node as Contact) : html``}
 
                 `}
           </div>
@@ -588,6 +704,7 @@ export class NodeDetailDialog extends LitElement {
 
   private _close() {
     this.open = false;
+    this._pathResetError = '';
     this._showLogin = false;
     this._canLoadSettings = false;
     this._confirming = false;

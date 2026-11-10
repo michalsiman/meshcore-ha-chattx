@@ -37,6 +37,7 @@ from .const import (
     MESHCORE_DOMAIN,
 )
 from .message_store import MessageStore
+from .contact_import import ContactParseError, new_contact_record, parse_contact_text
 from .offline_map import async_register_offline_map_commands
 from .blocklist import async_register_blocklist_commands, get_blocklist
 from .image_upload import async_register_image_upload_commands
@@ -483,6 +484,7 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_import_identity)
     websocket_api.async_register_command(hass, ws_set_location_source)
     websocket_api.async_register_command(hass, ws_add_contact)
+    websocket_api.async_register_command(hass, ws_import_contact)
     websocket_api.async_register_command(hass, ws_remove_contact)
     websocket_api.async_register_command(hass, ws_trace)
     websocket_api.async_register_command(hass, ws_get_blocked_contacts)
@@ -3598,6 +3600,110 @@ async def ws_add_contact(hass, connection, msg):
         _ws_send_error_safe(
             connection, msg["id"], ex, handler="ws_add_contact"
         )
+
+
+def _find_known_contact(coordinator, public_key: str):
+    """(added, discovered) records for a full key, each None when unknown."""
+    added = coordinator._contacts.get(public_key[:12])
+    discovered = None
+    for full_pk, disc in coordinator._discovered_contacts.items():
+        if full_pk.lower() == public_key:
+            discovered = dict(disc)
+            discovered.setdefault("public_key", full_pk)
+            break
+    return added, discovered
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/import_contact",
+        vol.Required("text"): str,
+        vol.Optional("name", default=""): str,
+        vol.Optional("node_type"): vol.In([1, 2, 3, 4]),
+        vol.Optional("dry_run", default=False): bool,
+        vol.Optional("entry_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_import_contact(hass, connection, msg):
+    """Add a contact entered by hand: public key, QR link or contact card.
+
+    With dry_run it only reads the entry and says what would be added, so the
+    dialog can show the name and type before the user confirms.
+    """
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "Coordinator not found")
+        return
+    try:
+        parsed = parse_contact_text(msg["text"], msg.get("name", ""), msg.get("node_type"))
+    except ContactParseError as err:
+        connection.send_error(msg["id"], err.code, str(err))
+        return
+
+    public_key = parsed["public_key"]
+    added, discovered = _find_known_contact(coordinator, public_key)
+    if parsed["kind"] == "key" and discovered:
+        if not parsed["name"]:
+            parsed["name"] = discovered.get("adv_name") or ""
+        if not parsed.get("type_given") and discovered.get("type") in (1, 2, 3, 4):
+            parsed["type"] = discovered["type"]
+    preview = {
+        "kind": parsed["kind"],
+        "public_key": public_key,
+        "name": parsed["name"] or (added or {}).get("adv_name", ""),
+        "type": parsed["type"],
+        "already_added": added is not None,
+        "known": discovered is not None,
+    }
+    if msg["dry_run"]:
+        connection.send_result(msg["id"], preview)
+        return
+    if added is not None:
+        connection.send_error(msg["id"], "already_added", "Contact is already added to node")
+        return
+    if parsed["kind"] == "key" and not parsed["name"]:
+        connection.send_error(msg["id"], "name_required", "Enter a name for the contact")
+        return
+
+    api = coordinator.api
+    if not radio_ready(api):
+        connection.send_error(msg["id"], "not_connected", "Device not connected")
+        return
+    try:
+        from meshcore.events import EventType
+
+        if parsed["kind"] == "card":
+            result = await radio_command(api, "import_contact", parsed["card"])
+            record = discovered or {
+                **new_contact_record(parsed),
+                "adv_lat": parsed.get("lat", 0.0),
+                "adv_lon": parsed.get("lon", 0.0),
+            }
+        else:
+            record = new_contact_record(parsed)
+            if discovered:
+                # Keep what the mesh already told us (location, last advert, path).
+                record.update({k: v for k, v in discovered.items() if k in record})
+                record["adv_name"] = parsed["name"]
+            result = await radio_command(api, "add_contact", dict(record))
+        if result is not None and result.type == EventType.ERROR:
+            connection.send_error(msg["id"], "command_failed", f"Adding the contact failed: {result.payload}")
+            return
+
+        mark_contacts_dirty(api)
+        record["added_to_node"] = True
+        prefix = public_key[:12]
+        coordinator._contacts.setdefault(prefix, record)
+        coordinator._discovered_contacts.pop(public_key, None)
+        coordinator.mark_contact_dirty(prefix)
+        updated = dict(coordinator.data) if coordinator.data else {}
+        updated["contacts"] = coordinator.get_all_contacts()
+        coordinator.async_set_updated_data(updated)
+        connection.send_result(msg["id"], {**preview, "already_added": True, "success": True})
+    except Exception as ex:
+        _ws_send_error_safe(connection, msg["id"], ex, handler="ws_import_contact")
 
 
 @websocket_api.websocket_command(

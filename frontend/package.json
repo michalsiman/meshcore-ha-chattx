@@ -1,6 +1,6 @@
 {
   "name": "meshcore-chattx-panel",
-  "version": "0.16.2",
+  "version": "0.17.0",
   "private": true,
   "description": "MeshCore sidebar panel for Home Assistant",
   "scripts": {
@@ -12,12 +12,14 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "jsqr": "^1.4.0",
     "lit": "^3.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
     "@rollup/plugin-babel": "^7.1.0",
+    "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
