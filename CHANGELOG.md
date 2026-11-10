@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-10
+
+### Added
+
+- Six more panel languages: Spanish, Portuguese, Brazilian Portuguese, Italian, Greek and Welsh (19 in all). A browser or Home Assistant set to a region with its own translation, such as pt-BR, gets that variant; any other region gets the plain language. Like the other translations apart from Czech, they have not been checked by native speakers yet; corrections are welcome (see TRANSLATING.md).
+
 ## [0.15.0] - 2026-11-10
 
 ### Fixed
