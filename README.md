@@ -103,27 +103,59 @@ These use demo data, and the names and values are made up.
 
 <table>
 <tr>
-<td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png" alt="Chat with initials, message ages and hop counts"></a></td>
+<td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png" alt="Chat with an image preview, distances and a repeat count"></a></td>
 <td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-composer.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-composer.png" alt="Emoji picker, bytes-left counter and diacritics switch"></a></td>
 </tr>
 <tr>
-<td><b>Chat</b> — the newest message under each conversation, unread total on the Chat tab, clickable links, hop count and path size on messages, and "Shorten link" above the message field.</td>
+<td><b>Chat</b> — the newest message under each conversation, image previews, hop count, path size and the distance between the first and last repeater (with the route length in brackets) on messages, ×2 on a message its sender sent twice, and "Unheard" on an own message nobody repeated.</td>
 <td><b>Writing</b> — quick messages and the diacritics switch on the left, emoji and bytes left on the right.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-image-upload.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-image-upload.png" alt="Dialog for sending an image"></a></td>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-image-viewer.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-image-viewer.png" alt="An image shown large over the conversation"></a></td>
+</tr>
+<tr>
+<td><b>Images</b> — paste an image or pick one with 📎; Home Assistant uploads it to catbox.moe, litterbox or tmpfiles.org and the link goes into the message.</td>
+<td><b>Image viewer</b> — a tap on a preview shows the image large over the conversation; ✕, a tap beside it, Escape or the back gesture closes it.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-route-map-offline.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-route-map-offline.png" alt="Route on the offline map"></a></td>
+<td align="center"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-route-map-offline.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-route-map-offline.png" alt="Route on the offline map on a phone" width="300"></a></td>
+</tr>
+<tr>
+<td><b>Offline map</b> — without internet (or always, if chosen) the maps are drawn from data kept in Home Assistant: borders, regions, towns and peaks.</td>
+<td align="center"><b>Phone</b> — the same on a phone; one finger moves the map, two zoom.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-nodes-map-offline.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-nodes-map-offline.png" alt="Nodes on the offline map"></a></td>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-send-again.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-send-again.png" alt="Send again in the details of an own message"></a></td>
+</tr>
+<tr>
+<td><b>Nodes on the offline map</b> — the Nodes tab map works offline too.</td>
+<td><b>Send again</b> — the same text once more, for example when nobody heard it.</td>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-settings-blocklist.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-settings-blocklist.png" alt="Blocked contacts in Settings"></a></td>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-settings-map.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-settings-map.png" alt="Offline map download in Settings"></a></td>
+</tr>
+<tr>
+<td><b>Blocked contacts</b> — chosen by public key; their messages are neither shown nor stored.</td>
+<td><b>Map settings</b> — countries for the offline map (247, Home Assistant's country and its neighbours suggested), distance unit, and the switch for the offline map only.</td>
 </tr>
 <tr>
 <td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-route-map.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-route-map.png" alt="Route of a message on a map"></a></td>
 <td align="center"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-route-map.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mobile-route-map.png" alt="Route map on a phone" width="300"></a></td>
 </tr>
 <tr>
-<td><b>Route on a map</b> (experimental) — the repeaters a message went through, found among your contacts by their key prefix and drawn over OpenStreetMap, with the list below.</td>
+<td><b>Route on a map</b> (experimental) — the repeaters a message went through, found among your contacts by their key prefix and drawn over OpenStreetMap (loaded through Home Assistant); the map can be dragged and zoomed, and the list below gives each leg and both distances.</td>
 <td align="center"><b>Phone</b> — the same map; the dialog scrolls, and the back gesture hides the map, then closes the dialog.</td>
 </tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png" alt="Message dialog with the heard reply"></a></td>
+<td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-message-popup.png" alt="Message dialog with distances and the sender's key"></a></td>
 <td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-hide-ids.png" alt="Switch that hides contact IDs and channel numbers"></a></td>
 </tr>
 <tr>
-<td><b>Quick reply</b> — one tap puts a reply such as "Slyším, 4 hops!" with the sender's name in the message field.</td>
+<td><b>Message details</b> — the route with its distances, the sender's public key to copy, and a quick reply set in Settings with {hops}, {km} and {route}, here "Heard, 4 hops, 123 km (124 km)!".</td>
 <td><b>Cleaner list</b> — the gear menu hides contact IDs and channel numbers.</td>
 </tr>
 <tr>
