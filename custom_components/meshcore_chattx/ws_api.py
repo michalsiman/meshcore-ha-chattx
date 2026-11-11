@@ -485,6 +485,7 @@ def async_register_ws_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_set_location_source)
     websocket_api.async_register_command(hass, ws_add_contact)
     websocket_api.async_register_command(hass, ws_import_contact)
+    websocket_api.async_register_command(hass, ws_get_contact_path)
     websocket_api.async_register_command(hass, ws_remove_contact)
     websocket_api.async_register_command(hass, ws_trace)
     websocket_api.async_register_command(hass, ws_get_blocked_contacts)
@@ -3710,6 +3711,56 @@ async def ws_import_contact(hass, connection, msg):
         connection.send_result(msg["id"], {**preview, "already_added": True, "success": True})
     except Exception as ex:
         _ws_send_error_safe(connection, msg["id"], ex, handler="ws_import_contact")
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "meshcore_chattx/get_contact_path",
+        vol.Required("public_key"): str,
+        vol.Optional("entry_id"): str,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_get_contact_path(hass, connection, msg):
+    """Read a contact's outgoing path from the radio itself.
+
+    The integration's contact list keeps the path it last synced; after a
+    path reset, or once the radio learns a new path, only the radio knows.
+    The cached contact is updated too, so other views see the fresh path.
+    """
+    coordinator = _get_coordinator(hass, msg.get("entry_id"))
+    if not coordinator:
+        connection.send_error(msg["id"], "not_found", "Coordinator not found")
+        return
+    key = msg["public_key"].strip().lower()
+    if not re.fullmatch(r"[0-9a-f]{64}", key):
+        connection.send_error(msg["id"], "invalid", "public_key must be 64 hex characters")
+        return
+    api = coordinator.api
+    if not radio_ready(api):
+        connection.send_error(msg["id"], "not_connected", "Device not connected")
+        return
+    try:
+        from meshcore.events import EventType
+
+        result = await radio_command(api, "get_contact_by_key", bytes.fromhex(key))
+    except Exception as ex:
+        _ws_send_error_safe(connection, msg["id"], ex, handler="ws_get_contact_path")
+        return
+    if result is None or result.type == EventType.ERROR or not isinstance(result.payload, dict):
+        connection.send_error(msg["id"], "not_found", "Contact not found on the radio")
+        return
+    payload = result.payload
+    path = {
+        "out_path": payload.get("out_path") or "",
+        "out_path_len": payload.get("out_path_len", -1),
+        "out_path_hash_mode": payload.get("out_path_hash_mode", 0),
+    }
+    cached = coordinator._contacts.get(key[:12])
+    if isinstance(cached, dict):
+        cached.update(path)
+    connection.send_result(msg["id"], path)
 
 
 @websocket_api.websocket_command(

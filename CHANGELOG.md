@@ -4,6 +4,13 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-11-11
+
+### Fixed
+
+- After "Reset path", node details kept showing "Flood" even when the radio had found a new path: they showed the integration's contact list, which only syncs later. The path is now read from the radio when the window opens, and after a reset every 5 seconds for up to 10 minutes, so the new path shows as soon as it is found. The integration's copy of the contact is updated too.
+- The distance of a message ("↔ … km" and {km}/{route} in the reply) was missing when the first or last repeater of the path had no known position. The outermost repeaters with a position are used then, and the distance is marked approximate (~). "? km" is left only when fewer than two repeaters have a position.
+
 ## [0.18.0] - 2026-11-11
 
 ### Added

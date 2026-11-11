@@ -18,9 +18,17 @@ describe('distance between the end repeaters', () => {
     expect(formatDistance(edgeDistance(['aaaa', 'bbbb'], nodes)!)).toBe('↔ 83 km');
   });
 
-  it('needs two repeaters with a known position at both ends', () => {
+  it('needs two repeaters with a known position', () => {
     expect(edgeDistance(['aaaa'], nodes)).toBeNull();
     expect(edgeDistance(['aaaa', 'ffff'], nodes)).toBeNull();
+  });
+
+  it('measures from the outermost known repeaters when an end is unknown, as approximate', () => {
+    const d = edgeDistance(['ffff', 'aaaa', 'bbbb', 'cccc', 'eeee'], nodes)!;
+    expect(Math.round(d.km)).toBe(241);
+    expect(d.approx).toBe(true);
+    expect(d.routeApprox).toBe(true);
+    expect(formatDistance(d)).toBe('↔ ~241 km (∑ ~268 km)');
   });
 
   it('marks a shared prefix as approximate', () => {

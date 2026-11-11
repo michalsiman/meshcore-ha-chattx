@@ -294,11 +294,12 @@ export function shortestPath(rxLogData: Array<Record<string, unknown>> | undefin
 
 /**
  * Straight-line distance between the first and the last repeater of a
- * path, when both have a known position, and the length of the route
- * itself: the legs between consecutive repeaters added up (repeaters
- * without a position are skipped, which makes it approximate). `approx`
- * when a prefix is shared by several known repeaters, so the nearest one
- * was taken.
+ * path, and the length of the route itself: the legs between consecutive
+ * repeaters added up. Repeaters without a known position are skipped; when
+ * one is at an end, the nearest repeater with a position stands in for it.
+ * Either makes the distance approximate (`approx`, `routeApprox`), as does
+ * a prefix shared by several known repeaters. Null when fewer than two
+ * repeaters have a position.
  */
 export function edgeDistance(
   pathNodes: string[] | null,
@@ -307,19 +308,18 @@ export function edgeDistance(
   if (!pathNodes || pathNodes.length < 2) return null;
   const repeaters = resolveRoute({ pathNodes, nodes, me: null, outgoing: false })
     .filter((p) => p.kind === 'repeater');
-  const first = repeaters[0];
-  const last = repeaters[repeaters.length - 1];
-  if (first.lat === null || first.lon === null || last.lat === null || last.lon === null) return null;
+  const placed = repeaters.filter((p) => p.lat !== null && p.lon !== null);
+  if (placed.length < 2) return null;
+  const first = placed[0];
+  const last = placed[placed.length - 1];
   let routeKm = 0;
-  let prev: RoutePoint | null = null;
-  for (const p of repeaters) {
-    if (p.lat === null || p.lon === null) continue;
-    if (prev) routeKm += distanceKm(prev.lat!, prev.lon!, p.lat, p.lon);
-    prev = p;
+  for (let i = 1; i < placed.length; i++) {
+    routeKm += distanceKm(placed[i - 1].lat!, placed[i - 1].lon!, placed[i].lat!, placed[i].lon!);
   }
+  const endsMissing = first !== repeaters[0] || last !== repeaters[repeaters.length - 1];
   return {
-    km: distanceKm(first.lat, first.lon, last.lat, last.lon),
-    approx: first.ambiguous || last.ambiguous,
+    km: distanceKm(first.lat!, first.lon!, last.lat!, last.lon!),
+    approx: first.ambiguous || last.ambiguous || endsMissing,
     routeKm,
     routeApprox: repeaters.some((p) => p.ambiguous || p.lat === null),
   };

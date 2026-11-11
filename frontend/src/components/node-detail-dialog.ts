@@ -4,7 +4,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, ManagedDevice, HomeAssistant } from '../types';
 import { attachDialogA11y } from '../utils/dialog-a11y';
-import { executeLocal, getContacts, getConversationInfo, getRepeaterLoginState } from '../api';
+import { executeLocal, getContactPath, getContacts, getConversationInfo, getRepeaterLoginState } from '../api';
 import './repeater-login';
 import './repeater-settings';
 import './repeater-telemetry';
@@ -35,7 +35,12 @@ export class NodeDetailDialog extends LitElement {
   @state() private _keyCopied = false;
   /** Path reset: key of the contact and the path it had when reset, so the
    *  dialog shows flood until the coordinator reports a new path. */
-  @state() private _pathReset: { key: string; from: string } | null = null;
+  /** Key of the contact whose path was reset here; cleared when a new path is found. */
+  @state() private _pathReset: { key: string } | null = null;
+  /** The path as read from the radio, newer than the integration's contact list. */
+  @state() private _freshPath: { key: string; out_path: string; out_path_len: number; out_path_hash_mode: number } | null = null;
+  private _freshFor: string | null = null;
+  private _pathWatch?: ReturnType<typeof setInterval>;
   @state() private _pathResetting = false;
   @state() private _pathResetError = '';
   /** The direct conversation with this node in Chat: stored messages and the newest one's time. */
@@ -58,6 +63,24 @@ export class NodeDetailDialog extends LitElement {
     } else if (!this.open) {
       this._conversationFor = null;
     }
+    // The path as the radio has it now, once per opened contact.
+    const key = this.open && node && 'adv_name' in node ? node.public_key : null;
+    if (key && this._freshFor !== key) {
+      this._freshFor = key;
+      this._freshPath = null;
+      this._stopPathWatch();
+      if (this._pathReset?.key !== key) this._pathReset = null;
+      void this._readPath(key);
+    } else if (!this.open && this._freshFor) {
+      this._freshFor = null;
+      this._freshPath = null;
+      this._stopPathWatch();
+    }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._stopPathWatch();
   }
 
   private _renderConversationInfo() {
@@ -104,8 +127,46 @@ export class NodeDetailDialog extends LitElement {
   }
 
   private _pathWasReset(c: Contact): boolean {
-    return !!this._pathReset && this._pathReset.key === c.public_key
-      && this._pathReset.from === (c.out_path || '');
+    return !!this._pathReset && this._pathReset.key === c.public_key && (c.out_path_len ?? -1) < 0;
+  }
+
+  /** The contact with the path read from the radio, when there is one. */
+  private _withFreshPath(c: Contact): Contact {
+    const f = this._freshPath;
+    return f && f.key === c.public_key
+      ? { ...c, out_path: f.out_path, out_path_len: f.out_path_len, out_path_hash_mode: f.out_path_hash_mode }
+      : c;
+  }
+
+  /** Read the contact's path from the radio; true when it has one. */
+  private async _readPath(key: string): Promise<boolean> {
+    if (!this.hass) return false;
+    const path = await getContactPath(this.hass, key, this.entryId);
+    if (!path || this._freshFor !== key) return false;
+    this._freshPath = { key, ...path };
+    if (path.out_path_len >= 0) {
+      this._pathReset = null;
+      return true;
+    }
+    return false;
+  }
+
+  /** After a reset, look for the new path every 5 s for up to 10 minutes. */
+  private _watchPath(key: string) {
+    this._stopPathWatch();
+    let tries = 0;
+    this._pathWatch = setInterval(() => {
+      if (++tries > 120 || !this.open) {
+        this._stopPathWatch();
+        return;
+      }
+      void this._readPath(key).then((found) => { if (found) this._stopPathWatch(); });
+    }, 5000);
+  }
+
+  private _stopPathWatch() {
+    if (this._pathWatch) clearInterval(this._pathWatch);
+    this._pathWatch = undefined;
   }
 
   /** The stored outgoing path split into hops ("a1b2", "c3d4", ...). */
@@ -121,7 +182,8 @@ export class NodeDetailDialog extends LitElement {
     return hops.length ? hops : [hex];
   }
 
-  private _renderPathSection(c: Contact) {
+  private _renderPathSection(contact: Contact) {
+    const c = this._withFreshPath(contact);
     const reset = this._pathWasReset(c);
     const len = c.out_path_len ?? -1;
     const flood = reset || len < 0;
@@ -162,7 +224,10 @@ export class NodeDetailDialog extends LitElement {
     const result = await executeLocal(this.hass, 'reset_path', { key: c.public_key }, this.entryId);
     this._pathResetting = false;
     if (result.success && !/error/i.test(result.response || '')) {
-      this._pathReset = { key: c.public_key, from: c.out_path || '' };
+      this._pathReset = { key: c.public_key };
+      this._freshFor = c.public_key;
+      this._freshPath = { key: c.public_key, out_path: '', out_path_len: -1, out_path_hash_mode: 0 };
+      this._watchPath(c.public_key);
     } else {
       this._pathResetError = t('Error: {error}', { error: result.response || '?' });
     }

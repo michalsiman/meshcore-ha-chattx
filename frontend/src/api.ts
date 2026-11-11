@@ -860,6 +860,21 @@ export async function getUnreadAndLastRead(
   } catch { return { unread: {}, last_read: {} }; }
 }
 
+/** A contact's outgoing path as the radio has it now; null when it can't be read. */
+export async function getContactPath(
+  hass: HomeAssistant,
+  publicKey: string,
+  entryId?: string,
+): Promise<{ out_path: string; out_path_len: number; out_path_hash_mode: number } | null> {
+  try {
+    const msg: Record<string, unknown> = { type: 'meshcore_chattx/get_contact_path', public_key: publicKey };
+    if (entryId) msg.entry_id = entryId;
+    return await hass.callWS<{ out_path: string; out_path_len: number; out_path_hash_mode: number }>(msg);
+  } catch {
+    return null;
+  }
+}
+
 /** Stored messages and newest message time of the direct conversation with a node, if any. */
 export async function getConversationInfo(
   hass: HomeAssistant,
