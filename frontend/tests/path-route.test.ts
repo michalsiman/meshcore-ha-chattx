@@ -57,12 +57,38 @@ describe('route on the map', () => {
     const node = (key: string, name: string, lat: number, lon: number) => ({ key, name, lat, lon, type: 2 });
     const layers = [[node('aa01', 'A', 50.0, 14.0)], [node('bb01', 'Far away', 49.0, 17.0)], [node('cc01', 'C', 50.0, 14.2)]];
     const start = { lat: 50.0, lon: 13.8 };
-    expect(chooseCandidates(layers, start, null, [true, true, true]).map((n) => n?.name ?? null)).toEqual(['A', null, 'C']);
-    // 2-byte prefixes are kept: the node is almost surely the right one.
-    expect(chooseCandidates(layers, start, null, [false, false, false]).map((n) => n?.name)).toEqual(['A', 'Far away', 'C']);
+    expect(chooseCandidates(layers, start, null, [200, 200, 200]).map((n) => n?.name ?? null)).toEqual(['A', null, 'C']);
+    // Without the option to leave hops out, the far node stays.
+    expect(chooseCandidates(layers, start, null).map((n) => n?.name)).toEqual(['A', 'Far away', 'C']);
   });
 
-  it('marks a left-out hop', () => {
+  it('keeps a long leg forward, leaves out a 2-byte hop far off the route', () => {
+    const node = (key: string, name: string, lat: number, lon: number) => ({ key, name, lat, lon, type: 2 });
+    const start = { lat: 50.0, lon: 13.0 };
+    // A long leg forward along the route is kept.
+    const ahead = [[node('aa01', 'A', 50.0, 13.1)], [node('bb01', 'Ahead', 50.0, 14.6)], [node('cc01', 'C', 50.0, 14.7)]];
+    expect(chooseCandidates(ahead, start, null, [400, 400, 400]).map((n) => n?.name ?? null)).toEqual(['A', 'Ahead', 'C']);
+    // About 250 km off the route: left out even with a 2-byte prefix.
+    const far = [[node('aa01', 'A', 50.0, 13.1)], [node('bb01', 'Far', 52.25, 13.1)], [node('cc01', 'C', 50.0, 13.2)]];
+    expect(chooseCandidates(far, start, null, [400, 400, 400]).map((n) => n?.name ?? null)).toEqual(['A', null, 'C']);
+  });
+
+  it('leaves out a 2-byte hop near us between hops far away (route does not turn back)', () => {
+    const node = (key: string, name: string, lat: number, lon: number) => ({ key, name, lat, lon, type: 2 });
+    const me = { lat: 49.6, lon: 13.2 };
+    // From us outwards: two hops east, unknown hops, then a node back near us.
+    const layers = [
+      [node('aa01', 'East 1', 49.6, 15.6)],
+      [node('bb01', 'East 2', 49.4, 16.9)],
+      [], [], [],
+      [node('cc01', 'Near us', 50.1, 14.4)],
+      [],
+    ];
+    const picked = chooseCandidates(layers, me, null, layers.map(() => 600));
+    expect(picked.map((n) => n?.name ?? null)).toEqual(['East 1', 'East 2', null, null, null, null, null]);
+  });
+
+    it('marks a left-out hop', () => {
     const states2 = {
       ...states,
       'binary_sensor.meshcore_f_contact': { entity_id: 'binary_sensor.meshcore_f_contact', attributes: { public_key: '17aaaa', adv_name: 'Moravia', adv_lat: 49.3, adv_lon: 16.6, type: 2 } },

@@ -85,40 +85,56 @@ function candidatesFor(prefix: string, nodes: MapNode[]): MapNode[] {
   return forwarders.length ? forwarders : nodes.filter((n) => n.key.startsWith(p));
 }
 
-/** Cost of one leg: its length, with legs over about 100 km counting ever more. */
-function legCost(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
-  const d = distanceKm(a.lat, a.lon, b.lat, b.lon);
-  return d + (d * d) / 100;
+/** Cost of one leg of `hops` hops: each hop its length, hops over about 100 km counting ever more. */
+function legCost(a: { lat: number; lon: number }, b: { lat: number; lon: number }, hops = 1): number {
+  const d = distanceKm(a.lat, a.lon, b.lat, b.lon) / hops;
+  return hops * (d + (d * d) / 100);
 }
 
 /**
- * What leaving a hop out costs: about one 100 km leg. With 1-byte prefixes
- * many repeaters on a path are not among our contacts, and the one known
- * node with the same prefix may be far away; dropping it is then more
- * likely right than a long jump there and back.
+ * What leaving a hop out costs, by prefix length: for a 1-byte prefix about
+ * the cost of one 100 km hop, for a longer one three times that. Many
+ * repeaters on a path are not among our contacts, and the one known node
+ * with the same prefix may be far away; dropping it is then more likely
+ * right than a long jump there and back. A 2-byte prefix is far more
+ * often the node we know, so leaving it out costs more.
  */
-const SKIP_COST = 200;
+export function skipCost(prefix: string): number {
+  return prefix.length <= 2 ? 200 : 600;
+}
+
+/**
+ * Cost per kilometre of coming back towards us: walking the path from us
+ * outwards, each repeater should be at least as far from us as the one
+ * before, give or take. A repeater near us between ones far away is a
+ * wrong guess more likely than a route that turned back.
+ */
+const BACKTRACK_COST = 2;
 
 interface ChainState {
   pos: { lat: number; lon: number } | null;
+  /** Distance from us of the last placed node, and the hop it is on (-1: us). */
+  fromStart: number;
+  layer: number;
   cost: number;
   picks: Array<MapNode | null>;
 }
 
 /**
  * Choose one candidate per hop so that the chain start → hops → end is
- * cheapest. Hops without candidates are left out; a hop marked skippable
- * may be left out too, at SKIP_COST, as a repeater we don't know. The legs
- * around a left-out hop join its neighbours.
+ * cheapest: short hops, no turning back towards the start. Hops without
+ * candidates are left out; a hop may be left out too, at its cost in
+ * skipCosts, as a repeater we don't know. A leg across left-out hops
+ * counts as that many hops.
  */
 export function chooseCandidates(
   layers: MapNode[][],
   start: { lat: number; lon: number } | null,
   end: { lat: number; lon: number } | null,
-  skippable: boolean[] = [],
+  skipCosts: number[] = [],
 ): Array<MapNode | null> {
-  // One state per "last placed node": the cheapest chain that ends there.
-  let states = new Map<string, ChainState>([['', { pos: start, cost: 0, picks: [] }]]);
+  // One state per last placed node (and its hop): the cheapest chain that ends there.
+  let states = new Map<string, ChainState>([['', { pos: start, fromStart: 0, layer: -1, cost: 0, picks: [] }]]);
   layers.forEach((layer, k) => {
     const next = new Map<string, ChainState>();
     const offer = (key: string, state: ChainState) => {
@@ -127,14 +143,19 @@ export function chooseCandidates(
     };
     for (const [key, s] of states) {
       for (const c of layer) {
-        offer(c.key, {
+        const fromStart = start ? distanceKm(start.lat, start.lon, c.lat, c.lon) : 0;
+        const back = start && s.layer >= 0 ? Math.max(0, s.fromStart - fromStart) * BACKTRACK_COST : 0;
+        offer(`${k}:${c.key}`, {
           pos: { lat: c.lat, lon: c.lon },
-          cost: s.cost + (s.pos ? legCost(s.pos, c) : 0),
+          fromStart,
+          layer: k,
+          cost: s.cost + (s.pos ? legCost(s.pos, c, k - s.layer) : 0) + back,
           picks: [...s.picks, c],
         });
       }
-      if (layer.length === 0 || skippable[k]) {
-        offer(key, { pos: s.pos, cost: s.cost + (layer.length ? SKIP_COST : 0), picks: [...s.picks, null] });
+      const skip = layer.length === 0 ? 0 : skipCosts[k] ?? Infinity;
+      if (Number.isFinite(skip)) {
+        offer(key, { ...s, cost: s.cost + skip, picks: [...s.picks, null] });
       }
     }
     states = next;
@@ -142,7 +163,7 @@ export function chooseCandidates(
   let best: ChainState | null = null;
   let bestCost = Infinity;
   for (const s of states.values()) {
-    const total = s.cost + (end && s.pos ? legCost(s.pos, end) : 0);
+    const total = s.cost + (end && s.pos ? legCost(s.pos, end, layers.length - s.layer) : 0);
     if (total < bestCost) {
       bestCost = total;
       best = s;
@@ -169,9 +190,8 @@ export function resolveRoute(options: {
   // Chain from our end: us, the repeaters nearest to us first, then the sender.
   const order = outgoing ? pathNodes.map((_, i) => i) : pathNodes.map((_, i) => pathNodes.length - 1 - i);
   const layers = order.map((i) => candidatesFor(pathNodes[i], nodes));
-  // A 1-byte prefix (two hex digits) may well be a repeater we don't know.
-  const skippable = order.map((i) => pathNodes[i].length <= 2);
-  const picked = chooseCandidates(layers, meNear, sender ? { lat: sender.lat, lon: sender.lon } : null, skippable);
+  const skips = order.map((i) => skipCost(pathNodes[i]));
+  const picked = chooseCandidates(layers, meNear, sender ? { lat: sender.lat, lon: sender.lon } : null, skips);
   const placed: RoutePoint[] = new Array(pathNodes.length);
   order.forEach((i, k) => {
     const node = picked[k];

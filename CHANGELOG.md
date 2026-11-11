@@ -4,6 +4,14 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.17.3] - 2026-11-11
+
+### Changed
+
+- The route map can leave out a hop with a 2-byte prefix too, when the one known repeater with that prefix is far off the route, at a higher cost than a 1-byte hop. A message from Slovakia went through an unknown "9D00", and the only known 9D00 in Prague made the route jump there and back.
+- A leg across hops without a known position counts as that many hops, so a long leg over unknown repeaters isn't taken for one long hop.
+- A route that comes back towards us and leaves again counts as unlikely: walking from us outwards, each repeater should be at least about as far from us as the one before.
+
 ## [0.17.2] - 2026-11-11
 
 ### Fixed
