@@ -21,6 +21,15 @@ let pending: string[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let seq = 0;
 let listening = false;
+/** A history.go() of flush() has not arrived as popstate yet. */
+let navigating = false;
+let settledWaiters: Array<() => void> = [];
+
+function releaseSettled(): void {
+  const waiters = settledWaiters;
+  settledWaiters = [];
+  waiters.forEach((resolve) => resolve());
+}
 
 function chain(): string[] {
   const steps = (history.state as Record<string, unknown> | null)?.[KEY];
@@ -40,6 +49,10 @@ function onPopState(): void {
     openSteps.delete(token);
     close?.();
   }
+  if (navigating) {
+    navigating = false;
+    releaseSettled();
+  }
 }
 
 function flush(): void {
@@ -48,7 +61,34 @@ function flush(): void {
   const index = steps.findIndex((t) => pending.includes(t));
   pending = [];
   // Leaving the entry also closes any step still open above it.
-  if (index >= 0) history.go(-(steps.length - index));
+  if (index >= 0) {
+    navigating = true;
+    history.go(-(steps.length - index));
+    // Should the popstate never come, don't keep waiters forever.
+    setTimeout(() => {
+      if (navigating) {
+        navigating = false;
+        releaseSettled();
+      }
+    }, 1000);
+  } else {
+    releaseSettled();
+  }
+}
+
+/**
+ * Resolves once the steps closed so far have left their history entries.
+ * Open a new window after it when it replaces windows just closed in the
+ * same moment: otherwise the going back closes the new window at once.
+ */
+export function afterClosedSteps(): Promise<void> {
+  return new Promise((resolve) => {
+    // Let the closing windows finish their update and the flush be queued.
+    setTimeout(() => {
+      if (!flushTimer && !navigating) resolve();
+      else settledWaiters.push(resolve);
+    }, 0);
+  });
 }
 
 /** Open a step; `close` runs when the back gesture leaves its entry. Returns its token. */
@@ -84,4 +124,6 @@ export function _resetBackStack(): void {
   pending = [];
   if (flushTimer) clearTimeout(flushTimer);
   flushTimer = null;
+  navigating = false;
+  settledWaiters = [];
 }

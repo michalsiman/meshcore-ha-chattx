@@ -1,3 +1,4 @@
+import { afterClosedSteps } from '../utils/back-stack';
 import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -1423,9 +1424,13 @@ export class ChatPage extends LitElement {
   }
 
   /** A route map image from a message's details: offer it for the message being written. */
-  private _onSendImage = (e: Event) => {
+  private _onSendImage = async (e: Event) => {
     const file = (e as CustomEvent<{ file: Blob }>).detail?.file;
     if (!file || !this.selectedId) return;
+    // The message dialog and its map just closed; on a phone their history
+    // entries are being left. Opening the upload dialog before that ends
+    // would let the going back close it again at once.
+    await afterClosedSteps();
     this._imageFile = file;
   };
 

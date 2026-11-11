@@ -705,5 +705,6 @@
   "Map image shared": "Kartbild delad",
   "Map image downloaded": "Kartbild nedladdad",
   "The map image could not be made": "Kartbilden kunde inte skapas",
-  "Send map in a message": "Skicka kartan i ett meddelande"
+  "Send map in a message": "Skicka kartan i ett meddelande",
+  "probably a repeater we don't know": "troligen en repeater vi inte känner till"
 }

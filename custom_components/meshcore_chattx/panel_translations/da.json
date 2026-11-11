@@ -705,5 +705,6 @@
   "Map image shared": "Kortbillede delt",
   "Map image downloaded": "Kortbillede downloadet",
   "The map image could not be made": "Kortbilledet kunne ikke laves",
-  "Send map in a message": "Send kortet i en besked"
+  "Send map in a message": "Send kortet i en besked",
+  "probably a repeater we don't know": "sandsynligvis en repeater, vi ikke kender"
 }

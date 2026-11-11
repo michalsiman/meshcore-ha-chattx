@@ -705,5 +705,6 @@
   "Map image shared": "Delwedd y map wedi’i rhannu",
   "Map image downloaded": "Delwedd y map wedi’i lawrlwytho",
   "The map image could not be made": "Methu creu delwedd y map",
-  "Send map in a message": "Anfon y map mewn neges"
+  "Send map in a message": "Anfon y map mewn neges",
+  "probably a repeater we don't know": "ailadroddydd nad ydym yn ei adnabod, mae’n debyg"
 }

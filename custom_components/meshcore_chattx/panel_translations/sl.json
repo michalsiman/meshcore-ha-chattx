@@ -705,5 +705,6 @@
   "Map image shared": "Slika zemljevida deljena",
   "Map image downloaded": "Slika zemljevida prenesena",
   "The map image could not be made": "Slike zemljevida ni bilo mogoče ustvariti",
-  "Send map in a message": "Pošlji zemljevid v sporočilu"
+  "Send map in a message": "Pošlji zemljevid v sporočilu",
+  "probably a repeater we don't know": "verjetno repetitor, ki ga ne poznamo"
 }

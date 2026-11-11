@@ -510,7 +510,9 @@ export class PathMap extends LitElement {
     try {
       const png = this._mapImage();
       let copied = false;
-      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+      // The Home Assistant app on Android reports a copied image but keeps nothing.
+      const fakeClipboard = /Android/.test(navigator.userAgent) && /Home ?Assistant/i.test(navigator.userAgent);
+      if (!fakeClipboard && typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
         try {
           // Pass the promise so Safari keeps the click as the user gesture.
           await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
@@ -578,7 +580,7 @@ export class PathMap extends LitElement {
           const leg = legs[i];
           return html`<li value=${hop}>
             <span class="prefix">${p.prefix}</span>
-            ${p.name ? html` ${p.name}` : html` – ${t('no known position')}`}${p.ambiguous ? ' (?)' : ''}${leg !== null
+            ${p.name ? html` ${p.name}` : p.leftOut ? html` – ${t('probably a repeater we don\'t know')}` : html` – ${t('no known position')}`}${p.ambiguous && !p.leftOut ? ' (?)' : ''}${leg !== null
               ? html` <span class="leg">+${formatLength(leg)}</span>`
               : nothing}
           </li>`;

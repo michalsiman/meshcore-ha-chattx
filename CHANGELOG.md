@@ -4,6 +4,17 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.17.2] - 2026-11-11
+
+### Fixed
+
+- On a phone, "Send map in a message" closed the message window but the image upload dialog did not appear: going back over the closed windows' history entries closed the new dialog at once. It now opens after that.
+- "Copy map as image" in the Home Assistant app on Android said the image was copied, but nothing was on the clipboard. The app skips the clipboard now and downloads the image.
+
+### Changed
+
+- With 1-byte path prefixes, the route map chooses the repeaters of all hops together: the combination giving the shortest route, long legs counting more. Before, each hop took the candidate nearest to the previous one, and one wrong guess sent the route far off (a message with a 106 km straight line showed a 612 km route; now 180 km). A 1-byte hop whose only known repeater lies far off the route is shown as "probably a repeater we don't know", without a position.
+
 ## [0.17.1] - 2026-11-11
 
 ### Added

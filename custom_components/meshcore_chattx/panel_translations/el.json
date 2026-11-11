@@ -705,5 +705,6 @@
   "Map image shared": "Η εικόνα του χάρτη κοινοποιήθηκε",
   "Map image downloaded": "Η εικόνα του χάρτη λήφθηκε",
   "The map image could not be made": "Δεν ήταν δυνατή η δημιουργία της εικόνας του χάρτη",
-  "Send map in a message": "Αποστολή χάρτη σε μήνυμα"
+  "Send map in a message": "Αποστολή χάρτη σε μήνυμα",
+  "probably a repeater we don't know": "μάλλον αναμεταδότης που δεν γνωρίζουμε"
 }

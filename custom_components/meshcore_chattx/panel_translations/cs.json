@@ -705,5 +705,6 @@
   "Map image shared": "Obrázek mapy sdílen",
   "Map image downloaded": "Obrázek mapy stažen",
   "The map image could not be made": "Obrázek mapy se nepodařilo vytvořit",
-  "Send map in a message": "Poslat mapu ve zprávě"
+  "Send map in a message": "Poslat mapu ve zprávě",
+  "probably a repeater we don't know": "nejspíš repeater, který neznáme"
 }

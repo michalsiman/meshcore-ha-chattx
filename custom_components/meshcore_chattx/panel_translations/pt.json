@@ -705,5 +705,6 @@
   "Map image shared": "Imagem do mapa partilhada",
   "Map image downloaded": "Imagem do mapa transferida",
   "The map image could not be made": "Não foi possível criar a imagem do mapa",
-  "Send map in a message": "Enviar o mapa numa mensagem"
+  "Send map in a message": "Enviar o mapa numa mensagem",
+  "probably a repeater we don't know": "provavelmente um repetidor que não conhecemos"
 }

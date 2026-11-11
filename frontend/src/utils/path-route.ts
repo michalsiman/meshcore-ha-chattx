@@ -5,10 +5,12 @@
  * A path lists the repeaters a packet went through as the first bytes of
  * their public keys, from the sender's side to ours. With 2-byte prefixes
  * almost every prefix names one repeater; with 1-byte prefixes many do.
- * When several known nodes share a prefix, the one nearest to the
- * neighbouring point already placed is taken and the point is marked as
- * uncertain. Placing starts at our own end of the path, which is the one
- * position always known.
+ * When several known nodes share a prefix, the point is marked as
+ * uncertain and the candidates are chosen together: of all combinations,
+ * the one whose route from us to the sender (when its position is known)
+ * is shortest, with long legs counting more than short ones. A radio
+ * route does not jump far away and back, so this beats taking each hop's
+ * nearest candidate one by one, where one wrong guess drags the rest.
  */
 
 import { formatLength } from './units';
@@ -32,6 +34,8 @@ export interface RoutePoint {
   lon: number | null;
   /** More than one known node shares the prefix. */
   ambiguous: boolean;
+  /** Known nodes share the prefix, but all lie off the route: probably a repeater we don't know. */
+  leftOut?: boolean;
 }
 
 interface StateLike {
@@ -74,27 +78,77 @@ export function distanceKm(aLat: number, aLon: number, bLat: number, bLon: numbe
   return 12742 * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-function pick(
-  prefix: string,
-  nodes: MapNode[],
-  near: { lat: number; lon: number } | null,
-): { node: MapNode | null; ambiguous: boolean } {
+/** Known nodes a path prefix can stand for; repeaters and room servers first, as they forward packets. */
+function candidatesFor(prefix: string, nodes: MapNode[]): MapNode[] {
   const p = prefix.toLowerCase();
-  // Repeaters and room servers forward packets; prefer them over companions.
-  let candidates = nodes.filter((n) => n.key.startsWith(p) && (n.type === 2 || n.type === 3));
-  if (candidates.length === 0) candidates = nodes.filter((n) => n.key.startsWith(p));
-  if (candidates.length === 0) return { node: null, ambiguous: false };
-  if (candidates.length === 1 || !near) return { node: candidates[0], ambiguous: candidates.length > 1 };
-  let best = candidates[0];
-  let bestD = Infinity;
-  for (const c of candidates) {
-    const d = distanceKm(near.lat, near.lon, c.lat, c.lon);
-    if (d < bestD) {
-      best = c;
-      bestD = d;
+  const forwarders = nodes.filter((n) => n.key.startsWith(p) && (n.type === 2 || n.type === 3));
+  return forwarders.length ? forwarders : nodes.filter((n) => n.key.startsWith(p));
+}
+
+/** Cost of one leg: its length, with legs over about 100 km counting ever more. */
+function legCost(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+  const d = distanceKm(a.lat, a.lon, b.lat, b.lon);
+  return d + (d * d) / 100;
+}
+
+/**
+ * What leaving a hop out costs: about one 100 km leg. With 1-byte prefixes
+ * many repeaters on a path are not among our contacts, and the one known
+ * node with the same prefix may be far away; dropping it is then more
+ * likely right than a long jump there and back.
+ */
+const SKIP_COST = 200;
+
+interface ChainState {
+  pos: { lat: number; lon: number } | null;
+  cost: number;
+  picks: Array<MapNode | null>;
+}
+
+/**
+ * Choose one candidate per hop so that the chain start → hops → end is
+ * cheapest. Hops without candidates are left out; a hop marked skippable
+ * may be left out too, at SKIP_COST, as a repeater we don't know. The legs
+ * around a left-out hop join its neighbours.
+ */
+export function chooseCandidates(
+  layers: MapNode[][],
+  start: { lat: number; lon: number } | null,
+  end: { lat: number; lon: number } | null,
+  skippable: boolean[] = [],
+): Array<MapNode | null> {
+  // One state per "last placed node": the cheapest chain that ends there.
+  let states = new Map<string, ChainState>([['', { pos: start, cost: 0, picks: [] }]]);
+  layers.forEach((layer, k) => {
+    const next = new Map<string, ChainState>();
+    const offer = (key: string, state: ChainState) => {
+      const old = next.get(key);
+      if (!old || state.cost < old.cost) next.set(key, state);
+    };
+    for (const [key, s] of states) {
+      for (const c of layer) {
+        offer(c.key, {
+          pos: { lat: c.lat, lon: c.lon },
+          cost: s.cost + (s.pos ? legCost(s.pos, c) : 0),
+          picks: [...s.picks, c],
+        });
+      }
+      if (layer.length === 0 || skippable[k]) {
+        offer(key, { pos: s.pos, cost: s.cost + (layer.length ? SKIP_COST : 0), picks: [...s.picks, null] });
+      }
+    }
+    states = next;
+  });
+  let best: ChainState | null = null;
+  let bestCost = Infinity;
+  for (const s of states.values()) {
+    const total = s.cost + (end && s.pos ? legCost(s.pos, end) : 0);
+    if (total < bestCost) {
+      bestCost = total;
+      best = s;
     }
   }
-  return { node: best, ambiguous: true };
+  return best ? best.picks : layers.map(() => null);
 }
 
 /**
@@ -111,23 +165,26 @@ export function resolveRoute(options: {
 }): RoutePoint[] {
   const { pathNodes, nodes, me, outgoing, senderName } = options;
   const meNear = me ? { lat: me.lat, lon: me.lon } : null;
-  // Place repeaters starting from our end, each near the one placed before.
+  const sender = !outgoing && senderName ? nodes.find((n) => n.name === senderName) : undefined;
+  // Chain from our end: us, the repeaters nearest to us first, then the sender.
   const order = outgoing ? pathNodes.map((_, i) => i) : pathNodes.map((_, i) => pathNodes.length - 1 - i);
+  const layers = order.map((i) => candidatesFor(pathNodes[i], nodes));
+  // A 1-byte prefix (two hex digits) may well be a repeater we don't know.
+  const skippable = order.map((i) => pathNodes[i].length <= 2);
+  const picked = chooseCandidates(layers, meNear, sender ? { lat: sender.lat, lon: sender.lon } : null, skippable);
   const placed: RoutePoint[] = new Array(pathNodes.length);
-  let near = meNear;
-  for (const i of order) {
-    const prefix = pathNodes[i];
-    const { node, ambiguous } = pick(prefix, nodes, near);
+  order.forEach((i, k) => {
+    const node = picked[k];
     placed[i] = {
       kind: 'repeater',
-      prefix: prefix.toUpperCase(),
+      prefix: pathNodes[i].toUpperCase(),
       name: node?.name ?? '',
       lat: node?.lat ?? null,
       lon: node?.lon ?? null,
-      ambiguous,
+      ambiguous: layers[k].length > 1,
+      ...(node === null && layers[k].length > 0 ? { leftOut: true } : {}),
     };
-    if (node) near = { lat: node.lat, lon: node.lon };
-  }
+  });
   const mePoint: RoutePoint = {
     kind: 'me',
     prefix: '',
@@ -137,7 +194,6 @@ export function resolveRoute(options: {
     ambiguous: false,
   };
   if (outgoing) return [mePoint, ...placed];
-  const sender = senderName ? nodes.find((n) => n.name === senderName) : undefined;
   const senderPoint: RoutePoint = {
     kind: 'sender',
     prefix: '',

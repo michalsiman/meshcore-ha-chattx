@@ -705,5 +705,6 @@
   "Map image shared": "Karttakuva jaettu",
   "Map image downloaded": "Karttakuva ladattu",
   "The map image could not be made": "Karttakuvaa ei voitu tehdä",
-  "Send map in a message": "Lähetä kartta viestissä"
+  "Send map in a message": "Lähetä kartta viestissä",
+  "probably a repeater we don't know": "luultavasti toistin, jota emme tunne"
 }

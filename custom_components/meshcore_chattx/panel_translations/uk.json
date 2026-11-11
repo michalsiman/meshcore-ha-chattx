@@ -705,5 +705,6 @@
   "Map image shared": "Зображенням карти поділилися",
   "Map image downloaded": "Зображення карти завантажено",
   "The map image could not be made": "Не вдалося створити зображення карти",
-  "Send map in a message": "Надіслати карту в повідомленні"
+  "Send map in a message": "Надіслати карту в повідомленні",
+  "probably a repeater we don't know": "імовірно, невідомий нам ретранслятор"
 }
