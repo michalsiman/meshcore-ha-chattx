@@ -35,6 +35,10 @@ vi.mock('../src/api', () => ({
   isRepeaterSettingsReply: vi.fn(() => false),
   getRememberedRepeaterSettings: vi.fn(async () => ({})),
   getRepeaterLoginState: vi.fn(async () => ({ has_saved_password: false, logged_in_at: null })),
+  // Node details (repeater window) read the path from the radio.
+  getContactPath: vi.fn(async () => null),
+  getConversationInfo: vi.fn(async () => null),
+  executeLocal: vi.fn(async () => ({ response: 'OK', success: true, timestamp: '' })),
 }));
 
 // Mock entity-resolver — chat-page calls discoverChannelEntity /
