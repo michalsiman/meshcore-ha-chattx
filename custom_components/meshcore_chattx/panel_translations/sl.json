@@ -713,5 +713,9 @@
   "Open conversation": "Odpri pogovor",
   "No conversation in Chat yet": "V klepetu še ni pogovora",
   "{n} messages in Chat": "{n} sporočilo v klepetu|{n} sporočili v klepetu|{n} sporočila v klepetu|{n} sporočil v klepetu",
-  "last {when}": "zadnje {when}"
+  "last {when}": "zadnje {when}",
+  "Contact added": "Stik dodan",
+  "Already a contact": "Že stik",
+  "Adding failed, try again": "Dodajanje ni uspelo, poskusite znova",
+  "Contact": "Stik"
 }

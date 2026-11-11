@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.18.2] - 2026-11-11
+
+### Added
+
+- A contact shared in a message by the MeshCore apps, `<public key:type:name>`, shows as a contact card with its name, type and key, and an "Add contact" button for admins. The button says when the contact is already added. The same text can be pasted into "+ Add manually" in the Nodes tab.
+
 ## [0.18.1] - 2026-11-11
 
 ### Fixed

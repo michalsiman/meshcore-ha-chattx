@@ -713,5 +713,9 @@
   "Open conversation": "Agor y sgwrs",
   "No conversation in Chat yet": "Dim sgwrs yn y Sgwrs eto",
   "{n} messages in Chat": "{n} neges yn y Sgwrs|{n} neges yn y Sgwrs",
-  "last {when}": "olaf {when}"
+  "last {when}": "olaf {when}",
+  "Contact added": "Cyswllt wedi’i ychwanegu",
+  "Already a contact": "Eisoes yn gyswllt",
+  "Adding failed, try again": "Methu ychwanegu, rhowch gynnig arall",
+  "Contact": "Cyswllt"
 }

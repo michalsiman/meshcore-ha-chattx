@@ -713,5 +713,9 @@
   "Open conversation": "Do rozmowy",
   "No conversation in Chat yet": "Brak rozmowy w czacie",
   "{n} messages in Chat": "{n} wiadomość w czacie|{n} wiadomości w czacie|{n} wiadomości w czacie",
-  "last {when}": "ostatnia {when}"
+  "last {when}": "ostatnia {when}",
+  "Contact added": "Kontakt dodany",
+  "Already a contact": "Już jest w kontaktach",
+  "Adding failed, try again": "Dodawanie nie powiodło się, spróbuj ponownie",
+  "Contact": "Kontakt"
 }

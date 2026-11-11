@@ -40,6 +40,8 @@ export class MessageBubble extends LitElement {
   @property({ attribute: false, hasChanged: (value: unknown, old: unknown) => !old && !!value }) hass?: HomeAssistant;
   @property({ type: String }) nodeName = '';
   @state() private _showMap = false;
+  /** Contacts shared in this message: adding in progress, added, already a contact, failed. */
+  @state() private _sharedContacts: Record<string, 'busy' | 'added' | 'exists' | 'error'> = {};
   @state() private _copiedKey = '';
   /** The image shown large over the conversation. */
   @state() private _viewer: { src: string; url: string } | null = null;
@@ -161,6 +163,37 @@ export class MessageBubble extends LitElement {
       white-space: pre-wrap;
     }
 
+    .shared-contact {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      margin: 2px 0;
+      border-radius: 8px;
+      border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.4));
+      background: rgba(127, 127, 127, 0.08);
+      vertical-align: middle;
+    }
+    .shared-contact-type {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+    }
+    .shared-contact-add {
+      font: inherit;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--primary-color, #03a9f4);
+      background: transparent;
+      color: var(--primary-color, #03a9f4);
+      cursor: pointer;
+    }
+    .shared-contact-add:disabled {
+      border-color: var(--divider-color, #888);
+      color: var(--secondary-text-color);
+      cursor: default;
+    }
     .message-text .mention {
       background: var(--mention-bg, rgba(3, 169, 244, 0.15));
       color: var(--mention-text, var(--primary-color, #03a9f4));
@@ -517,7 +550,7 @@ export class MessageBubble extends LitElement {
     if (mentions.length === 0) {
       // No mentions to highlight. Lit auto-escapes string interpolations
       // in html`...` templates; web addresses become links.
-      return this._renderLinks(text);
+      return this._renderRich(text);
     }
 
     // Build a single regex matching either @[Name] or @Name forms for any
@@ -534,12 +567,12 @@ export class MessageBubble extends LitElement {
     let last = 0;
     let m: RegExpExecArray | null;
     while ((m = pattern.exec(text)) !== null) {
-      if (m.index > last) parts.push(this._renderLinks(text.slice(last, m.index)));
+      if (m.index > last) parts.push(this._renderRich(text.slice(last, m.index)));
       const name = m[1] ?? m[2];
       parts.push(html`<span class="mention">@${name}</span>`);
       last = m.index + m[0].length;
     }
-    if (last < text.length) parts.push(this._renderLinks(text.slice(last)));
+    if (last < text.length) parts.push(this._renderRich(text.slice(last)));
     return parts;
   }
 
@@ -574,6 +607,62 @@ export class MessageBubble extends LitElement {
           </button>`;
       })}
     </div>`;
+  }
+
+  /** Text with contacts shared by the MeshCore apps (<key:type:name>) as cards, and links. */
+  private _renderRich(text: string) {
+    const share = /<([0-9a-fA-F]{64}):(\d{1,2}):([^<>\n]{1,64})>/g;
+    if (!share.test(text)) return this._renderLinks(text);
+    share.lastIndex = 0;
+    const parts: unknown[] = [];
+    let last = 0;
+    for (const m of text.matchAll(share)) {
+      const start = m.index ?? 0;
+      if (start > last) parts.push(this._renderLinks(text.slice(last, start)));
+      parts.push(this._renderSharedContact(m[1].toLowerCase(), Number(m[2]), m[3].trim()));
+      last = start + m[0].length;
+    }
+    if (last < text.length) parts.push(this._renderLinks(text.slice(last)));
+    return parts;
+  }
+
+  private _renderSharedContact(key: string, type: number, name: string) {
+    const typeLabel = ({ 1: 'Companion', 2: 'Repeater', 3: 'Room server', 4: 'Sensor' } as Record<number, string>)[type] ?? 'Contact';
+    const state = this._sharedContacts[key];
+    const label = state === 'busy' ? t('Adding…')
+      : state === 'added' ? t('Contact added')
+      : state === 'exists' ? t('Already a contact')
+      : state === 'error' ? t('Adding failed, try again')
+      : t('Add contact');
+    return html`<span class="shared-contact" title=${key}>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <b>${name}</b><span class="shared-contact-type">${t(typeLabel)} · ${key.slice(0, 6)}</span>
+      ${this.hass?.user?.is_admin ? html`<button class="shared-contact-add"
+        ?disabled=${state === 'busy' || state === 'added' || state === 'exists'}
+        @click=${(e: Event) => { e.stopPropagation(); void this._addSharedContact(key, type, name); }}>${label}</button>` : ''}
+    </span>`;
+  }
+
+  /** Add a contact shared in a message; says so when it is a contact already. */
+  private async _addSharedContact(key: string, type: number, name: string) {
+    if (!this.hass) return;
+    const set = (state: 'busy' | 'added' | 'exists' | 'error') => {
+      this._sharedContacts = { ...this._sharedContacts, [key]: state };
+    };
+    set('busy');
+    const text = `<${key}:${type}:${name}>`;
+    try {
+      const preview = await this.hass.callWS<{ already_added: boolean }>({ type: 'meshcore_chattx/import_contact', text, dry_run: true });
+      if (preview.already_added) {
+        set('exists');
+        return;
+      }
+      await this.hass.callWS({ type: 'meshcore_chattx/import_contact', text });
+      set('added');
+      this.dispatchEvent(new CustomEvent('contacts-changed', { bubbles: true, composed: true }));
+    } catch (err) {
+      set((err as { code?: string })?.code === 'already_added' ? 'exists' : 'error');
+    }
   }
 
   /**

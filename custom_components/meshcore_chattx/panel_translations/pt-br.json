@@ -713,5 +713,9 @@
   "Open conversation": "Abrir conversa",
   "No conversation in Chat yet": "Ainda sem conversa no chat",
   "{n} messages in Chat": "{n} mensagem no chat|{n} mensagens no chat",
-  "last {when}": "última {when}"
+  "last {when}": "última {when}",
+  "Contact added": "Contato adicionado",
+  "Already a contact": "Já é um contato",
+  "Adding failed, try again": "Falha ao adicionar, tente novamente",
+  "Contact": "Contato"
 }

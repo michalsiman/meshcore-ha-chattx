@@ -713,5 +713,9 @@
   "Open conversation": "Do konverzácie",
   "No conversation in Chat yet": "V Chate zatiaľ žiadna konverzácia",
   "{n} messages in Chat": "{n} správa v Chate|{n} správy v Chate|{n} správ v Chate",
-  "last {when}": "posledná {when}"
+  "last {when}": "posledná {when}",
+  "Contact added": "Kontakt pridaný",
+  "Already a contact": "Už je v kontaktoch",
+  "Adding failed, try again": "Pridanie zlyhalo, skús znova",
+  "Contact": "Kontakt"
 }

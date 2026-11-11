@@ -713,5 +713,9 @@
   "Open conversation": "Avaa keskustelu",
   "No conversation in Chat yet": "Ei vielä keskustelua chatissa",
   "{n} messages in Chat": "{n} viesti chatissa|{n} viestiä chatissa",
-  "last {when}": "viimeisin {when}"
+  "last {when}": "viimeisin {when}",
+  "Contact added": "Yhteystieto lisätty",
+  "Already a contact": "Jo yhteystieto",
+  "Adding failed, try again": "Lisääminen epäonnistui, yritä uudelleen",
+  "Contact": "Yhteystieto"
 }

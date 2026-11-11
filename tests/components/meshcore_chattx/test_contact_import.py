@@ -33,6 +33,11 @@ def test_link_without_type_defaults_to_companion():
     assert parsed["type"] == 1 and parsed["type_given"] is False
 
 
+def test_contact_shared_in_a_message():
+    parsed = parse_contact_text(f"<{KEY}:2:amm.ave rpt>")
+    assert parsed == {"kind": "key", "public_key": KEY, "name": "amm.ave rpt", "type": 2, "type_given": True}
+
+
 def test_form_overrides_link():
     parsed = parse_contact_text(f"meshcore://contact/add?name=A&public_key={KEY}&type=2", "B", 3)
     assert (parsed["name"], parsed["type"]) == ("B", 3)

@@ -713,5 +713,9 @@
   "Open conversation": "Άνοιγμα συνομιλίας",
   "No conversation in Chat yet": "Καμία συνομιλία στη συνομιλία ακόμη",
   "{n} messages in Chat": "{n} μήνυμα στη συνομιλία|{n} μηνύματα στη συνομιλία",
-  "last {when}": "τελευταίο {when}"
+  "last {when}": "τελευταίο {when}",
+  "Contact added": "Η επαφή προστέθηκε",
+  "Already a contact": "Ήδη επαφή",
+  "Adding failed, try again": "Η προσθήκη απέτυχε, δοκιμάστε ξανά",
+  "Contact": "Επαφή"
 }

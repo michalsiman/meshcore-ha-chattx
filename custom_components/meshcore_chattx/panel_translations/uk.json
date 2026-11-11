@@ -713,5 +713,9 @@
   "Open conversation": "Відкрити розмову",
   "No conversation in Chat yet": "У чаті ще немає розмови",
   "{n} messages in Chat": "{n} повідомлення в чаті|{n} повідомлення в чаті|{n} повідомлень у чаті",
-  "last {when}": "останнє {when}"
+  "last {when}": "останнє {when}",
+  "Contact added": "Контакт додано",
+  "Already a contact": "Уже є контактом",
+  "Adding failed, try again": "Не вдалося додати, спробуйте ще раз",
+  "Contact": "Контакт"
 }

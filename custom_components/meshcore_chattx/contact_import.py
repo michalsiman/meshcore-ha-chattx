@@ -6,6 +6,8 @@ Accepted forms:
   in the contact QR code of the MeshCore apps (docs.meshcore.io/qr_codes).
 * ``meshcore://<hex>``, a contact card as ``export_contact`` gives it: a whole
   signed advert packet. The radio imports it with ``import_contact``.
+* ``<public key:type:name>``, a contact shared in a message by the MeshCore
+  apps, e.g. ``<ee6a…3d95:1:amm.ave>``.
 * A bare public key, 64 hex characters; name and type then come from the form.
 
 Pure functions, no Home Assistant imports, so they can be tested alone.
@@ -22,6 +24,8 @@ PUBLIC_KEY_HEX = 64
 MAX_NAME_BYTES = 31
 CONTACT_TYPES = (1, 2, 3, 4)
 _HEX = re.compile(r"^[0-9a-fA-F]+$")
+# A contact shared in a message: <64 hex:type:name>
+SHARED_CONTACT = re.compile(r"<([0-9a-fA-F]{64}):(\d{1,2}):([^<>\n]{1,64})>")
 _PAYLOAD_ADVERT = 4
 
 
@@ -89,6 +93,11 @@ def parse_contact_text(text: str, name: str = "", node_type: int | None = None) 
     ``type_given`` is False when the type is only the default. ``name`` and
     ``node_type`` fill in what a bare key lacks and override the link's.
     """
+    shared = SHARED_CONTACT.fullmatch((text or "").strip())
+    if shared:
+        contact = _key_contact(shared.group(1), name or shared.group(3), node_type or int(shared.group(2)))
+        contact["type_given"] = True
+        return contact
     s = re.sub(r"\s+", "", text or "") if "://" not in (text or "") else (text or "").strip()
     if not s:
         raise ContactParseError("empty", "Nothing entered")

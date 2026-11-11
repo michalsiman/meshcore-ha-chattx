@@ -713,5 +713,9 @@
   "Open conversation": "Åbn samtale",
   "No conversation in Chat yet": "Endnu ingen samtale i chatten",
   "{n} messages in Chat": "{n} besked i chatten|{n} beskeder i chatten",
-  "last {when}": "seneste {when}"
+  "last {when}": "seneste {when}",
+  "Contact added": "Kontakt tilføjet",
+  "Already a contact": "Allerede en kontakt",
+  "Adding failed, try again": "Tilføjelse mislykkedes, prøv igen",
+  "Contact": "Kontakt"
 }
