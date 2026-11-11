@@ -706,5 +706,12 @@
   "Map image downloaded": "Slika karte preuzeta",
   "The map image could not be made": "Slika karte nije mogla biti izrađena",
   "Send map in a message": "Pošalji kartu u poruci",
-  "probably a repeater we don't know": "vjerojatno repetitor koji ne poznajemo"
+  "probably a repeater we don't know": "vjerojatno repetitor koji ne poznajemo",
+  "Channel settings": "Postavke kanala",
+  "Remove channel": "Ukloni kanal",
+  "Remove this channel from the radio?": "Ukloniti ovaj kanal s radija?",
+  "Open conversation": "Otvori razgovor",
+  "No conversation in Chat yet": "Još nema razgovora u chatu",
+  "{n} messages in Chat": "{n} poruka u chatu|{n} poruke u chatu|{n} poruka u chatu",
+  "last {when}": "zadnja {when}"
 }

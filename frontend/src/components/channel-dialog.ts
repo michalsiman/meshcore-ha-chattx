@@ -30,6 +30,9 @@ export class ChannelDialog extends LitElement {
   // custom key instead of silently regenerating it on save.
   @property({ type: String }) initialKey = '';
   @property({ type: Array }) availableIndices: number[] = [];
+  /** Show a Remove button (editing an existing channel); fires `channel-remove` after confirming. */
+  @property({ type: Boolean }) removable = false;
+  @state() private _confirmRemove = false;
 
   @state() private _channelIdx = 0;
   @state() private _channelName = '';
@@ -67,6 +70,21 @@ export class ChannelDialog extends LitElement {
          in their layout or it pushes the parent dialog aside. */
       :host {
         display: contents;
+      }
+
+      .dialog-footer { flex-wrap: wrap; }
+      .remove-btn, .remove-confirm { margin-right: auto; }
+      .remove-confirm {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--primary-text-color);
+      }
+      .dialog-button.danger {
+        color: var(--error-color, #db4437);
+        border-color: var(--error-color, #db4437);
       }
 
       :host([narrow]) .dialog {
@@ -268,6 +286,17 @@ export class ChannelDialog extends LitElement {
             </div>
           </div>
           <div class="dialog-footer">
+            ${this.removable && this.editMode
+              ? this._confirmRemove
+                ? html`<span class="remove-confirm">${t('Remove this channel from the radio?')}
+                    <button class="dialog-button danger" @click=${() => {
+                      this._confirmRemove = false;
+                      this.dispatchEvent(new CustomEvent('channel-remove', { bubbles: true, composed: true }));
+                    }}>${t('Yes')}</button>
+                    <button class="dialog-button" @click=${() => { this._confirmRemove = false; }}>${t('No')}</button></span>`
+                : html`<button class="dialog-button danger remove-btn" ?disabled=${this._saving}
+                    @click=${() => { this._confirmRemove = true; }}>${t('Remove channel')}</button>`
+              : ''}
             <button
               class="dialog-button"
               ?disabled=${this._saving}
@@ -415,6 +444,7 @@ export class ChannelDialog extends LitElement {
   }
 
   private _reset() {
+    this._confirmRemove = false;
     this._channelIdx = 0;
     this._channelName = '';
     this._customKey = '';

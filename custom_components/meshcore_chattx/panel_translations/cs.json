@@ -706,5 +706,12 @@
   "Map image downloaded": "Obrázek mapy stažen",
   "The map image could not be made": "Obrázek mapy se nepodařilo vytvořit",
   "Send map in a message": "Poslat mapu ve zprávě",
-  "probably a repeater we don't know": "nejspíš repeater, který neznáme"
+  "probably a repeater we don't know": "nejspíš repeater, který neznáme",
+  "Channel settings": "Nastavení kanálu",
+  "Remove channel": "Smazat kanál",
+  "Remove this channel from the radio?": "Smazat tento kanál z rádia?",
+  "Open conversation": "Do konverzace",
+  "No conversation in Chat yet": "V Chatu zatím žádná konverzace",
+  "{n} messages in Chat": "{n} zpráva v Chatu|{n} zprávy v Chatu|{n} zpráv v Chatu",
+  "last {when}": "poslední {when}"
 }

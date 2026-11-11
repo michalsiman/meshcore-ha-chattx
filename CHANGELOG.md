@@ -4,6 +4,14 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-11-11
+
+### Added
+
+- A gear button in a channel's header opens that channel's settings straight away: name, key, region scope and the Chat total; the Manage window stays out of the way. The region chip next to the channel name opens them too.
+- "Remove channel" in the channel settings, after a confirmation. Removing the open channel goes back to the list.
+- Node details: "Open conversation" goes to the chat with the node, for every added contact (repeaters and sensors too, not only clients and room servers) and for any node with a conversation. Below the quick actions, how many messages the conversation has in Chat and when the last one came.
+
 ## [0.17.3] - 2026-11-11
 
 ### Changed

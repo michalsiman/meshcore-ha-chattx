@@ -706,5 +706,12 @@
   "Map image downloaded": "Kortbillede downloadet",
   "The map image could not be made": "Kortbilledet kunne ikke laves",
   "Send map in a message": "Send kortet i en besked",
-  "probably a repeater we don't know": "sandsynligvis en repeater, vi ikke kender"
+  "probably a repeater we don't know": "sandsynligvis en repeater, vi ikke kender",
+  "Channel settings": "Kanalindstillinger",
+  "Remove channel": "Fjern kanal",
+  "Remove this channel from the radio?": "Fjern denne kanal fra radioen?",
+  "Open conversation": "Åbn samtale",
+  "No conversation in Chat yet": "Endnu ingen samtale i chatten",
+  "{n} messages in Chat": "{n} besked i chatten|{n} beskeder i chatten",
+  "last {when}": "seneste {when}"
 }

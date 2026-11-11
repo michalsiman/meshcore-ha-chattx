@@ -4,7 +4,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, ManagedDevice, HomeAssistant } from '../types';
 import { attachDialogA11y } from '../utils/dialog-a11y';
-import { executeLocal, getContacts, getRepeaterLoginState } from '../api';
+import { executeLocal, getContacts, getConversationInfo, getRepeaterLoginState } from '../api';
 import './repeater-login';
 import './repeater-settings';
 import './repeater-telemetry';
@@ -38,6 +38,38 @@ export class NodeDetailDialog extends LitElement {
   @state() private _pathReset: { key: string; from: string } | null = null;
   @state() private _pathResetting = false;
   @state() private _pathResetError = '';
+  /** The direct conversation with this node in Chat: stored messages and the newest one's time. */
+  @state() private _conversation: { count: number; last: string | null } | null = null;
+  private _conversationFor: string | null = null;
+
+  private _loadConversation(prefix: string) {
+    if (!this.hass || this._conversationFor === prefix) return;
+    this._conversationFor = prefix;
+    this._conversation = null;
+    void getConversationInfo(this.hass, prefix).then((info) => {
+      if (this._conversationFor === prefix) this._conversation = info;
+    });
+  }
+
+  willUpdate() {
+    const node = this.node as Contact | undefined;
+    if (this.open && !this.loginOnly && node && 'adv_name' in node && node.pubkey_prefix) {
+      this._loadConversation(node.pubkey_prefix);
+    } else if (!this.open) {
+      this._conversationFor = null;
+    }
+  }
+
+  private _renderConversationInfo() {
+    const c = this._conversation;
+    if (!c || !c.count) return html`<div class="conversation-info">${t('No conversation in Chat yet')}</div>`;
+    const last = c.last ? new Date(c.last) : null;
+    const when = last && !Number.isNaN(last.getTime())
+      ? last.toLocaleString(getLocale(), { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : '';
+    return html`<div class="conversation-info">${tn('{n} message in Chat', '{n} messages in Chat', c.count)}${when
+      ? html` · ${t('last {when}', { when })}` : ''}</div>`;
+  }
   /** Repeaters and room servers, for naming the hops of a path. */
   @state() private _hopNodes: Contact[] | null = null;
   private _hopNodesLoading = false;
@@ -432,6 +464,12 @@ export class NodeDetailDialog extends LitElement {
 
     .action-btn.logged-in svg { color: var(--success-color, #43a047); }
 
+    .conversation-info {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--secondary-text-color);
+    }
+
     .path-reset {
       display: flex;
       flex-wrap: wrap;
@@ -606,8 +644,8 @@ export class NodeDetailDialog extends LitElement {
                       ${canLogin ? html`
                         <button class=${this._loggedIn ? 'action-btn logged-in' : 'action-btn'} @click=${() => { this._showLogin = true; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>${this._loggedIn ? t('Logged in') : t('Log in')}</button>
                       ` : html``}
-                      ${isContact && (this.node as Contact).added_to_node && (isClient || isRoomServer) ? html`
-                        <button class="action-btn" @click=${() => this._dispatchEvent('message')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>${t('Message')}</button>
+                      ${isContact && ((this.node as Contact).added_to_node || (this._conversation?.count ?? 0) > 0) ? html`
+                        <button class="action-btn" @click=${() => this._dispatchEvent('message')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>${t('Open conversation')}</button>
                       ` : html``}
                       ${prefix && !isClient ? html`
                         <button class="action-btn" @click=${() => this._dispatchEvent('trace')}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2 12a2 2 0 104 0 2 2 0 10-4 0zM10 12a2 2 0 104 0 2 2 0 10-4 0zM18 12a2 2 0 104 0 2 2 0 10-4 0zM7 10l3 2-3 2zM15 10l3 2-3 2z"/></svg>${t('Trace')}</button>
@@ -623,6 +661,7 @@ export class NodeDetailDialog extends LitElement {
                               : html`<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>${t('Add contact')}`}</button>`
                         : html``}
                     </div>
+                    ${isContact ? this._renderConversationInfo() : html``}
                   </div>
 
                   ${canLogin && isSensor ? html`

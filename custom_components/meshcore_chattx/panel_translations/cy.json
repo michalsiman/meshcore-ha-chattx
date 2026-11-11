@@ -706,5 +706,12 @@
   "Map image downloaded": "Delwedd y map wedi’i lawrlwytho",
   "The map image could not be made": "Methu creu delwedd y map",
   "Send map in a message": "Anfon y map mewn neges",
-  "probably a repeater we don't know": "ailadroddydd nad ydym yn ei adnabod, mae’n debyg"
+  "probably a repeater we don't know": "ailadroddydd nad ydym yn ei adnabod, mae’n debyg",
+  "Channel settings": "Gosodiadau’r sianel",
+  "Remove channel": "Tynnu’r sianel",
+  "Remove this channel from the radio?": "Tynnu’r sianel hon o’r radio?",
+  "Open conversation": "Agor y sgwrs",
+  "No conversation in Chat yet": "Dim sgwrs yn y Sgwrs eto",
+  "{n} messages in Chat": "{n} neges yn y Sgwrs|{n} neges yn y Sgwrs",
+  "last {when}": "olaf {when}"
 }

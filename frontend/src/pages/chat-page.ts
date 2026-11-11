@@ -77,6 +77,8 @@ export class ChatPage extends LitElement {
   private _mediaHandler: ((e: MediaQueryListEvent) => void) | null = null;
   @state() private _narrowShowMessages = false;
   @state() private _manageOpen = false;
+  /** Channel to open straight in the editor when Manage opens (header gear, scope chip). */
+  @state() private _manageEditChannelIdx: number | null = null;
   // Tab the manage dialog opens on: 'contacts' from the list's Manage
   // button, 'channels' from the header scope chip.
   @state() private _manageInitialTab: 'contacts' | 'channels' = 'contacts';
@@ -869,12 +871,14 @@ export class ChatPage extends LitElement {
                 <span class="narrow-conv-name">${this._getConversationName()}${this._renderScopeChip()}</span>
                 <div class="chat-header-actions">
                   ${this._renderRepeaterButton()}
+                ${this._renderChannelSettingsButton()}
                   <button class="header-action-btn" title=${t('Search messages')} aria-label=${t('Search messages')} @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
                 </div>
               </div>
               ${this._renderChatArea()}
             </div>
             ${this._renderRepeaterDialog()}
+            ${this._renderManageDialog()}
           </div>
         `;
       } else {
@@ -904,21 +908,7 @@ export class ChatPage extends LitElement {
                 this.requestUpdate();
               }}
               @manage-requested=${() => this._onManageRequested()}></chattx-conversation-list>
-            ${this._manageOpen ? html`
-              <chattx-manage-dialog
-                .showContactIds=${this._showContactIds}
-                @show-contact-ids-changed=${this._onShowContactIdsChanged}
-                .showMessagePreview=${this._showMessagePreview}
-                @show-message-preview-changed=${this._onShowMessagePreviewChanged}
-                .hass=${this.hass}
-                .entryId=${this.config?.entry_id}
-                .narrow=${this.narrow}
-                .initialTab=${this._manageInitialTab}
-                @manage-closed=${() => this._manageOpen = false}
-                @contacts-changed=${this._onContactsChanged}
-                @channels-changed=${this._onChannelsChanged}
-              ></chattx-manage-dialog>
-            ` : html``}
+            ${this._renderManageDialog()}
           </div>
         `;
       }
@@ -958,6 +948,7 @@ export class ChatPage extends LitElement {
               </div>
               <div class="chat-header-actions">
                 ${this._renderRepeaterButton()}
+                ${this._renderChannelSettingsButton()}
                 <button class="header-action-btn" title=${t('Search messages')} aria-label=${t('Search messages')} @click=${() => { this._searchOpen = !this._searchOpen; }}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
               </div>
             </div>
@@ -977,21 +968,7 @@ export class ChatPage extends LitElement {
             ></chattx-message-search>
           </div>
         ` : ''}
-        ${this._manageOpen ? html`
-          <chattx-manage-dialog
-            .showContactIds=${this._showContactIds}
-            @show-contact-ids-changed=${this._onShowContactIdsChanged}
-                .showMessagePreview=${this._showMessagePreview}
-                @show-message-preview-changed=${this._onShowMessagePreviewChanged}
-            .hass=${this.hass}
-            .entryId=${this.config?.entry_id}
-            .narrow=${this.narrow}
-            .initialTab=${this._manageInitialTab}
-            @manage-closed=${() => this._manageOpen = false}
-            @contacts-changed=${this._onContactsChanged}
-            @channels-changed=${this._onChannelsChanged}
-          ></chattx-manage-dialog>
-        ` : html``}
+        ${this._renderManageDialog()}
       </div>
     `;
   }
@@ -1565,6 +1542,7 @@ export class ChatPage extends LitElement {
 
   private _onManageRequested() {
     this._manageInitialTab = 'contacts';
+    this._manageEditChannelIdx = null;
     this._manageOpen = true;
   }
 
@@ -1677,6 +1655,56 @@ export class ChatPage extends LitElement {
     `;
   }
 
+  private _renderManageDialog() {
+    if (!this._manageOpen) return html``;
+    return html`
+      <chattx-manage-dialog
+        .showContactIds=${this._showContactIds}
+        @show-contact-ids-changed=${this._onShowContactIdsChanged}
+        .showMessagePreview=${this._showMessagePreview}
+        @show-message-preview-changed=${this._onShowMessagePreviewChanged}
+        .hass=${this.hass}
+        .entryId=${this.config?.entry_id}
+        .narrow=${this.narrow}
+        .initialTab=${this._manageInitialTab}
+        .editChannelIdx=${this._manageEditChannelIdx}
+        @manage-closed=${() => { this._manageOpen = false; this._manageEditChannelIdx = null; }}
+        @contacts-changed=${this._onContactsChanged}
+        @channels-changed=${this._onChannelsChanged}
+        @channel-removed=${this._onChannelRemoved}
+      ></chattx-manage-dialog>
+    `;
+  }
+
+  /** The open channel, when the conversation is one. */
+  private _activeChannel(): Channel | null {
+    if (!this.selectedId || this._isContact()) return null;
+    return (this.conversations.find(
+      (c) => !('pubkey_prefix' in c) && String((c as Channel).channel_idx) === this.selectedId,
+    ) as Channel | undefined) ?? null;
+  }
+
+  private _openChannelSettings() {
+    const channel = this._activeChannel();
+    if (!channel) return;
+    this._manageInitialTab = 'channels';
+    this._manageEditChannelIdx = channel.channel_idx;
+    this._manageOpen = true;
+  }
+
+  private _renderChannelSettingsButton() {
+    if (!this.hass?.user?.is_admin || !this._activeChannel()) return '';
+    const label = t('Channel settings');
+    return html`<button class="header-action-btn" title=${label} aria-label=${label} @click=${() => this._openChannelSettings()}><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>`;
+  }
+
+  /** The open channel was removed: back to the list. */
+  private _onChannelRemoved = (e: CustomEvent<{ channel_idx: number }>) => {
+    if (this.selectedId !== String(e.detail.channel_idx)) return;
+    this.selectedId = null;
+    if (this._narrowShowMessages) this._closeNarrowConversation();
+  };
+
   private _renderScopeChip() {
     const scope = this._getActiveChannelScope();
     if (!scope) return '';
@@ -1684,10 +1712,7 @@ export class ChatPage extends LitElement {
       class="scope-chip"
       title=${t('Region scope: messages on this channel flood only through \'{scope}\' repeaters. Click to manage.', { scope })}
       aria-label=${t('Region scope {scope} — manage channels', { scope })}
-      @click=${() => {
-        this._manageInitialTab = 'channels';
-        this._manageOpen = true;
-      }}>🌐 ${scope}</button>`;
+      @click=${() => this._openChannelSettings()}>🌐 ${scope}</button>`;
   }
 
 

@@ -706,5 +706,12 @@
   "Map image downloaded": "Зображення карти завантажено",
   "The map image could not be made": "Не вдалося створити зображення карти",
   "Send map in a message": "Надіслати карту в повідомленні",
-  "probably a repeater we don't know": "імовірно, невідомий нам ретранслятор"
+  "probably a repeater we don't know": "імовірно, невідомий нам ретранслятор",
+  "Channel settings": "Налаштування каналу",
+  "Remove channel": "Видалити канал",
+  "Remove this channel from the radio?": "Видалити цей канал із радіо?",
+  "Open conversation": "Відкрити розмову",
+  "No conversation in Chat yet": "У чаті ще немає розмови",
+  "{n} messages in Chat": "{n} повідомлення в чаті|{n} повідомлення в чаті|{n} повідомлень у чаті",
+  "last {when}": "останнє {when}"
 }

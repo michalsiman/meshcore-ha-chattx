@@ -706,5 +706,12 @@
   "Map image downloaded": "Imagen del mapa descargada",
   "The map image could not be made": "No se pudo crear la imagen del mapa",
   "Send map in a message": "Enviar el mapa en un mensaje",
-  "probably a repeater we don't know": "probablemente un repetidor que no conocemos"
+  "probably a repeater we don't know": "probablemente un repetidor que no conocemos",
+  "Channel settings": "Ajustes del canal",
+  "Remove channel": "Eliminar canal",
+  "Remove this channel from the radio?": "¿Eliminar este canal de la radio?",
+  "Open conversation": "Abrir conversación",
+  "No conversation in Chat yet": "Aún no hay conversación en el chat",
+  "{n} messages in Chat": "{n} mensaje en el chat|{n} mensajes en el chat",
+  "last {when}": "último {when}"
 }

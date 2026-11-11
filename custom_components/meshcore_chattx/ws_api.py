@@ -1791,7 +1791,13 @@ async def ws_get_conversation_activity(hass, connection, msg):
                 if m.get("text"):
                     previews[entity_id] = {"sender": m.get("sender", ""), "text": (m.get("text") or "")[:50]}
                 break
-    connection.send_result(msg["id"], {"activity": activity, "previews": previews})
+    # Stored messages per conversation, for node details.
+    counts = {
+        entity_id: entry["message_count"]
+        for entity_id, entry in index.items()
+        if entry.get("message_count")
+    }
+    connection.send_result(msg["id"], {"activity": activity, "previews": previews, "counts": counts})
 
 
 # ─── meshcore/quick_messages ────────────────────────────────────────────

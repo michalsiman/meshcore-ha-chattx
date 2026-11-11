@@ -706,5 +706,12 @@
   "Map image downloaded": "Karttakuva ladattu",
   "The map image could not be made": "Karttakuvaa ei voitu tehdä",
   "Send map in a message": "Lähetä kartta viestissä",
-  "probably a repeater we don't know": "luultavasti toistin, jota emme tunne"
+  "probably a repeater we don't know": "luultavasti toistin, jota emme tunne",
+  "Channel settings": "Kanavan asetukset",
+  "Remove channel": "Poista kanava",
+  "Remove this channel from the radio?": "Poistetaanko tämä kanava radiosta?",
+  "Open conversation": "Avaa keskustelu",
+  "No conversation in Chat yet": "Ei vielä keskustelua chatissa",
+  "{n} messages in Chat": "{n} viesti chatissa|{n} viestiä chatissa",
+  "last {when}": "viimeisin {when}"
 }

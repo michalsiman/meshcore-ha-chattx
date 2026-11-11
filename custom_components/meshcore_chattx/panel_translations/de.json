@@ -706,5 +706,12 @@
   "Map image downloaded": "Kartenbild heruntergeladen",
   "The map image could not be made": "Das Kartenbild konnte nicht erstellt werden",
   "Send map in a message": "Karte in einer Nachricht senden",
-  "probably a repeater we don't know": "wahrscheinlich ein uns unbekannter Repeater"
+  "probably a repeater we don't know": "wahrscheinlich ein uns unbekannter Repeater",
+  "Channel settings": "Kanaleinstellungen",
+  "Remove channel": "Kanal entfernen",
+  "Remove this channel from the radio?": "Diesen Kanal vom Funkgerät entfernen?",
+  "Open conversation": "Zur Unterhaltung",
+  "No conversation in Chat yet": "Noch keine Unterhaltung im Chat",
+  "{n} messages in Chat": "{n} Nachricht im Chat|{n} Nachrichten im Chat",
+  "last {when}": "zuletzt {when}"
 }

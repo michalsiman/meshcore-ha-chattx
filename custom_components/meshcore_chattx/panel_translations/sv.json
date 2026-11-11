@@ -706,5 +706,12 @@
   "Map image downloaded": "Kartbild nedladdad",
   "The map image could not be made": "Kartbilden kunde inte skapas",
   "Send map in a message": "Skicka kartan i ett meddelande",
-  "probably a repeater we don't know": "troligen en repeater vi inte känner till"
+  "probably a repeater we don't know": "troligen en repeater vi inte känner till",
+  "Channel settings": "Kanalinställningar",
+  "Remove channel": "Ta bort kanal",
+  "Remove this channel from the radio?": "Ta bort den här kanalen från radion?",
+  "Open conversation": "Öppna konversation",
+  "No conversation in Chat yet": "Ingen konversation i chatten än",
+  "{n} messages in Chat": "{n} meddelande i chatten|{n} meddelanden i chatten",
+  "last {when}": "senaste {when}"
 }

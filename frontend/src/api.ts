@@ -860,6 +860,25 @@ export async function getUnreadAndLastRead(
   } catch { return { unread: {}, last_read: {} }; }
 }
 
+/** Stored messages and newest message time of the direct conversation with a node, if any. */
+export async function getConversationInfo(
+  hass: HomeAssistant,
+  pubkeyPrefix: string,
+): Promise<{ count: number; last: string | null } | null> {
+  try {
+    const result = await hass.callWS<{ activity: Record<string, string>; counts?: Record<string, number> }>({
+      type: 'meshcore_chattx/get_conversation_activity',
+    });
+    const suffix = `_${pubkeyPrefix.slice(0, 6).toLowerCase()}_messages`;
+    const entityId = Object.keys({ ...result.counts, ...result.activity })
+      .find((id) => id.startsWith('binary_sensor.meshcore_') && id.endsWith(suffix));
+    if (!entityId) return null;
+    return { count: result.counts?.[entityId] ?? 0, last: result.activity[entityId] ?? null };
+  } catch {
+    return null;
+  }
+}
+
 /** Newest message time per conversation; empty if it can't be fetched. */
 export async function getConversationActivity(
   hass: HomeAssistant,

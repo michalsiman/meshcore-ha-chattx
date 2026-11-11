@@ -27,6 +27,10 @@ export class ManageDialog extends LitElement {
    * scope chip opens the dialog on 'channels' so the user lands on
    * the channel whose scope they tapped. */
   @property({ type: String }) initialTab?: ManageTab;
+  /** Open this channel straight in the editor; Manage itself stays hidden and closes with it. */
+  @property({ type: Number }) editChannelIdx: number | null = null;
+  /** Opened for one channel's settings: only the channel editor shows. */
+  @state() private _direct = false;
   @property({ type: Boolean }) showContactIds = true;
   @property({ type: Boolean }) showMessagePreview = true;
 
@@ -38,6 +42,8 @@ export class ManageDialog extends LitElement {
       if (this.initialTab) {
         this._activeTab = this.initialTab;
       }
+      // Hidden from the start; shown after all if the channel isn't found.
+      if (this.editChannelIdx !== null && this.editChannelIdx !== undefined) this._direct = true;
     }
   }
 
@@ -79,6 +85,14 @@ export class ManageDialog extends LitElement {
       background: rgba(0, 0, 0, 0.5);
       z-index: 1000;
       padding: 16px;
+    }
+
+    :host([direct]) {
+      background: transparent;
+    }
+
+    .dialog[hidden] {
+      display: none;
     }
 
     .dialog {
@@ -559,10 +573,15 @@ export class ManageDialog extends LitElement {
     this._loadData();
   }
 
+  updated() {
+    this.toggleAttribute('direct', this._direct);
+  }
+
   render() {
     return html`
       <div
         class="dialog"
+        ?hidden=${this._direct}
         role="dialog"
         aria-modal="true"
         aria-label=${t('Manage contacts and channels')}
@@ -679,8 +698,14 @@ export class ManageDialog extends LitElement {
               .initialExcludeFromTotal=${!!this._editingChannel?.exclude_from_total}
               .initialKey=${(this._editingChannel?.settings?.channel_secret as string | undefined) ?? ''}
               .availableIndices=${this._getAvailableIndices()}
+              .removable=${!!this._editingChannel}
               @channel-saved=${this._onChannelSaved}
-              @close=${() => { this._channelDialogOpen = false; this._editingChannel = null; }}
+              @channel-remove=${() => this._removeFromEditor()}
+              @close=${() => {
+                this._channelDialogOpen = false;
+                this._editingChannel = null;
+                if (this._direct) this._close();
+              }}
             ></chattx-channel-dialog>
           `
         : ''}
@@ -837,6 +862,11 @@ export class ManageDialog extends LitElement {
       ]);
       this._contacts = contacts;
       this._channels = channels;
+      if (this.editChannelIdx !== null && this.editChannelIdx !== undefined) {
+        const channel = channels.find((c) => c.channel_idx === this.editChannelIdx);
+        if (channel) this._openEditChannel(channel);
+        else this._direct = false;
+      }
       try {
         const deviceConfig = await getDeviceConfig(this.hass!, this.entryId);
         if (deviceConfig?.max_channels) {
@@ -975,6 +1005,9 @@ export class ManageDialog extends LitElement {
         this.entryId,
       );
       if (result.success) {
+        this.dispatchEvent(new CustomEvent('channel-removed', {
+          detail: { channel_idx: channel.channel_idx }, bubbles: true, composed: true,
+        }));
         const channels = await getChannels(this.hass, this.entryId);
         this._channels = channels;
         this.dispatchEvent(
@@ -986,9 +1019,24 @@ export class ManageDialog extends LitElement {
     }
   }
 
+  /** Remove button in the channel editor (it asked for confirmation already). */
+  private async _removeFromEditor() {
+    const channel = this._editingChannel;
+    if (!channel) return;
+    this._channelDialogOpen = false;
+    this._editingChannel = null;
+    await this._doRemoveChannel(channel);
+    if (this._direct) this._close();
+  }
+
   private async _onChannelSaved() {
     this._channelDialogOpen = false;
     this._editingChannel = null;
+    if (this._direct) {
+      this.dispatchEvent(new CustomEvent('channels-changed', { bubbles: true, composed: true }));
+      this._close();
+      return;
+    }
     if (this.hass) {
       const channels = await getChannels(this.hass, this.entryId);
       this._channels = channels;

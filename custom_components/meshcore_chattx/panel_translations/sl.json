@@ -706,5 +706,12 @@
   "Map image downloaded": "Slika zemljevida prenesena",
   "The map image could not be made": "Slike zemljevida ni bilo mogoče ustvariti",
   "Send map in a message": "Pošlji zemljevid v sporočilu",
-  "probably a repeater we don't know": "verjetno repetitor, ki ga ne poznamo"
+  "probably a repeater we don't know": "verjetno repetitor, ki ga ne poznamo",
+  "Channel settings": "Nastavitve kanala",
+  "Remove channel": "Odstrani kanal",
+  "Remove this channel from the radio?": "Odstranim ta kanal z radia?",
+  "Open conversation": "Odpri pogovor",
+  "No conversation in Chat yet": "V klepetu še ni pogovora",
+  "{n} messages in Chat": "{n} sporočilo v klepetu|{n} sporočili v klepetu|{n} sporočila v klepetu|{n} sporočil v klepetu",
+  "last {when}": "zadnje {when}"
 }
