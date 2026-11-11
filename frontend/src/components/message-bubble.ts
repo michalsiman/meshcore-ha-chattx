@@ -4,12 +4,13 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { ChatMessage, MessageGroup, DeliveryStatus, LateEcho, HomeAssistant } from '../types';
 import './path-map';
-import { hasMapPath } from './path-map';
+import { hasMapPath, loadOwnPosition } from './path-map';
 import { fewestHops, formatHopLabel, formatTimestamp } from '../chat/message-parser';
-import { cachedKnownNodes, edgeDistance, formatDistance, shortestPath } from '../utils/path-route';
+import { cachedKnownNodes, edgeDistance, formatDistance, knownOwnPosition, shortestPath } from '../utils/path-route';
 import { closeStep, openStep } from '../utils/back-stack';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
+import { publicNodes, withPublicNodes } from '../utils/public-nodes';
 import { imageLinks, splitLinks } from '../utils/links';
 import { loadImagePreviews } from '../utils/image-previews';
 import { imageFailed, markImageFailed, proxiedImage } from '../utils/image-proxy';
@@ -493,7 +494,7 @@ export class MessageBubble extends LitElement {
     const hopLabel = !msg.isOutgoing && !msg.isSystem ? formatHopLabel(msg.rxLogData) : '';
     // Straight-line distance between the first and the last repeater, when known.
     const edge = !msg.isOutgoing && !msg.isSystem && this.hass
-      ? edgeDistance(shortestPath(msg.rxLogData), cachedKnownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>))
+      ? edgeDistance(shortestPath(msg.rxLogData), this._routeNodes(), this._ownPosition(), msg.sender)
       : null;
     const ts = formatTimestamp(msg.timestamp, this.timestampFormat) + (hopLabel ? ` · ${hopLabel}` : '')
       + (edge ? ` · ${formatDistance(edge)}` : '')
@@ -544,6 +545,23 @@ export class MessageBubble extends LitElement {
       default:
         return t('Sent');
     }
+  }
+
+  /** Repeaters to place paths with: our contacts plus, when turned on, the public map's. */
+  private _routeNodes() {
+    return withPublicNodes(
+      cachedKnownNodes(this.hass!.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>),
+      publicNodes(this.hass, () => this.requestUpdate()),
+    );
+  }
+
+  /** Our position for choosing repeaters as the map does; loads it once, then redraws. */
+  private _ownPosition(): { lat: number; lon: number } | null {
+    const known = knownOwnPosition();
+    if (known === undefined && this.hass) {
+      void loadOwnPosition(this.hass).then(() => this.requestUpdate());
+    }
+    return known ?? null;
   }
 
   private _renderTextWithMentions(text: string, mentions: string[]) {
@@ -720,7 +738,7 @@ export class MessageBubble extends LitElement {
   private _renderMessageDialog(msg: ChatMessage) {
     const hasRoute = msg.rxLogData && msg.rxLogData.length > 0;
     const knownForRoute = this.hass
-      ? cachedKnownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>)
+      ? this._routeNodes()
       : [];
     const routeText = hasRoute
       ? msg.rxLogData!
@@ -744,7 +762,7 @@ export class MessageBubble extends LitElement {
             if (snr !== undefined) parts.push(`SNR: ${snr}`);
             if (rssi !== undefined) parts.push(`RSSI: ${rssi}`);
             // Distances between the repeaters, when their positions are known.
-            const distance = nodes ? edgeDistance(nodes, knownForRoute) : null;
+            const distance = nodes ? edgeDistance(nodes, knownForRoute, msg.isOutgoing ? null : this._ownPosition(), msg.isOutgoing ? undefined : msg.sender) : null;
             if (distance) parts.push(formatDistance(distance));
             return parts.join(' · ');
           })
@@ -762,7 +780,7 @@ export class MessageBubble extends LitElement {
     });
     const hops = fewestHops(msg.rxLogData);
     const distance = this.hass
-      ? edgeDistance(shortestPath(msg.rxLogData), cachedKnownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>))
+      ? edgeDistance(shortestPath(msg.rxLogData), this._routeNodes(), this._ownPosition(), msg.sender)
       : null;
     const heardText = hops === null ? '' : formatHeardReply(hops, distance);
     const footerStyle = 'padding: 8px 16px; font-size: 12px; color: var(--secondary-text-color); border-top: 1px solid var(--divider-color, #e0e0e0);';

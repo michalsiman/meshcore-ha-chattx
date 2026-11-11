@@ -5,13 +5,17 @@ import type { ChatMessage, HomeAssistant } from '../types';
 import { getDeviceConfig } from '../api';
 import { MapTilesController } from '../utils/map-tiles';
 import { formatLength } from '../utils/units';
+import {
+  rememberOwnPosition,
+  cachedKnownNodes,
+} from '../utils/path-route';
+import { publicNodes, withPublicNodes } from '../utils/public-nodes';
 import { offlineMapLayer, offlineMapStyles } from '../utils/offline-map';
 import {
   TILE_SIZE,
   distanceKm,
   fitZoom,
   formatDistance,
-  knownNodes,
   project,
   resolveRoute,
   type RoutePoint,
@@ -39,6 +43,10 @@ export function loadOwnPosition(hass: HomeAssistant): Promise<{ lat: number; lon
       const lat = Number(home?.latitude);
       const lon = Number(home?.longitude);
       return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+    })
+    .then((pos) => {
+      rememberOwnPosition(pos);
+      return pos;
     });
   return ownPosition;
 }
@@ -163,6 +171,10 @@ export class PathMap extends LitElement {
     .prefix {
       font-family: monospace;
     }
+    .public-tag {
+      font-size: 11px;
+      cursor: help;
+    }
     .leg {
       color: var(--secondary-text-color);
       opacity: 0.8;
@@ -214,7 +226,10 @@ export class PathMap extends LitElement {
     const index = Math.min(this._pathIndex, paths.length - 1);
     const route = resolveRoute({
       pathNodes: paths[index],
-      nodes: knownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>),
+      nodes: withPublicNodes(
+        cachedKnownNodes(this.hass.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>),
+        publicNodes(this.hass, () => this.requestUpdate()),
+      ),
       me: this._me ? { ...this._me, name: this.nodeName } : null,
       outgoing: this.message.isOutgoing,
       senderName: this.message.isOutgoing ? undefined : this.message.sender,
@@ -580,7 +595,7 @@ export class PathMap extends LitElement {
           const leg = legs[i];
           return html`<li value=${hop}>
             <span class="prefix">${p.prefix}</span>
-            ${p.name ? html` ${p.name}` : p.leftOut ? html` – ${t('probably a repeater we don\'t know')}` : html` – ${t('no known position')}`}${p.ambiguous && !p.leftOut ? ' (?)' : ''}${leg !== null
+            ${p.name ? html` ${p.name}${p.public ? html` <span class="public-tag" title=${t('From the public map map.meshcore.io, not one of your contacts')}>🌐</span>` : ''}` : p.leftOut ? html` – ${t('probably a repeater we don\'t know')}` : html` – ${t('no known position')}`}${p.ambiguous && !p.leftOut ? ' (?)' : ''}${leg !== null
               ? html` <span class="leg">+${formatLength(leg)}</span>`
               : nothing}
           </li>`;

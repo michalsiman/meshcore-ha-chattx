@@ -717,5 +717,13 @@
   "Contact added": "Yhteystieto lisätty",
   "Already a contact": "Jo yhteystieto",
   "Adding failed, try again": "Lisääminen epäonnistui, yritä uudelleen",
-  "Contact": "Yhteystieto"
+  "Contact": "Yhteystieto",
+  "From the public map map.meshcore.io, not one of your contacts": "Julkiselta kartalta map.meshcore.io, ei yhteystietosi",
+  "Online repeater database (map.meshcore.io)": "Verkon toistintietokanta (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Sijoittaa viestireittien toistimet, joita radiosi ei ole koskaan kuullut, julkisen MeshCore-kartan mukaan. Home Assistant lataa listan kerran päivässä ja pitää lähellä olevat toistimet ja room serverit, joilla on samat radioasetukset. Omat yhteystietosi menevät edelle; kartan toistimet on merkitty 🌐.",
+  "Distance from your node": "Etäisyys nodestasi",
+  "{n} repeaters": "{n} toistin|{n} toistinta",
+  "updated {when}": "päivitetty {when}",
+  "Update failed: {error}": "Päivitys epäonnistui: {error}",
+  "Update now": "Päivitä nyt"
 }

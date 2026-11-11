@@ -717,5 +717,13 @@
   "Contact added": "Kontakt pridaný",
   "Already a contact": "Už je v kontaktoch",
   "Adding failed, try again": "Pridanie zlyhalo, skús znova",
-  "Contact": "Kontakt"
+  "Contact": "Kontakt",
+  "From the public map map.meshcore.io, not one of your contacts": "Z verejnej mapy map.meshcore.io, nie je medzi tvojimi kontaktmi",
+  "Online repeater database (map.meshcore.io)": "Online databáza repeaterov (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Umiestni repeatery na cestách správ, ktoré tvoje rádio nikdy nepočulo, podľa verejnej mapy MeshCore. Home Assistant stiahne zoznam z mapy raz denne a ponechá repeatery a room servery v tvojom okolí na tvojom rádiovom nastavení. Tvoje kontakty majú prednosť; repeatery z mapy sú označené 🌐.",
+  "Distance from your node": "Vzdialenosť od tvojho nodu",
+  "{n} repeaters": "{n} repeater|{n} repeatery|{n} repeaterov",
+  "updated {when}": "aktualizované {when}",
+  "Update failed: {error}": "Aktualizácia zlyhala: {error}",
+  "Update now": "Aktualizovať teraz"
 }

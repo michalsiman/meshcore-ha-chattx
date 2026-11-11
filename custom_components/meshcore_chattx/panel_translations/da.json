@@ -717,5 +717,13 @@
   "Contact added": "Kontakt tilføjet",
   "Already a contact": "Allerede en kontakt",
   "Adding failed, try again": "Tilføjelse mislykkedes, prøv igen",
-  "Contact": "Kontakt"
+  "Contact": "Kontakt",
+  "From the public map map.meshcore.io, not one of your contacts": "Fra det offentlige kort map.meshcore.io, ikke en af dine kontakter",
+  "Online repeater database (map.meshcore.io)": "Online repeaterdatabase (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Placerer repeatere på beskedstier, som din radio aldrig har hørt, ud fra det offentlige MeshCore-kort. Home Assistant henter listen én gang om dagen og beholder repeatere og room servere i nærheden på dine radioindstillinger. Dine egne kontakter går forud; repeatere fra kortet er markeret 🌐.",
+  "Distance from your node": "Afstand fra din node",
+  "{n} repeaters": "{n} repeater|{n} repeatere",
+  "updated {when}": "opdateret {when}",
+  "Update failed: {error}": "Opdatering mislykkedes: {error}",
+  "Update now": "Opdater nu"
 }

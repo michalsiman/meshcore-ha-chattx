@@ -88,7 +88,16 @@ describe('route on the map', () => {
     expect(picked.map((n) => n?.name ?? null)).toEqual(['East 1', 'East 2', null, null, null, null, null]);
   });
 
-    it('marks a left-out hop', () => {
+    it('prefers our contact over a public map repeater, uses the map when we know none', () => {
+    const node = (key: string, name: string, lat: number, lon: number, pub = false) => ({ key, name, lat, lon, type: 2, ...(pub ? { public: true } : {}) });
+    const start = { lat: 50.0, lon: 14.0 };
+    const tie = [[node('aa01', 'Ours', 50.0, 14.1), node('aa02', 'Map', 50.0, 14.1, true)]];
+    expect(chooseCandidates(tie, start, null, [600])[0]?.name).toBe('Ours');
+    const onlyMap = [[node('bb01', 'Map only', 50.0, 14.1, true)]];
+    expect(chooseCandidates(onlyMap, start, null, [600])[0]?.name).toBe('Map only');
+  });
+
+  it('marks a left-out hop', () => {
     const states2 = {
       ...states,
       'binary_sensor.meshcore_f_contact': { entity_id: 'binary_sensor.meshcore_f_contact', attributes: { public_key: '17aaaa', adv_name: 'Moravia', adv_lat: 49.3, adv_lon: 16.6, type: 2 } },

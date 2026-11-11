@@ -717,5 +717,13 @@
   "Contact added": "Kontakt dodat",
   "Already a contact": "Već je kontakt",
   "Adding failed, try again": "Dodavanje nije uspelo, pokušajte ponovo",
-  "Contact": "Kontakt"
+  "Contact": "Kontakt",
+  "From the public map map.meshcore.io, not one of your contacts": "Sa javne mape map.meshcore.io, nije među tvojim kontaktima",
+  "Online repeater database (map.meshcore.io)": "Onlajn baza repetitora (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Postavlja repetitore na putanjama poruka koje tvoj radio nikad nije čuo, prema javnoj MeshCore mapi. Home Assistant jednom dnevno preuzima listu i zadržava repetitore i room servere u blizini sa tvojim radio podešavanjima. Tvoji kontakti imaju prednost; repetitori sa mape su označeni 🌐.",
+  "Distance from your node": "Udaljenost od tvog noda",
+  "{n} repeaters": "{n} repetitor|{n} repetitora|{n} repetitora",
+  "updated {when}": "ažurirano {when}",
+  "Update failed: {error}": "Ažuriranje nije uspelo: {error}",
+  "Update now": "Ažuriraj sada"
 }

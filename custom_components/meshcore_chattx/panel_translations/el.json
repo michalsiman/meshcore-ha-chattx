@@ -717,5 +717,13 @@
   "Contact added": "Η επαφή προστέθηκε",
   "Already a contact": "Ήδη επαφή",
   "Adding failed, try again": "Η προσθήκη απέτυχε, δοκιμάστε ξανά",
-  "Contact": "Επαφή"
+  "Contact": "Επαφή",
+  "From the public map map.meshcore.io, not one of your contacts": "Από τον δημόσιο χάρτη map.meshcore.io, όχι από τις επαφές σας",
+  "Online repeater database (map.meshcore.io)": "Διαδικτυακή βάση αναμεταδοτών (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Τοποθετεί τους αναμεταδότες στις διαδρομές μηνυμάτων που ο πομποδέκτης σας δεν έχει ακούσει ποτέ, με βάση τον δημόσιο χάρτη MeshCore. Το Home Assistant κατεβάζει τη λίστα μία φορά την ημέρα και κρατά τους κοντινούς αναμεταδότες και room servers με τις ρυθμίσεις του πομποδέκτη σας. Οι επαφές σας προηγούνται· οι αναμεταδότες από τον χάρτη σημειώνονται με 🌐.",
+  "Distance from your node": "Απόσταση από τον κόμβο σας",
+  "{n} repeaters": "{n} αναμεταδότης|{n} αναμεταδότες",
+  "updated {when}": "ενημερώθηκε {when}",
+  "Update failed: {error}": "Η ενημέρωση απέτυχε: {error}",
+  "Update now": "Ενημέρωση τώρα"
 }

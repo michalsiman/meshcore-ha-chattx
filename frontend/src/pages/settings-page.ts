@@ -22,6 +22,7 @@ import '../components/sensor-tile';
 import '../components/node-summary';
 import '../components/quick-messages-editor';
 import '../components/offline-map-settings';
+import '../components/public-nodes-settings';
 import '../components/blocklist-settings';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import type { CompanionDeviceDescriptor } from '../components/node-summary';
@@ -864,6 +865,7 @@ export class SettingsPage extends LitElement {
             <div class="device-section">
               <div class="card-title">${t('Map')}</div>
               <chattx-offline-map-settings .hass=${this.hass}></chattx-offline-map-settings>
+              <chattx-public-nodes-settings .hass=${this.hass}></chattx-public-nodes-settings>
             </div>
 
             <!-- Previews of image links in messages, per browser -->

@@ -4,6 +4,16 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-11
+
+### Added
+
+- Online repeater database (Settings → Map, off by default): Home Assistant downloads the node list of the public MeshCore map, [map.meshcore.io](https://map.meshcore.io), once a day and keeps the repeaters and room servers near your node (300–2000 km) that use your radio settings and were seen in the last two months. They place the hops of a message's path that your radio has never heard: on the route map, in the distances, and in the hop names of node details. Your own contacts come first; repeaters from the map are marked 🌐. The list is read with a small MessagePack reader of Chattx's own, so no package is added.
+
+### Fixed
+
+- The distance in a message's details and in the reply ("↔ … km") could differ from the route map: it chose repeaters sharing a 1-byte prefix without knowing our position. It now places them as the map does, from our position and the sender.
+
 ## [0.18.2] - 2026-11-11
 
 ### Added

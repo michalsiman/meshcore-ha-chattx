@@ -717,5 +717,13 @@
   "Contact added": "Cyswllt wedi’i ychwanegu",
   "Already a contact": "Eisoes yn gyswllt",
   "Adding failed, try again": "Methu ychwanegu, rhowch gynnig arall",
-  "Contact": "Cyswllt"
+  "Contact": "Cyswllt",
+  "From the public map map.meshcore.io, not one of your contacts": "O’r map cyhoeddus map.meshcore.io, nid un o’ch cysylltiadau",
+  "Online repeater database (map.meshcore.io)": "Cronfa ailadroddwyr ar-lein (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Yn gosod ailadroddwyr llwybrau negeseuon nad yw’ch radio erioed wedi’u clywed, o fap cyhoeddus MeshCore. Mae Home Assistant yn lawrlwytho’r rhestr unwaith y dydd ac yn cadw’r ailadroddwyr a’r room servers cyfagos ar eich gosodiadau radio. Mae’ch cysylltiadau’n dod yn gyntaf; mae ailadroddwyr o’r map wedi’u marcio 🌐.",
+  "Distance from your node": "Pellter o’ch nod",
+  "{n} repeaters": "{n} ailadroddydd|{n} ailadroddydd",
+  "updated {when}": "diweddarwyd {when}",
+  "Update failed: {error}": "Methodd y diweddariad: {error}",
+  "Update now": "Diweddaru nawr"
 }

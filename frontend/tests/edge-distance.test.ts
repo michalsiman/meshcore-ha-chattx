@@ -31,6 +31,16 @@ describe('distance between the end repeaters', () => {
     expect(formatDistance(d)).toBe('↔ ~241 km (∑ ~268 km)');
   });
 
+  it('chooses shared prefixes as the map does when our position is known', () => {
+    // Two "dddd" repeaters: one 45 km from bbbb (Prague), one next to us in the west.
+    const both = [...nodes, node('dddd01', 50.3, 15.0), node('dddd02', 49.62, 13.2)];
+    const me = { lat: 49.6, lon: 13.15 };
+    // Without our position the nearer one to bbbb is taken; with it, the one the
+    // packet must have come through to reach us.
+    expect(edgeDistance(['bbbb', 'dddd'], both)!.km).toBeLessThan(60);
+    expect(edgeDistance(['bbbb', 'dddd'], both, me)!.km).toBeGreaterThan(80);
+  });
+
   it('marks a shared prefix as approximate', () => {
     const d = edgeDistance(['aaaa', 'bbbb'], [...nodes, node('bbbb99', 50.1, 14.5)])!;
     expect(formatDistance(d)).toMatch(/^↔ ~/);

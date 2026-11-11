@@ -21,6 +21,8 @@ export interface MapNode {
   lat: number;
   lon: number;
   type: number;
+  /** From the public map (map.meshcore.io), not one of our contacts. */
+  public?: boolean;
 }
 
 export type RouteKind = 'sender' | 'repeater' | 'me';
@@ -36,6 +38,8 @@ export interface RoutePoint {
   ambiguous: boolean;
   /** Known nodes share the prefix, but all lie off the route: probably a repeater we don't know. */
   leftOut?: boolean;
+  /** Placed with a repeater from the public map, not one of our contacts. */
+  public?: boolean;
 }
 
 interface StateLike {
@@ -111,6 +115,12 @@ export function skipCost(prefix: string): number {
  */
 const BACKTRACK_COST = 2;
 
+/**
+ * Extra cost of a repeater from the public map: our own contacts are heard
+ * by our radio, so between two equally good choices they win.
+ */
+const PUBLIC_COST = 30;
+
 interface ChainState {
   pos: { lat: number; lon: number } | null;
   /** Distance from us of the last placed node, and the hop it is on (-1: us). */
@@ -149,7 +159,7 @@ export function chooseCandidates(
           pos: { lat: c.lat, lon: c.lon },
           fromStart,
           layer: k,
-          cost: s.cost + (s.pos ? legCost(s.pos, c, k - s.layer) : 0) + back,
+          cost: s.cost + (s.pos ? legCost(s.pos, c, k - s.layer) : 0) + back + (c.public ? PUBLIC_COST : 0),
           picks: [...s.picks, c],
         });
       }
@@ -203,6 +213,7 @@ export function resolveRoute(options: {
       lon: node?.lon ?? null,
       ambiguous: layers[k].length > 1,
       ...(node === null && layers[k].length > 0 ? { leftOut: true } : {}),
+      ...(node?.public ? { public: true } : {}),
     };
   });
   const mePoint: RoutePoint = {
@@ -270,6 +281,17 @@ export function unproject(x: number, y: number, zoom: number): { lat: number; lo
 
 // ── Distance between the end repeaters of a path ────────────────────────
 
+/** Our companion's position once loadOwnPosition has read it; undefined before. */
+let ownPosition: { lat: number; lon: number } | null | undefined;
+
+export function knownOwnPosition(): { lat: number; lon: number } | null | undefined {
+  return ownPosition;
+}
+
+export function rememberOwnPosition(position: { lat: number; lon: number } | null): void {
+  ownPosition = position;
+}
+
 const nodeCache = new WeakMap<object, MapNode[]>();
 
 /** knownNodes, computed once per states object. */
@@ -304,9 +326,12 @@ export function shortestPath(rxLogData: Array<Record<string, unknown>> | undefin
 export function edgeDistance(
   pathNodes: string[] | null,
   nodes: MapNode[],
+  // Our position and the sender: the repeaters are chosen as on the map.
+  me: { lat: number; lon: number } | null = null,
+  senderName?: string,
 ): { km: number; approx: boolean; routeKm: number; routeApprox: boolean } | null {
   if (!pathNodes || pathNodes.length < 2) return null;
-  const repeaters = resolveRoute({ pathNodes, nodes, me: null, outgoing: false })
+  const repeaters = resolveRoute({ pathNodes, nodes, me: me ? { ...me, name: '' } : null, outgoing: false, senderName })
     .filter((p) => p.kind === 'repeater');
   const placed = repeaters.filter((p) => p.lat !== null && p.lon !== null);
   if (placed.length < 2) return null;

@@ -717,5 +717,13 @@
   "Contact added": "Contact ajouté",
   "Already a contact": "Déjà un contact",
   "Adding failed, try again": "Échec de l’ajout, réessayez",
-  "Contact": "Contact"
+  "Contact": "Contact",
+  "From the public map map.meshcore.io, not one of your contacts": "De la carte publique map.meshcore.io, pas un de vos contacts",
+  "Online repeater database (map.meshcore.io)": "Base de répéteurs en ligne (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Place les répéteurs des chemins de messages que votre radio n’a jamais entendus, d’après la carte publique MeshCore. Home Assistant télécharge la liste une fois par jour et garde les répéteurs et room servers proches sur vos réglages radio. Vos contacts passent en premier ; les répéteurs de la carte sont marqués 🌐.",
+  "Distance from your node": "Distance de votre nœud",
+  "{n} repeaters": "{n} répéteur|{n} répéteurs",
+  "updated {when}": "mis à jour {when}",
+  "Update failed: {error}": "Échec de la mise à jour : {error}",
+  "Update now": "Mettre à jour"
 }

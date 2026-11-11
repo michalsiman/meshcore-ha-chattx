@@ -81,6 +81,7 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - Experimental: the route of a message on a map, with the repeaters it went through; the map can be sent in a message or copied as a picture
 - Experimental: all nodes with a known position on a map in the Nodes tab, with clusters, zoom and node details
 - A simplified offline map for both maps when there is no internet: world borders and capitals, and borders, regions, towns and peaks of the countries chosen in Settings → Map (247 countries)
+- Optional: repeaters from the public [MeshCore map](https://map.meshcore.io) (by recrof) place the hops of a message's path that your radio has never heard, marked 🌐 (Settings → Map)
 - The distance between the first and last repeater of a received message, and the length of its route
 - Images: paste or pick an image, Home Assistant uploads it to catbox.moe and puts the link into the message; image links show a preview
 

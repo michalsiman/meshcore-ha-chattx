@@ -717,5 +717,13 @@
   "Contact added": "Контакт додано",
   "Already a contact": "Уже є контактом",
   "Adding failed, try again": "Не вдалося додати, спробуйте ще раз",
-  "Contact": "Контакт"
+  "Contact": "Контакт",
+  "From the public map map.meshcore.io, not one of your contacts": "З публічної мапи map.meshcore.io, не з ваших контактів",
+  "Online repeater database (map.meshcore.io)": "Онлайн-база ретрансляторів (map.meshcore.io)",
+  "Places the repeaters of message paths that your radio has never heard, using the public MeshCore map. Home Assistant downloads the map's list once a day and keeps the repeaters and room servers near you on your radio settings. Your own contacts come first; repeaters from the map are marked 🌐.": "Розміщує ретранслятори на шляхах повідомлень, яких ваше радіо ніколи не чуло, за публічною мапою MeshCore. Home Assistant завантажує список раз на день і зберігає ретранслятори та room-сервери поблизу з вашими налаштуваннями радіо. Ваші контакти мають перевагу; ретранслятори з мапи позначено 🌐.",
+  "Distance from your node": "Відстань від вашого вузла",
+  "{n} repeaters": "{n} ретранслятор|{n} ретранслятори|{n} ретрансляторів",
+  "updated {when}": "оновлено {when}",
+  "Update failed: {error}": "Не вдалося оновити: {error}",
+  "Update now": "Оновити зараз"
 }

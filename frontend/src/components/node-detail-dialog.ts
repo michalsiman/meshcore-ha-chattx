@@ -4,6 +4,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, ManagedDevice, HomeAssistant } from '../types';
 import { attachDialogA11y } from '../utils/dialog-a11y';
+import { publicNodes } from '../utils/public-nodes';
 import { executeLocal, getContactPath, getContacts, getConversationInfo, getRepeaterLoginState } from '../api';
 import './repeater-login';
 import './repeater-settings';
@@ -122,6 +123,12 @@ export class NodeDetailDialog extends LitElement {
     if (matches.length > 1) {
       const names = matches.map((m) => m.adv_name).filter(Boolean).join(', ');
       return html`<span class="hop-id" title=${names}>${hex}</span> <span class="hop-ambiguous">${tn('{n} possible repeater', '{n} possible repeaters', matches.length)}</span>`;
+    }
+    // Not among our contacts: the public map may know it.
+    const listed = publicNodes(this.hass, () => this.requestUpdate()).filter((n) => n.key.startsWith(hex));
+    if (listed.length === 1) {
+      return html`<span class="hop-name">${listed[0].name || hex}</span>
+        <span title=${t('From the public map map.meshcore.io, not one of your contacts')}>🌐</span> <span class="hop-id">${hex}</span>`;
     }
     return html`<span class="hop-id">${hex}</span>`;
   }

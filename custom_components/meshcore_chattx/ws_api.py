@@ -39,6 +39,7 @@ from .const import (
 from .message_store import MessageStore
 from .contact_import import ContactParseError, new_contact_record, parse_contact_text
 from .offline_map import async_register_offline_map_commands
+from .public_nodes import async_register_public_nodes, radio_signature
 from .blocklist import async_register_blocklist_commands, get_blocklist
 from .image_upload import async_register_image_upload_commands
 from .image_proxy import async_register_image_proxy
@@ -437,6 +438,21 @@ def _get_channel_scopes(hass: HomeAssistant):
 def async_register_ws_commands(hass: HomeAssistant) -> None:
     """Register all MeshCore Chattx WebSocket commands."""
     async_register_offline_map_commands(hass)
+
+    def _public_nodes_context():
+        """Our position (radio's advert position, else the HA home) and radio settings."""
+        coordinator = _get_coordinator(hass, None)
+        info = (getattr(coordinator.api, "self_info", None) or {}) if coordinator else {}
+        center = None
+        lat, lon = info.get("adv_lat"), info.get("adv_lon")
+        if isinstance(lat, (int, float)) and isinstance(lon, (int, float)) and (lat or lon):
+            center = (float(lat), float(lon))
+        elif hass.config.latitude or hass.config.longitude:
+            center = (hass.config.latitude, hass.config.longitude)
+        radio = radio_signature(info.get("radio_freq"), info.get("radio_bw"), info.get("radio_sf"), info.get("radio_cr"))
+        return center, radio
+
+    async_register_public_nodes(hass, _public_nodes_context)
     async_register_blocklist_commands(hass)
     async_register_image_upload_commands(hass)
     async_register_image_proxy(hass)
