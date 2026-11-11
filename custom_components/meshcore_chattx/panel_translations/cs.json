@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Kartu kontaktu nelze přečíst.",
   "The public key must be 64 hex characters.": "Veřejný klíč musí mít 64 hex znaků.",
   "This contact is already added.": "Tento kontakt už je přidaný.",
-  "You can also paste a QR code image here (Ctrl+V).": "QR kód můžeš sem vložit i jako obrázek (Ctrl+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "QR kód můžeš sem vložit i jako obrázek (Ctrl+V).",
+  "Copy map as image": "Kopírovat mapu jako obrázek",
+  "Preparing image…": "Připravuji obrázek…",
+  "Map image copied": "Obrázek mapy zkopírován",
+  "Map image shared": "Obrázek mapy sdílen",
+  "Map image downloaded": "Obrázek mapy stažen",
+  "The map image could not be made": "Obrázek mapy se nepodařilo vytvořit",
+  "Send map in a message": "Poslat mapu ve zprávě"
 }

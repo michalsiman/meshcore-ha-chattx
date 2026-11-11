@@ -725,7 +725,8 @@ export class MessageBubble extends LitElement {
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>${this._showMap ? t('Hide map') : t('Show route on map')}
                 </button>
                 ${this._showMap
-                  ? html`<chattx-path-map .hass=${this.hass} .message=${msg} .nodeName=${this.nodeName}></chattx-path-map>`
+                  ? html`<chattx-path-map .hass=${this.hass} .message=${msg} .nodeName=${this.nodeName}
+                      @chattx-send-image=${() => this._closeDialog()}></chattx-path-map>`
                   : html``}
               `
             : html``}

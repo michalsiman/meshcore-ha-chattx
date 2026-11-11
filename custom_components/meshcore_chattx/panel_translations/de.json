@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Die Kontaktkarte kann nicht gelesen werden.",
   "The public key must be 64 hex characters.": "Der öffentliche Schlüssel muss 64 Hex-Zeichen haben.",
   "This contact is already added.": "Dieser Kontakt ist bereits hinzugefügt.",
-  "You can also paste a QR code image here (Ctrl+V).": "Du kannst hier auch ein QR-Code-Bild einfügen (Strg+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "Du kannst hier auch ein QR-Code-Bild einfügen (Strg+V).",
+  "Copy map as image": "Karte als Bild kopieren",
+  "Preparing image…": "Bild wird erstellt…",
+  "Map image copied": "Kartenbild kopiert",
+  "Map image shared": "Kartenbild geteilt",
+  "Map image downloaded": "Kartenbild heruntergeladen",
+  "The map image could not be made": "Das Kartenbild konnte nicht erstellt werden",
+  "Send map in a message": "Karte in einer Nachricht senden"
 }

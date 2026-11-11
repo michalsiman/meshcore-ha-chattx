@@ -17,6 +17,8 @@ import {
   type RoutePoint,
 } from '../utils/path-route';
 
+type CopyState = 'idle' | 'busy' | 'copied' | 'shared' | 'saved' | 'failed';
+
 const WIDTH = 520;
 const HEIGHT = 320;
 
@@ -79,6 +81,9 @@ export class PathMap extends LitElement {
   private _pinchStart = 0;
   private _lastWheel = 0;
   private _tiles = new MapTilesController(this, () => this.hass);
+  /** State of the Copy image button: idle, working, or the outcome shown for a moment. */
+  @state() private _copyState: CopyState = 'idle';
+  private _copyTimer?: ReturnType<typeof setTimeout>;
 
   static styles = [offlineMapStyles, css`
     :host {
@@ -175,6 +180,19 @@ export class PathMap extends LitElement {
     .attribution {
       font: 9px sans-serif;
       fill: #333;
+    }
+    .controls button svg { display: block; margin: auto; }
+    .controls button:disabled { opacity: 0.6; cursor: default; }
+    .copy-note {
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      background: var(--card-background-color, #fff);
+      color: var(--primary-text-color, #222);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     }
   `];
 
@@ -377,11 +395,157 @@ export class PathMap extends LitElement {
         <button aria-label=${t('Zoom in')} @click=${() => this._zoomAt(zoom + 1)}>+</button>
         <button aria-label=${t('Zoom out')} @click=${() => this._zoomAt(zoom - 1)}>−</button>
         <button aria-label=${t('Show all')} @click=${() => { this._view = null; }}>⤢</button>
+        <button aria-label=${t('Copy map as image')} title=${t('Copy map as image')} ?disabled=${this._copyState === 'busy'}
+          @click=${() => void this._copyImage()}><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+        <button aria-label=${t('Send map in a message')} title=${t('Send map in a message')} ?disabled=${this._copyState === 'busy'}
+          @click=${() => void this._sendImage()}><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
       </div>
+      ${this._copyState !== 'idle' ? html`<div class="copy-note" role="status">${
+        this._copyState === 'busy' ? t('Preparing image…')
+        : this._copyState === 'copied' ? t('Map image copied')
+        : this._copyState === 'shared' ? t('Map image shared')
+        : this._copyState === 'saved' ? t('Map image downloaded')
+        : t('The map image could not be made')}</div>` : nothing}
     </div>
     ${offline && this._tiles.offlineLoaded && !this._tiles.offlineMap
       ? html`<div class="note">${t('No offline map downloaded. Download it in Settings → Map.')}</div>`
       : nothing}`;
+  }
+
+  /** The map as it is shown, with the hop list below it, as a PNG. */
+  private async _mapImage(): Promise<Blob> {
+    const shown = this.renderRoot.querySelector('.wrap svg') as SVGSVGElement | null;
+    if (!shown) throw new Error('no map');
+    const clone = shown.cloneNode(true) as SVGSVGElement;
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('width', String(WIDTH));
+    clone.setAttribute('height', String(HEIGHT));
+    // Styles live in the shadow root; a standalone SVG needs them inline.
+    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.textContent = `${offlineMapStyles.cssText}
+      .label { font: 600 10px sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 3px; fill: #222; }
+      .attribution { font: 9px sans-serif; fill: #333; }`;
+    clone.insertBefore(style, clone.firstChild);
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('width', String(WIDTH));
+    bg.setAttribute('height', String(HEIGHT));
+    bg.setAttribute('fill', '#aad3df');
+    clone.insertBefore(bg, style.nextSibling);
+    // An SVG drawn as an image loads nothing from outside: embed the tiles.
+    await Promise.all(Array.from(clone.querySelectorAll('image')).map(async (img) => {
+      const href = img.getAttribute('href');
+      if (!href || href.startsWith('data:')) return;
+      try {
+        const blob = await (await fetch(href)).blob();
+        img.setAttribute('href', await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(blob);
+        }));
+      } catch {
+        img.remove();
+      }
+    }));
+    const svgUrl = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml' }));
+    try {
+      const picture = new Image();
+      await new Promise<void>((resolve, reject) => {
+        picture.onload = () => resolve();
+        picture.onerror = () => reject(new Error('svg'));
+        picture.src = svgUrl;
+      });
+      // The hop list and distance as text under the map.
+      const lines = Array.from(this.renderRoot.querySelectorAll('ol li'))
+        .map((li, i) => `${i + 1}. ${(li.textContent ?? '').replace(/\s+/g, ' ').trim()}`);
+      const distance = (this.renderRoot.querySelector('.note.distance')?.textContent ?? '').trim();
+      if (distance) lines.push(distance);
+      const scale = 2;
+      const lineHeight = 18;
+      const pad = 10;
+      const canvas = document.createElement('canvas');
+      canvas.width = WIDTH * scale;
+      canvas.height = (HEIGHT + (lines.length ? pad * 2 + lines.length * lineHeight : 0)) * scale;
+      const ctx = canvas.getContext('2d')!;
+      ctx.scale(scale, scale);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, WIDTH, canvas.height / scale);
+      ctx.drawImage(picture, 0, 0, WIDTH, HEIGHT);
+      ctx.fillStyle = '#222';
+      ctx.font = '13px sans-serif';
+      ctx.textBaseline = 'top';
+      lines.forEach((line, i) => ctx.fillText(line, pad, HEIGHT + pad + i * lineHeight, WIDTH - pad * 2));
+      return await new Promise<Blob>((resolve, reject) =>
+        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('png'))), 'image/png'));
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  }
+
+  /** Hand the map image to the chat, which opens the image upload dialog for the message. */
+  private async _sendImage() {
+    if (this._copyState === 'busy') return;
+    clearTimeout(this._copyTimer);
+    this._copyState = 'busy';
+    try {
+      const blob = await this._mapImage();
+      this._copyState = 'idle';
+      this.dispatchEvent(new CustomEvent('chattx-send-image', {
+        detail: { file: new File([blob], 'chattx-route.png', { type: 'image/png' }) },
+        bubbles: true,
+        composed: true,
+      }));
+    } catch {
+      this._copyState = 'failed';
+      this._copyTimer = setTimeout(() => { this._copyState = 'idle'; }, 2500);
+    }
+  }
+
+  /** Copy the map image; where the browser can't, share it (phones) or download it. */
+  private async _copyImage() {
+    if (this._copyState === 'busy') return;
+    clearTimeout(this._copyTimer);
+    this._copyState = 'busy';
+    let result: CopyState = 'failed';
+    try {
+      const png = this._mapImage();
+      let copied = false;
+      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+        try {
+          // Pass the promise so Safari keeps the click as the user gesture.
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
+          copied = true;
+        } catch {
+          copied = false;
+        }
+      }
+      if (copied) {
+        result = 'copied';
+      } else {
+        const blob = await png;
+        const file = new File([blob], 'chattx-route.png', { type: 'image/png' });
+        const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
+        if (nav.canShare?.({ files: [file] }) && nav.share) {
+          try {
+            await nav.share({ files: [file] });
+            result = 'shared';
+          } catch (err) {
+            result = (err as Error)?.name === 'AbortError' ? 'idle' : 'failed';
+          }
+        } else {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = file.name;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+          result = 'saved';
+        }
+      }
+    } catch {
+      result = 'failed';
+    }
+    this._copyState = result;
+    if (result !== 'idle') this._copyTimer = setTimeout(() => { this._copyState = 'idle'; }, 2500);
   }
 
   private _renderList(route: RoutePoint[]) {

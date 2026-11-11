@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Η κάρτα επαφής δεν μπορεί να διαβαστεί.",
   "The public key must be 64 hex characters.": "Το δημόσιο κλειδί πρέπει να έχει 64 δεκαεξαδικούς χαρακτήρες.",
   "This contact is already added.": "Αυτή η επαφή έχει ήδη προστεθεί.",
-  "You can also paste a QR code image here (Ctrl+V).": "Μπορείτε επίσης να επικολλήσετε εδώ εικόνα κωδικού QR (Ctrl+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "Μπορείτε επίσης να επικολλήσετε εδώ εικόνα κωδικού QR (Ctrl+V).",
+  "Copy map as image": "Αντιγραφή χάρτη ως εικόνα",
+  "Preparing image…": "Προετοιμασία εικόνας…",
+  "Map image copied": "Η εικόνα του χάρτη αντιγράφηκε",
+  "Map image shared": "Η εικόνα του χάρτη κοινοποιήθηκε",
+  "Map image downloaded": "Η εικόνα του χάρτη λήφθηκε",
+  "The map image could not be made": "Δεν ήταν δυνατή η δημιουργία της εικόνας του χάρτη",
+  "Send map in a message": "Αποστολή χάρτη σε μήνυμα"
 }

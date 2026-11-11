@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Ni ellir darllen y cerdyn cyswllt.",
   "The public key must be 64 hex characters.": "Rhaid i’r allwedd gyhoeddus fod yn 64 nod hecs.",
   "This contact is already added.": "Mae’r cyswllt hwn eisoes wedi’i ychwanegu.",
-  "You can also paste a QR code image here (Ctrl+V).": "Gallwch hefyd ludo delwedd cod QR yma (Ctrl+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "Gallwch hefyd ludo delwedd cod QR yma (Ctrl+V).",
+  "Copy map as image": "Copïo’r map fel delwedd",
+  "Preparing image…": "Wrthi’n paratoi’r ddelwedd…",
+  "Map image copied": "Delwedd y map wedi’i chopïo",
+  "Map image shared": "Delwedd y map wedi’i rhannu",
+  "Map image downloaded": "Delwedd y map wedi’i lawrlwytho",
+  "The map image could not be made": "Methu creu delwedd y map",
+  "Send map in a message": "Anfon y map mewn neges"
 }

@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Karticu kontakta nije moguće pročitati.",
   "The public key must be 64 hex characters.": "Javni ključ mora imati 64 heks znaka.",
   "This contact is already added.": "Ovaj kontakt je već dodat.",
-  "You can also paste a QR code image here (Ctrl+V).": "Ovde možete nalepiti i sliku QR koda (Ctrl+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "Ovde možete nalepiti i sliku QR koda (Ctrl+V).",
+  "Copy map as image": "Kopiraj mapu kao sliku",
+  "Preparing image…": "Priprema slike…",
+  "Map image copied": "Slika mape kopirana",
+  "Map image shared": "Slika mape podeljena",
+  "Map image downloaded": "Slika mape preuzeta",
+  "The map image could not be made": "Slika mape nije mogla da se napravi",
+  "Send map in a message": "Pošalji mapu u poruci"
 }

@@ -637,6 +637,7 @@ export class ChatPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.addEventListener('chattx-send-image', this._onSendImage);
     if (this.config && !this._messageStore) {
       this._messageStore = new MessageStore(this.config);
       this._messageStore.setOnChange(() => this.requestUpdate());
@@ -680,6 +681,7 @@ export class ChatPage extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.removeEventListener('chattx-send-image', this._onSendImage);
     window.removeEventListener('popstate', this._onPopState);
     window.visualViewport?.removeEventListener('resize', this._onViewportResize);
     if (this._messageStore) {
@@ -1419,6 +1421,13 @@ export class ChatPage extends LitElement {
   private _pickImage() {
     this.shadowRoot?.querySelector<HTMLInputElement>('.image-input')?.click();
   }
+
+  /** A route map image from a message's details: offer it for the message being written. */
+  private _onSendImage = (e: Event) => {
+    const file = (e as CustomEvent<{ file: Blob }>).detail?.file;
+    if (!file || !this.selectedId) return;
+    this._imageFile = file;
+  };
 
   /** An image pasted into the message field opens the upload dialog; text pastes as usual. */
   private _onPaste(e: ClipboardEvent) {

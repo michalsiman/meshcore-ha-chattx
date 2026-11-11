@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Картку контакту неможливо прочитати.",
   "The public key must be 64 hex characters.": "Публічний ключ має містити 64 шістнадцяткові символи.",
   "This contact is already added.": "Цей контакт уже додано.",
-  "You can also paste a QR code image here (Ctrl+V).": "Сюди також можна вставити зображення QR-коду (Ctrl+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "Сюди також можна вставити зображення QR-коду (Ctrl+V).",
+  "Copy map as image": "Копіювати карту як зображення",
+  "Preparing image…": "Підготовка зображення…",
+  "Map image copied": "Зображення карти скопійовано",
+  "Map image shared": "Зображенням карти поділилися",
+  "Map image downloaded": "Зображення карти завантажено",
+  "The map image could not be made": "Не вдалося створити зображення карти",
+  "Send map in a message": "Надіслати карту в повідомленні"
 }

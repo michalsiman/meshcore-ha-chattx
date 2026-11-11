@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.17.1] - 2026-11-11
+
+### Added
+
+- The route map of a message has two new buttons: "Send map in a message" opens the image upload dialog with a picture of the map as shown and the hop list under it, and the link goes into the message being written; "Copy map as image" puts the same picture on the clipboard, or shares or downloads it where the browser can't (the Home Assistant app on Android reports a copy but keeps nothing, so use Send there).
+
 ## [0.17.0] - 2026-11-10
 
 ### Added

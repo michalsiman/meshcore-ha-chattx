@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Yhteystietokorttia ei voi lukea.",
   "The public key must be 64 hex characters.": "Julkisessa avaimessa on oltava 64 heksamerkkiä.",
   "This contact is already added.": "Tämä yhteystieto on jo lisätty.",
-  "You can also paste a QR code image here (Ctrl+V).": "Voit myös liittää tähän QR-koodin kuvan (Ctrl+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "Voit myös liittää tähän QR-koodin kuvan (Ctrl+V).",
+  "Copy map as image": "Kopioi kartta kuvana",
+  "Preparing image…": "Valmistellaan kuvaa…",
+  "Map image copied": "Karttakuva kopioitu",
+  "Map image shared": "Karttakuva jaettu",
+  "Map image downloaded": "Karttakuva ladattu",
+  "The map image could not be made": "Karttakuvaa ei voitu tehdä",
+  "Send map in a message": "Lähetä kartta viestissä"
 }

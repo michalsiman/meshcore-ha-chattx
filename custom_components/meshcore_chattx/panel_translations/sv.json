@@ -698,5 +698,12 @@
   "The contact card cannot be read.": "Kontaktkortet kan inte läsas.",
   "The public key must be 64 hex characters.": "Den publika nyckeln måste ha 64 hex-tecken.",
   "This contact is already added.": "Den här kontakten är redan tillagd.",
-  "You can also paste a QR code image here (Ctrl+V).": "Du kan också klistra in en QR-kodbild här (Ctrl+V)."
+  "You can also paste a QR code image here (Ctrl+V).": "Du kan också klistra in en QR-kodbild här (Ctrl+V).",
+  "Copy map as image": "Kopiera kartan som bild",
+  "Preparing image…": "Förbereder bild…",
+  "Map image copied": "Kartbild kopierad",
+  "Map image shared": "Kartbild delad",
+  "Map image downloaded": "Kartbild nedladdad",
+  "The map image could not be made": "Kartbilden kunde inte skapas",
+  "Send map in a message": "Skicka kartan i ett meddelande"
 }
