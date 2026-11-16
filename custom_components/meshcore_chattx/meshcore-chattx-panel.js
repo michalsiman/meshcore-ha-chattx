@@ -4555,7 +4555,7 @@ let e,t,o,i,r,s,a,n,l,d,c,u,h,p,m,g,v,f,y,_,b,x,w,k,C,$,F,B,A,E,D,S,M,P,z,I,R,O,
     }
     .item:hover, .item:focus-visible { background: var(--secondary-background-color, #f5f5f5); }
     .empty { padding: 12px; font-size: 13px; color: var(--secondary-text-color); }
-  `)),Mu([Xp({type:Object})],Cf.prototype,"hass",void 0),Mu([Xp({type:Boolean})],Cf.prototype,"disabled",void 0),Mu([Gp()],Cf.prototype,"_open",void 0),Mu([Gp()],Cf.prototype,"_messages",void 0),Cf=Mu([Vp("chattx-quick-message-picker")],Cf);const $f=["😀","😁","😂","🤣","😊","😉","😍","😘","😎","🤔","😅","😇","🙂","🙃","😐","😴","😢","😭","😡","😱","🤯","🥳","🤝","🙏","👍","👎","👌","👋","👏","💪","✌️","🤞","❤️","🔥","⭐","✅","❌","❗","❓","⚠️","🎉","💡","📡","📻","📟","📱","🛰️","🗼","🔋","🔌","⚡","🌐","📍","🗺️","🧭","🏠","🚗","🚲","🥾","⛰️","☀️","⛅","🌧️","❄️","🌙","☕","🍺","🍕","🐶","🐱","🦌","🌲"];let Ff=class extends Hp{constructor(){super(...arguments),this.disabled=!1,this._open=!1,this._onOutsideClick=e=>{e.composedPath().includes(this)||this._close()},this._onKeydown=e=>{"Escape"===e.key&&this._close()}}disconnectedCallback(){super.disconnectedCallback(),this._removeListeners()}_removeListeners(){document.removeEventListener("click",this._onOutsideClick),document.removeEventListener("keydown",this._onKeydown)}_close(){this._open=!1,this._removeListeners()}_toggle(){this._open?this._close():(this._open=!0,document.addEventListener("click",this._onOutsideClick),document.addEventListener("keydown",this._onKeydown))}_select(e){this._close(),this.dispatchEvent(new CustomEvent("emoji-selected",{detail:{emoji:e}}))}render(){const e=fh("Insert emoji");return Cp(yr||(yr=Su`
+  `)),Mu([Xp({type:Object})],Cf.prototype,"hass",void 0),Mu([Xp({type:Boolean})],Cf.prototype,"disabled",void 0),Mu([Gp()],Cf.prototype,"_open",void 0),Mu([Gp()],Cf.prototype,"_messages",void 0),Cf=Mu([Vp("chattx-quick-message-picker")],Cf);const $f=["😀","😁","😂","🤣","😊","😉","😍","😘","😎","🤔","😅","😇","🙂","🙃","😐","😴","😢","😭","😡","😱","🤯","🥳","🤝","🙏","👍","👎","👌","👋","👏","💪","✌️","🤞","❤️","🔥","⭐","✅","❌","❗","❓","⚠️","🎉","💡","📡","📻","📟","📱","🛰️","🗼","🔋","🔌","⚡","🌐","📍","🗺️","🧭","🏠","🚗","🚲","🥾","⛰️","☀️","⛅","🌧️","❄️","🌙","☕","🍺","🍕","🐶","🐱","🦌","🌲"];let Ff=class extends Hp{constructor(){super(...arguments),this.disabled=!1,this._open=!1,this._onOutsideClick=e=>{e.composedPath().includes(this)||this._close()},this._onKeydown=e=>{"Escape"===e.key&&this._close()},this._onViewport=()=>this._fit()}_fit(){var e,t,o;if(!(null===(e=this.shadowRoot)||void 0===e?void 0:e.querySelector(".menu")))return;const i=this.getBoundingClientRect().top;let r=null!==(t=null===(o=window.visualViewport)||void 0===o?void 0:o.offsetTop)&&void 0!==t?t:0,s=this.parentNode;for(;s;)if(s instanceof Element){const e=getComputedStyle(s);"visible"===e.overflowY&&"visible"===e.overflowX||(r=Math.max(r,s.getBoundingClientRect().top)),s=s.parentNode}else s=s instanceof ShadowRoot?s.host:null;const a=Math.floor(i-8-r-4);this.style.setProperty("--emoji-menu-max-height",`${Math.max(96,Math.min(240,a))}px`)}disconnectedCallback(){super.disconnectedCallback(),this._removeListeners()}_removeListeners(){var e;document.removeEventListener("click",this._onOutsideClick),document.removeEventListener("keydown",this._onKeydown),null===(e=window.visualViewport)||void 0===e||e.removeEventListener("resize",this._onViewport)}_close(){this._open=!1,this._removeListeners()}_toggle(){var e;this._open?this._close():(this._open=!0,document.addEventListener("click",this._onOutsideClick),document.addEventListener("keydown",this._onKeydown),null===(e=window.visualViewport)||void 0===e||e.addEventListener("resize",this._onViewport),this.updateComplete.then(()=>this._fit()))}_select(e){this._close(),this.dispatchEvent(new CustomEvent("emoji-selected",{detail:{emoji:e}}))}render(){const e=fh("Insert emoji");return Cp(yr||(yr=Su`
       <button class="toggle" title=${0} aria-label=${0} aria-expanded=${0} ?disabled=${0} @click=${0}>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M8.5,11A1.5,1.5 0 0,0 10,9.5A1.5,1.5 0 0,0 8.5,8A1.5,1.5 0 0,0 7,9.5A1.5,1.5 0 0,0 8.5,11M15.5,11A1.5,1.5 0 0,0 17,9.5A1.5,1.5 0 0,0 15.5,8A1.5,1.5 0 0,0 14,9.5A1.5,1.5 0 0,0 15.5,11M12,17.5C14.33,17.5 16.31,16.04 17.11,14H6.89C7.69,16.04 9.67,17.5 12,17.5Z"/></svg>
       </button>
@@ -4592,8 +4592,12 @@ let e,t,o,i,r,s,a,n,l,d,c,u,h,p,m,g,v,f,y,_,b,x,w,k,C,$,F,B,A,E,D,S,M,P,z,I,R,O,
       grid-template-columns: repeat(auto-fill, 38px);
       justify-content: center;
       width: min(290px, 80vw);
-      max-height: 240px;
+      max-height: var(--emoji-menu-max-height, 240px);
       overflow-y: auto;
+      overscroll-behavior: contain;
+      /* A scrollbar that stays visible, also on phones, so it is clear there is more. */
+      scrollbar-width: thin;
+      scrollbar-color: var(--secondary-text-color, #888) transparent;
       padding: 6px;
       box-sizing: border-box;
       border: 1px solid var(--divider-color, #e0e0e0);
@@ -4601,6 +4605,9 @@ let e,t,o,i,r,s,a,n,l,d,c,u,h,p,m,g,v,f,y,_,b,x,w,k,C,$,F,B,A,E,D,S,M,P,z,I,R,O,
       background: var(--card-background-color, #fff);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
+    .menu::-webkit-scrollbar { width: 6px; }
+    .menu::-webkit-scrollbar-thumb { background: var(--secondary-text-color, #888); border-radius: 3px; }
+    .menu::-webkit-scrollbar-track { background: transparent; }
     .item {
       width: 38px;
       height: 38px;

@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-11-16
+
+### Fixed
+
+- Emoji picker on a phone with the keyboard open: the grid is only as tall as the room above the composer (it went under the tab bar before) and scrolls inside, with a visible scrollbar.
+
 ## [0.23.0] - 2026-11-16
 
 ### Changed

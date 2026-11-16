@@ -46,8 +46,12 @@ export class EmojiPicker extends LitElement {
       grid-template-columns: repeat(auto-fill, 38px);
       justify-content: center;
       width: min(290px, 80vw);
-      max-height: 240px;
+      max-height: var(--emoji-menu-max-height, 240px);
       overflow-y: auto;
+      overscroll-behavior: contain;
+      /* A scrollbar that stays visible, also on phones, so it is clear there is more. */
+      scrollbar-width: thin;
+      scrollbar-color: var(--secondary-text-color, #888) transparent;
       padding: 6px;
       box-sizing: border-box;
       border: 1px solid var(--divider-color, #e0e0e0);
@@ -55,6 +59,9 @@ export class EmojiPicker extends LitElement {
       background: var(--card-background-color, #fff);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
+    .menu::-webkit-scrollbar { width: 6px; }
+    .menu::-webkit-scrollbar-thumb { background: var(--secondary-text-color, #888); border-radius: 3px; }
+    .menu::-webkit-scrollbar-track { background: transparent; }
     .item {
       width: 38px;
       height: 38px;
@@ -77,6 +84,32 @@ export class EmojiPicker extends LitElement {
     if (e.key === 'Escape') this._close();
   };
 
+  private _onViewport = () => this._fit();
+
+  /** Keep the menu inside the visible area above the button (the on-screen keyboard
+   *  and the tab bar leave little room on a phone); it scrolls inside instead. */
+  private _fit() {
+    const menu = this.shadowRoot?.querySelector('.menu') as HTMLElement | null;
+    if (!menu) return;
+    const top = this.getBoundingClientRect().top;
+    let limit = window.visualViewport?.offsetTop ?? 0;
+    // The nearest ancestors that clip (scroll containers, the chat area) set the ceiling.
+    let node: Node | null = this.parentNode;
+    while (node) {
+      if (node instanceof Element) {
+        const style = getComputedStyle(node);
+        if (style.overflowY !== 'visible' || style.overflowX !== 'visible') {
+          limit = Math.max(limit, node.getBoundingClientRect().top);
+        }
+        node = node.parentNode;
+      } else {
+        node = node instanceof ShadowRoot ? node.host : null;
+      }
+    }
+    const room = Math.floor(top - 8 - limit - 4);
+    this.style.setProperty('--emoji-menu-max-height', `${Math.max(96, Math.min(240, room))}px`);
+  }
+
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeListeners();
@@ -85,6 +118,7 @@ export class EmojiPicker extends LitElement {
   private _removeListeners() {
     document.removeEventListener('click', this._onOutsideClick);
     document.removeEventListener('keydown', this._onKeydown);
+    window.visualViewport?.removeEventListener('resize', this._onViewport);
   }
 
   private _close() {
@@ -100,6 +134,8 @@ export class EmojiPicker extends LitElement {
     this._open = true;
     document.addEventListener('click', this._onOutsideClick);
     document.addEventListener('keydown', this._onKeydown);
+    window.visualViewport?.addEventListener('resize', this._onViewport);
+    this.updateComplete.then(() => this._fit());
   }
 
   private _select(emoji: string) {
