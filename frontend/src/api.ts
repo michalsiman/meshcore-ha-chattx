@@ -866,6 +866,8 @@ export async function removeContact(
 export interface UnreadCountsResponse {
   unread: Record<string, number>;
   last_read: Record<string, string>;
+  /** Unread messages that mention our node name, per entity_id (only those > 0). */
+  mentions?: Record<string, number>;
 }
 
 /**
@@ -888,8 +890,9 @@ export async function getUnreadAndLastRead(
     return {
       unread: result.unread || {},
       last_read: result.last_read || {},
+      mentions: result.mentions || {},
     };
-  } catch { return { unread: {}, last_read: {} }; }
+  } catch { return { unread: {}, last_read: {}, mentions: {} }; }
 }
 
 /** A contact's outgoing path as the radio has it now; null when it can't be read. */

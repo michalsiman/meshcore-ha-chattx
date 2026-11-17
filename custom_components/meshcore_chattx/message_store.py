@@ -396,6 +396,28 @@ def _add_reaction(target: dict, reaction: dict) -> bool:
     return True
 
 
+def mentions_any(text: str, names: list[str]) -> bool:
+    """True when ``text`` mentions one of ``names``: "@[Name]" (the MeshCore form,
+    as the panel writes it) or "@Name" followed by a space, punctuation or the end.
+    Case does not matter."""
+    if "@" not in text:
+        return False
+    low = text.casefold()
+    for name in names:
+        n = (name or "").strip().casefold()
+        if not n:
+            continue
+        if f"@[{n}]" in low:
+            return True
+        start = low.find(f"@{n}")
+        while start >= 0:
+            end = start + 1 + len(n)
+            if end >= len(low) or not (low[end].isalnum() or low[end] in "_-"):
+                return True
+            start = low.find(f"@{n}", start + 1)
+    return False
+
+
 class MessageStore:
     """Per-conversation persistent message storage with lazy loading and idle eviction.
 
@@ -891,6 +913,26 @@ class MessageStore:
             start > 0,
             end < len(all_msgs),
             True,
+        )
+
+    async def count_mentions_after(
+        self, entity_id: str, cursor_id: str | None, names: list[str]
+    ) -> int:
+        """Count inbound messages newer than ``cursor_id`` that mention one of ``names``.
+
+        Same window as ``count_unread_after`` (the unread messages), so the
+        panel's "@" next to the unread badge goes away together with it.
+        """
+        if not names:
+            return 0
+        messages = await self._ensure_loaded(entity_id)
+        idx = None
+        if cursor_id is not None:
+            idx = next((i for i, m in enumerate(messages) if m.get("id") == cursor_id), None)
+        tail = messages if idx is None else messages[idx + 1:]
+        return sum(
+            1 for m in tail
+            if not m.get("outgoing", False) and mentions_any(m.get("text") or "", names)
         )
 
     async def count_unread_after(

@@ -748,5 +748,6 @@
   "Names": "Nimet",
   "More: quick messages, emoji, image, location, without diacritics": "Lisää: pikaviestit, emoji, kuva, sijainti, ilman tarkkeita",
   "Also networks on other frequencies": "Myös verkot muilla taajuuksilla",
-  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Säilyttää toistimet, joilla on sama kaistanleveys, SF ja CR kuin radiollasi, millä tahansa taajuudella. Siltojen yhdistämät verkot muilla taajuuksilla (kuten Tšekin ja Slovakian verkot) näyttävät silloin myös toistimensa reiteissä."
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Säilyttää toistimet, joilla on sama kaistanleveys, SF ja CR kuin radiollasi, millä tahansa taajuudella. Siltojen yhdistämät verkot muilla taajuuksilla (kuten Tšekin ja Slovakian verkot) näyttävät silloin myös toistimensa reiteissä.",
+  "you were mentioned": "sinut mainittiin"
 }

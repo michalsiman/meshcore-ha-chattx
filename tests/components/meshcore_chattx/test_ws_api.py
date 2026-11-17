@@ -1834,7 +1834,7 @@ async def test_ws_get_unread_counts_returns_empty_when_no_tracker(
     """No tracker → payload still carries both keys (Phase 1: stable shape)."""
     conn = _Connection()
     await _call_ws(ws_api.ws_get_unread_counts, hass, conn, {"id": 1})
-    assert conn.results[0][1] == {"unread": {}, "last_read": {}}
+    assert conn.results[0][1] == {"unread": {}, "last_read": {}, "mentions": {}}
 
 
 async def test_ws_get_unread_counts_happy(

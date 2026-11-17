@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-11-17
+
+### Added
+
+- Chat list: an orange **@** next to the unread badge when one of the unread messages mentions your node by name (`@[Name]` or `@Name`, any case). It goes away with the unread count when you read the conversation. `get_unread_counts` returns a `mentions` map next to `unread`.
+
 ## [0.24.0] - 2026-11-17
 
 ### Added

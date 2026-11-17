@@ -1148,3 +1148,15 @@ async def test_cleanup_save_failure_leaves_index_untouched(
     assert eid in s.get_message_index()  # index NOT mutated → retry next run
     assert "retention cleanup" in caplog.text
     await s.async_unload()
+
+
+def test_mentions_any_finds_our_name():
+    from custom_components.meshcore_chattx.message_store import mentions_any
+
+    names = ["OK1SIM-HA"]
+    assert mentions_any("@[OK1SIM-HA] good morning", names)
+    assert mentions_any("hi @ok1sim-ha!", names)
+    assert mentions_any("@OK1SIM-HA", names)
+    assert not mentions_any("@OK1SIM-HAX hi", names)
+    assert not mentions_any("OK1SIM-HA without an at sign", names)
+    assert not mentions_any("@[OK1SIM-HA] hi", [])

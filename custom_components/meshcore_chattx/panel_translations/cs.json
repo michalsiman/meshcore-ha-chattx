@@ -748,5 +748,6 @@
   "Names": "Jména",
   "More: quick messages, emoji, image, location, without diacritics": "Další: rychlé zprávy, emoji, obrázek, poloha, bez diakritiky",
   "Also networks on other frequencies": "I sítě na jiných kmitočtech",
-  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Ponechá repeatery se stejnou šířkou pásma, SF a CR jako tvoje rádio na jakémkoli kmitočtu. Sítě na jiných kmitočtech propojené mosty (třeba česká a slovenská) pak ukážou své repeatery v trasách také."
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Ponechá repeatery se stejnou šířkou pásma, SF a CR jako tvoje rádio na jakémkoli kmitočtu. Sítě na jiných kmitočtech propojené mosty (třeba česká a slovenská) pak ukážou své repeatery v trasách také.",
+  "you were mentioned": "zmínili tě"
 }

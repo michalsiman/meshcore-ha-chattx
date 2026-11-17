@@ -748,5 +748,6 @@
   "Names": "Namn",
   "More: quick messages, emoji, image, location, without diacritics": "Mer: snabbmeddelanden, emoji, bild, position, utan diakritiska tecken",
   "Also networks on other frequencies": "Även nät på andra frekvenser",
-  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Behåller repeatrar med samma bandbredd, SF och CR som din radio på vilken frekvens som helst. Nät på andra frekvenser som är sammankopplade med bryggor (som det tjeckiska och det slovakiska) visar då också sina repeatrar i vägarna."
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Behåller repeatrar med samma bandbredd, SF och CR som din radio på vilken frekvens som helst. Nät på andra frekvenser som är sammankopplade med bryggor (som det tjeckiska och det slovakiska) visar då också sina repeatrar i vägarna.",
+  "you were mentioned": "du nämndes"
 }

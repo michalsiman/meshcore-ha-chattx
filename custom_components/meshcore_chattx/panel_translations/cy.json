@@ -748,5 +748,6 @@
   "Names": "Enwau",
   "More: quick messages, emoji, image, location, without diacritics": "Mwy: negeseuon cyflym, emoji, llun, lleoliad, heb acenion",
   "Also networks on other frequencies": "Rhwydweithiau ar amleddau eraill hefyd",
-  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Yn cadw ailddarlledwyr sydd â’r un lled band, SF a CR â’th radio ar unrhyw amledd. Bydd rhwydweithiau ar amleddau eraill sydd wedi’u cysylltu gan bontydd (fel rhai Tsiecia a Slofacia) wedyn yn dangos eu hailddarlledwyr mewn llwybrau hefyd."
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Yn cadw ailddarlledwyr sydd â’r un lled band, SF a CR â’th radio ar unrhyw amledd. Bydd rhwydweithiau ar amleddau eraill sydd wedi’u cysylltu gan bontydd (fel rhai Tsiecia a Slofacia) wedyn yn dangos eu hailddarlledwyr mewn llwybrau hefyd.",
+  "you were mentioned": "cest dy grybwyll"
 }

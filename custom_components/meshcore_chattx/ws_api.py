@@ -3103,11 +3103,18 @@ async def ws_get_unread_counts(hass, connection, msg):
         # Empty maps for both fields keeps the wire shape stable for
         # frontends written against the new schema, regardless of
         # whether the tracker is initialised.
-        connection.send_result(msg["id"], {"unread": {}, "last_read": {}})
+        connection.send_result(msg["id"], {"unread": {}, "last_read": {}, "mentions": {}})
         return
     last_read = tracker.get_all_last_read()
     store = _get_store(hass, None)
     unread: dict[str, int] = {}
+    # Unread messages that mention our node name ("@[Name]" or "@Name"): the
+    # panel shows an "@" next to the unread badge.
+    mentions: dict[str, int] = {}
+    own_names = [
+        name for _entry_id, coord in _resolve_all_coordinators(hass)
+        if (name := ((getattr(coord.api, "self_info", None) or {}).get("name") or "").strip())
+    ]
     if store is not None:
         # Walk every conversation the store knows about — the index
         # surfaces entity_ids without forcing a full conversation load.
@@ -3119,12 +3126,15 @@ async def ws_get_unread_counts(hass, connection, msg):
             count = await store.count_unread_after(entity_id, cursor)
             if count > 0:
                 unread[entity_id] = count
+                mentioned = await store.count_mentions_after(entity_id, cursor, own_names)
+                if mentioned > 0:
+                    mentions[entity_id] = mentioned
     entry_id = msg.get("entry_id")
     if entry_id is not None:
         coord = _resolve_coordinator(hass, entry_id)
         if coord is None:
             # The resolver already logged the warning; respond with empty.
-            connection.send_result(msg["id"], {"unread": {}, "last_read": {}})
+            connection.send_result(msg["id"], {"unread": {}, "last_read": {}, "mentions": {}})
             return
         prefix = (getattr(coord, "pubkey", "") or "")[:6]
         if prefix:
@@ -3137,7 +3147,8 @@ async def ws_get_unread_counts(hass, connection, msg):
             needle = f".meshcore_{prefix}_"
             unread = {k: v for k, v in unread.items() if needle in k}
             last_read = {k: v for k, v in last_read.items() if needle in k}
-    connection.send_result(msg["id"], {"unread": unread, "last_read": last_read})
+            mentions = {k: v for k, v in mentions.items() if needle in k}
+    connection.send_result(msg["id"], {"unread": unread, "last_read": last_read, "mentions": mentions})
 
 
 @websocket_api.websocket_command(

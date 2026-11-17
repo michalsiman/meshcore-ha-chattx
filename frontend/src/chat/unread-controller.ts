@@ -10,6 +10,8 @@ import { MARK_READ_GRACE_PERIOD_MS } from '../constants';
 export interface UnreadBackendData {
   unread: Record<string, number>;
   last_read: Record<string, string>;
+  /** Unread messages that mention our node name, per entity_id. */
+  mentions?: Record<string, number>;
 }
 
 /**
@@ -122,6 +124,9 @@ export class UnreadController {
 
   /** Authoritative per-entity last-read message-ID cursor map. */
   private _lastRead: Record<string, string> = {};
+
+  /** Unread messages mentioning us, per entity_id (an "@" before the badge). */
+  private _mentions: Record<string, number> = {};
 
   /**
    * Re-render subscribers. Multi-subscriber by design: the controller
@@ -240,6 +245,7 @@ export class UnreadController {
   ): void {
     this._counts = { ...(payload?.unread ?? {}) };
     this._lastRead = { ...(payload?.last_read ?? {}) };
+    this._mentions = { ...(payload?.mentions ?? {}) };
     this._notify();
   }
 
@@ -257,6 +263,7 @@ export class UnreadController {
   clearEntity(entityId: string): void {
     if (entityId && this._counts[entityId]) {
       this._counts = { ...this._counts, [entityId]: 0 };
+      if (this._mentions[entityId]) this._mentions = { ...this._mentions, [entityId]: 0 };
       this._notify();
     }
   }
@@ -475,8 +482,25 @@ export class UnreadController {
     nodePrefix: string | null,
     directKey?: string | null,
   ): number {
+    return this._lookup(this._counts, idOrSelectedId, nodePrefix, directKey);
+  }
+
+  /** Unread messages in the conversation that mention us (same lookup as `badgeCount`). */
+  mentionCount(
+    idOrSelectedId: string | null,
+    nodePrefix: string | null,
+    directKey?: string | null,
+  ): number {
+    return this._lookup(this._mentions, idOrSelectedId, nodePrefix, directKey);
+  }
+
+  private _lookup(
+    counts: Record<string, number>,
+    idOrSelectedId: string | null,
+    nodePrefix: string | null,
+    directKey?: string | null,
+  ): number {
     if (!idOrSelectedId) return 0;
-    const counts = this._counts;
 
     // Direct match on a resolved entity_id (most reliable). Folds in
     // `_getUnreadCountForSelected`'s fast path; the `> 0` truthy check

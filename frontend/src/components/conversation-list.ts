@@ -220,6 +220,21 @@ export class ConversationList extends LitElement {
       opacity: 0.5;
     }
 
+    .mention-badge {
+      background: var(--accent-color, #ff9800);
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-right: 4px;
+    }
+
     .unread-badge {
       background: var(--primary-color, #03a9f4);
       color: #fff;
@@ -407,7 +422,8 @@ export class ConversationList extends LitElement {
     const isActive = this.activeId === id;
 
     const unread = this._getUnreadCount(id);
-    const ariaLabel = [name, detail, unread > 0 ? `${unread} unread` : ''].filter(Boolean).join(', ');
+    const mentioned = unread > 0 && this.unread ? this.unread.mentionCount(id, this.nodePrefix) > 0 : false;
+    const ariaLabel = [name, detail, unread > 0 ? `${unread} unread` : '', mentioned ? t('you were mentioned') : ''].filter(Boolean).join(', ');
 
     // Roving tabindex: exactly one item in the list is the Tab stop.
     // Prefer the active item; if nothing is active, the first row.
@@ -436,7 +452,7 @@ export class ConversationList extends LitElement {
           ${preview ? html`<div class="conversation-preview">${preview}</div>` : ''}
         </div>
         ${unread > 0
-          ? html`<div class="unread-badge" aria-hidden="true">${unread}</div>`
+          ? html`${mentioned ? html`<div class="mention-badge" title=${t('you were mentioned')} aria-hidden="true">@</div>` : ''}<div class="unread-badge" aria-hidden="true">${unread}</div>`
           : html`<span class="chevron" aria-hidden="true">›</span>`}
       </div>
     `;
