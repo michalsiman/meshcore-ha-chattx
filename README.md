@@ -340,6 +340,9 @@ From Home Assistant 2026.11, HACS is built in as the Marketplace under Settings.
 
 [![Open meshcore-ha-chattx in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=michalsiman&repository=meshcore-ha-chattx&category=integration)
 
+> [!TIP]
+> If the badge opens a wrong address (such as `homeassistant.local:8123` when your Home Assistant runs elsewhere), set your Home Assistant's address once at [my.home-assistant.io](https://my.home-assistant.io/) and click it again.
+
 Click the badge above to open this repository, or follow the manual steps:
 
 1. Open the Marketplace or HACS and go to its custom repositories
