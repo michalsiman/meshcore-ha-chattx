@@ -746,5 +746,7 @@
   "Insert into message": "Εισαγωγή στο μήνυμα",
   "MECP emergency message": "Μήνυμα έκτακτης ανάγκης MECP",
   "Names": "Ονόματα",
-  "More: quick messages, emoji, image, location, without diacritics": "Περισσότερα: γρήγορα μηνύματα, emoji, εικόνα, τοποθεσία, χωρίς τόνους"
+  "More: quick messages, emoji, image, location, without diacritics": "Περισσότερα: γρήγορα μηνύματα, emoji, εικόνα, τοποθεσία, χωρίς τόνους",
+  "Also networks on other frequencies": "Και δίκτυα σε άλλες συχνότητες",
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Κρατά τους αναμεταδότες με το ίδιο εύρος ζώνης, SF και CR με τον ασύρματό σου σε οποιαδήποτε συχνότητα. Δίκτυα σε άλλες συχνότητες που συνδέονται με γέφυρες (όπως το τσεχικό και το σλοβακικό) δείχνουν τότε κι αυτά τους αναμεταδότες τους στις διαδρομές."
 }

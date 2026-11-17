@@ -10,7 +10,9 @@ Off by default. When on, Home Assistant downloads the list at most once a
 day and keeps only repeaters and room servers
   * within a chosen distance of your companion,
   * on the same radio settings (frequency, bandwidth, SF, CR) when those
-    are known, and
+    are known, or, with "other frequencies" on, the same bandwidth, SF and CR
+    on any frequency: networks on other frequencies joined by bridges (a pair
+    of repeaters, one on each frequency) show up in paths too, and
   * seen by the map in the last two months.
 """
 
@@ -78,6 +80,7 @@ def select_nodes(
     radius_km: float,
     radio: tuple[int, int, int, int] | None,
     now: float,
+    any_frequency: bool = False,
 ) -> list[dict]:
     """Keep the repeaters worth knowing from the map's records, as compact dicts.
 
@@ -109,7 +112,8 @@ def select_nodes(
             params = rec.get("p")
             if not isinstance(params, dict):
                 continue
-            if radio_signature(params.get("freq"), params.get("bw"), params.get("sf"), params.get("cr")) != radio:
+            signature = radio_signature(params.get("freq"), params.get("bw"), params.get("sf"), params.get("cr"))
+            if signature is None or (signature[1:] != radio[1:] if any_frequency else signature != radio):
                 continue
         name = rec.get("n")
         name = _NAME_JUNK.sub("", name)[:40].strip() if isinstance(name, str) else ""
@@ -145,6 +149,7 @@ class PublicNodes:
                 data = {}
             data.setdefault("enabled", False)
             data.setdefault("radius_km", DEFAULT_RADIUS_KM)
+            data.setdefault("any_frequency", False)
             data.setdefault("nodes", [])
             data.setdefault("fetched_at", None)
             data.setdefault("error", None)
@@ -156,6 +161,7 @@ class PublicNodes:
         return {
             "enabled": data["enabled"],
             "radius_km": data["radius_km"],
+            "any_frequency": data["any_frequency"],
             "count": len(data["nodes"]),
             "fetched_at": data["fetched_at"],
             "error": data["error"],
@@ -167,13 +173,16 @@ class PublicNodes:
         data = await self._load()
         return data["nodes"] if data["enabled"] else []
 
-    async def configure(self, enabled: bool | None, radius_km: int | None) -> dict:
+    async def configure(self, enabled: bool | None, radius_km: int | None, any_frequency: bool | None = None) -> dict:
         data = await self._load()
-        changed_radius = radius_km is not None and radius_km != data["radius_km"]
+        changed_radius = (radius_km is not None and radius_km != data["radius_km"]) or (
+            any_frequency is not None and any_frequency != data["any_frequency"])
         if enabled is not None:
             data["enabled"] = enabled
         if radius_km is not None:
             data["radius_km"] = radius_km
+        if any_frequency is not None:
+            data["any_frequency"] = any_frequency
         if not data["enabled"]:
             data["nodes"], data["fetched_at"], data["error"] = [], None, None
         await self._store.async_save(data)
@@ -195,7 +204,8 @@ class PublicNodes:
                 records = await self._hass.async_add_executor_job(unpackb, raw)
                 del raw
                 nodes = await self._hass.async_add_executor_job(
-                    lambda: select_nodes(records, center=center, radius_km=data["radius_km"], radio=radio, now=time.time())
+                    lambda: select_nodes(records, center=center, radius_km=data["radius_km"], radio=radio, now=time.time(),
+                                         any_frequency=data["any_frequency"])
                 )
                 data["nodes"] = nodes
                 data["fetched_at"] = int(time.time())
@@ -252,6 +262,7 @@ async def ws_nodes(hass, connection, msg):
         vol.Required("type"): "meshcore_chattx/public_nodes_configure",
         vol.Optional("enabled"): bool,
         vol.Optional("radius_km"): vol.In(RADIUS_CHOICES_KM),
+        vol.Optional("any_frequency"): bool,
     }
 )
 @websocket_api.require_admin
@@ -261,7 +272,7 @@ async def ws_configure(hass, connection, msg):
     if manager is None:
         connection.send_error(msg["id"], "not_ready", "Not set up")
         return
-    connection.send_result(msg["id"], await manager.configure(msg.get("enabled"), msg.get("radius_km")))
+    connection.send_result(msg["id"], await manager.configure(msg.get("enabled"), msg.get("radius_km"), msg.get("any_frequency")))
 
 
 @websocket_api.websocket_command({vol.Required("type"): "meshcore_chattx/public_nodes_refresh"})

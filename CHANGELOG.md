@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-11-17
+
+### Added
+
+- Settings → Map → Online repeater database: *Also networks on other frequencies* keeps repeaters with your radio's bandwidth, SF and CR on any frequency. Networks joined by bridges (such as the Czech one on 869.432 MHz and the Slovak one on 869.618 MHz, linked at Kátov) then name and place their repeaters in paths too. Off by default; around Plzeň with 1000 km it keeps about 3,400 repeaters instead of about 970.
+
 ## [0.23.1] - 2026-11-16
 
 ### Fixed

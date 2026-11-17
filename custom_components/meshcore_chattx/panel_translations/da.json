@@ -746,5 +746,7 @@
   "Insert into message": "Indsæt i beskeden",
   "MECP emergency message": "MECP-nødbesked",
   "Names": "Navne",
-  "More: quick messages, emoji, image, location, without diacritics": "Mere: hurtige beskeder, emoji, billede, position, uden diakritiske tegn"
+  "More: quick messages, emoji, image, location, without diacritics": "Mere: hurtige beskeder, emoji, billede, position, uden diakritiske tegn",
+  "Also networks on other frequencies": "Også netværk på andre frekvenser",
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Beholder repeatere med samme båndbredde, SF og CR som din radio på enhver frekvens. Netværk på andre frekvenser, der er forbundet med broer (som det tjekkiske og det slovakiske), viser så også deres repeatere i ruterne."
 }

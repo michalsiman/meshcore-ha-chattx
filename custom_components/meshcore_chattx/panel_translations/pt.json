@@ -746,5 +746,7 @@
   "Insert into message": "Inserir na mensagem",
   "MECP emergency message": "Mensagem de emergência MECP",
   "Names": "Nomes",
-  "More: quick messages, emoji, image, location, without diacritics": "Mais: mensagens rápidas, emoji, imagem, localização, sem acentos"
+  "More: quick messages, emoji, image, location, without diacritics": "Mais: mensagens rápidas, emoji, imagem, localização, sem acentos",
+  "Also networks on other frequencies": "Também redes noutras frequências",
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Mantém os repetidores com a mesma largura de banda, SF e CR do teu rádio em qualquer frequência. As redes noutras frequências ligadas por pontes (como a checa e a eslovaca) mostram então também os seus repetidores nos percursos."
 }

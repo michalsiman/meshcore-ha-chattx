@@ -746,5 +746,7 @@
   "Insert into message": "Вставити в повідомлення",
   "MECP emergency message": "Екстрене повідомлення MECP",
   "Names": "Імена",
-  "More: quick messages, emoji, image, location, without diacritics": "Більше: швидкі повідомлення, емодзі, зображення, місцезнаходження, без діакритики"
+  "More: quick messages, emoji, image, location, without diacritics": "Більше: швидкі повідомлення, емодзі, зображення, місцезнаходження, без діакритики",
+  "Also networks on other frequencies": "Також мережі на інших частотах",
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Залишає ретранслятори з тією самою шириною смуги, SF і CR, що й у твого радіо, на будь-якій частоті. Мережі на інших частотах, з’єднані мостами (як чеська та словацька), тоді теж показують свої ретранслятори в маршрутах."
 }

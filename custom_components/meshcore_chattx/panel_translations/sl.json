@@ -746,5 +746,7 @@
   "Insert into message": "Vstavi v sporočilo",
   "MECP emergency message": "Nujno sporočilo MECP",
   "Names": "Imena",
-  "More: quick messages, emoji, image, location, without diacritics": "Več: hitra sporočila, emoji, slika, lokacija, brez strešic"
+  "More: quick messages, emoji, image, location, without diacritics": "Več: hitra sporočila, emoji, slika, lokacija, brez strešic",
+  "Also networks on other frequencies": "Tudi omrežja na drugih frekvencah",
+  "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Obdrži repetitorje z enako pasovno širino, SF in CR kot tvoj radio na kateri koli frekvenci. Omrežja na drugih frekvencah, povezana z mostovi (na primer češko in slovaško), potem prikažejo tudi svoje repetitorje v poteh."
 }

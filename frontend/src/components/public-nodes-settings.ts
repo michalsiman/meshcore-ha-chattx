@@ -8,6 +8,7 @@ import { resetPublicNodes } from '../utils/public-nodes';
 interface Status {
   enabled: boolean;
   radius_km: number;
+  any_frequency?: boolean;
   count: number;
   fetched_at: number | null;
   error: string | null;
@@ -30,6 +31,7 @@ export class PublicNodesSettings extends LitElement {
     .state { font-size: 13px; color: var(--secondary-text-color); margin-top: 8px; }
     .error { font-size: 13px; color: var(--error-color, #db4437); margin-top: 6px; }
     .refresh { margin-top: 8px; }
+    .other-freq { margin-top: 12px; }
   `];
 
   protected updated() {
@@ -58,7 +60,7 @@ export class PublicNodesSettings extends LitElement {
     }
   }
 
-  private async _configure(change: { enabled?: boolean; radius_km?: number }) {
+  private async _configure(change: { enabled?: boolean; radius_km?: number; any_frequency?: boolean }) {
     if (!this.hass || this._busy) return;
     this._busy = true;
     try {
@@ -102,6 +104,12 @@ export class PublicNodesSettings extends LitElement {
           @change=${(e: Event) => this._configure({ radius_km: Number((e.target as HTMLSelectElement).value) })}>
           ${s.radius_choices.map((km) => html`<option value=${km} ?selected=${km === s.radius_km}>${km} km</option>`)}
         </select>
+        <label class="form-toggle other-freq">
+          <input type="checkbox" .checked=${!!s.any_frequency} ?disabled=${!admin || this._busy}
+            @change=${(e: Event) => this._configure({ any_frequency: (e.target as HTMLInputElement).checked })} />
+          <span class="form-toggle-label">${t('Also networks on other frequencies')}</span>
+        </label>
+        <div class="form-description">${t('Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.')}</div>
         <div class="state">${this._busy || (!s.fetched_at && !s.error)
           ? t('Downloading…')
           : s.fetched_at

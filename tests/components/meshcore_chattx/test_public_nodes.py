@@ -80,6 +80,17 @@ def test_select_keeps_nearby_forwarders_on_our_radio():
     assert kept[0] == {"k": "01" * 32, "n": "rpt1", "t": 2, "lat": 49.7, "lon": 13.4, "la": int(NOW - 3600)}
 
 
+def test_select_other_frequencies_keeps_the_same_modulation():
+    records = [
+        node(1),                                                      # our radio
+        node(2, p={"freq": 869.618, "bw": 62.5, "sf": 7, "cr": 5}),  # bridged network, same modulation
+        node(3, p={"freq": 869.618, "bw": 62.5, "sf": 8, "cr": 8}),  # other preset
+    ]
+    kept = select_nodes(records, center=(49.62, 13.16), radius_km=500, radio=RADIO, now=NOW, any_frequency=True)
+    assert [k["k"][:2] for k in kept] == ["01", "02"]
+    assert [k["k"][:2] for k in select_nodes(records, center=(49.62, 13.16), radius_km=500, radio=RADIO, now=NOW)] == ["01"]
+
+
 def test_select_without_radio_or_center():
     kept = select_nodes([node(1), node(3, lat=40.0, lon=-3.7)], center=None, radius_km=500, radio=None, now=NOW)
     assert len(kept) == 2
