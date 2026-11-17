@@ -8,3 +8,26 @@ window.customIcons["chattx"] = {
   getIcon: async (name) => ({ path: ICONS[name] ?? "" }),
   getIconList: async () => Object.keys(ICONS).map((name) => ({ name })),
 };
+
+// Home Assistant loads extra modules after the app has started, so the sidebar
+// may have asked for "chattx:…" before this file ran. ha-icon then gives up on
+// the icon (an empty legacy icon) and never asks again: ask it once more.
+const PREFIX = "chattx:";
+
+function* iconsIn(root) {
+  for (const el of root.querySelectorAll("*")) {
+    if (el.localName === "ha-icon" && typeof el.icon === "string" && el.icon.startsWith(PREFIX)) yield el;
+    if (el.shadowRoot) yield* iconsIn(el.shadowRoot);
+  }
+}
+
+function refreshIcons() {
+  for (const el of iconsIn(document)) {
+    const icon = el.icon;
+    el._legacy = false;  // set when the icon set was missing; the reload below doesn't clear it
+    el.icon = "";
+    requestAnimationFrame(() => { el.icon = icon; });
+  }
+}
+
+for (const ms of [0, 1000, 3000, 10000]) setTimeout(refreshIcons, ms);

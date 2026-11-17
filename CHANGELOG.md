@@ -4,6 +4,12 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.25.1] - 2026-11-17
+
+### Fixed
+
+- The Chattx icon could be missing in Home Assistant's sidebar: Home Assistant loads extra modules after the app starts, so the sidebar sometimes asked for the icon before Chattx had registered it, and never asked again. The icon script now refreshes icons already drawn.
+
 ## [0.25.0] - 2026-11-17
 
 ### Added
