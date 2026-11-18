@@ -25,8 +25,8 @@ afterEach(() => { document.body.innerHTML = ''; });
 
 describe('reaction names under the bubble', () => {
   it('names who reacted next to each emoji', async () => {
-    const chips = await mount([reaction('👍', 'Krysa'), reaction('👍', 'Bob'), reaction('😂', 'Eva')]);
-    expect(chips.map((c) => c.textContent!.replace(/\s+/g, ' ').trim())).toEqual(['👍Krysa, Bob', '😂Eva']);
+    const chips = await mount([reaction('👍', 'Carol'), reaction('👍', 'Bob'), reaction('😂', 'Eva')]);
+    expect(chips.map((c) => c.textContent!.replace(/\s+/g, ' ').trim())).toEqual(['👍Carol, Bob', '😂Eva']);
   });
 
   it('shortens many names to three and a count, full list on hover', async () => {
