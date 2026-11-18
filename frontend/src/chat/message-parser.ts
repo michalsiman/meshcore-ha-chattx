@@ -355,3 +355,29 @@ export function formatTimestamp(date: Date, format: 'relative' | 'time' | 'datet
       return formatRelativeTime(date);
   }
 }
+
+/**
+ * Add `path_nodes` and `hop_count` to rx_log entries that carry only the raw
+ * `path` and `path_len`, as the backend does before it stores them
+ * (utils.enrich_rx_log_entries). Live delivery updates come straight from
+ * meshcore-ha without them. Returns new entries; the input is not changed.
+ */
+export function enrichRxLog(entries: Array<Record<string, unknown>>): Array<Record<string, unknown>> {
+  return entries.map((entry) => {
+    const out = { ...entry };
+    const raw = typeof entry.path === 'string' ? entry.path : '';
+    if (out.path_nodes === undefined && raw) {
+      const size = Number(entry.path_hash_size);
+      const hops = Number(entry.path_len ?? entry.hop_count);
+      const bytes = Math.floor(raw.length / 2);
+      const width = size > 0
+        ? Math.max(size * 2, 2)
+        : hops > 0 && bytes % hops === 0 ? (bytes / hops) * 2 : 2;
+      const nodes: string[] = [];
+      for (let i = 0; i < raw.length; i += width) nodes.push(raw.slice(i, i + width));
+      out.path_nodes = nodes;
+    }
+    if (out.hop_count === undefined && entry.path_len !== undefined) out.hop_count = entry.path_len;
+    return out;
+  });
+}

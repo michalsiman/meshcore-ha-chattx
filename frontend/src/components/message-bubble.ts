@@ -10,6 +10,7 @@ import { cachedKnownNodes, edgeDistance, formatDistance, knownOwnPosition, short
 import { closeStep, openStep } from '../utils/back-stack';
 import { attachDialogA11y } from '../utils/dialog-a11y';
 import { formatHeardReply } from '../utils/heard-reply';
+import { heardCopies, heardRepeaterCount } from '../utils/heard-copies';
 import { publicNodes, withPublicNodes } from '../utils/public-nodes';
 import { imageLinks, splitLinks } from '../utils/links';
 import { loadImagePreviews } from '../utils/image-previews';
@@ -511,6 +512,13 @@ export class MessageBubble extends LitElement {
       color: var(--primary-color, #03a9f4);
     }
 
+    .message-dialog-route.heard-copy {
+      padding: 6px 16px;
+      font-family: inherit;
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
+
     .message-dialog-route {
       padding: 12px 16px;
       font-size: 12px;
@@ -712,6 +720,28 @@ export class MessageBubble extends LitElement {
       cachedKnownNodes(this.hass!.states as unknown as Record<string, { entity_id: string; attributes: Record<string, unknown> }>),
       publicNodes(this.hass, () => this.requestUpdate()),
     );
+  }
+
+  /**
+   * Repeaters heard repeating our message: each repeater once, by the last
+   * hop of every heard copy. Without paths, the count meshcore-ha gave.
+   */
+  private _repeatersHeard(msg: ChatMessage): number {
+    return heardRepeaterCount(msg.rxLogData) || (msg.deliveryStatus?.repeaterCount ?? 0);
+  }
+
+  /** One line per heard copy of our message: the repeaters by name, hops, signal. */
+  private _renderHeardCopies(msg: ChatMessage) {
+    if (!this.hass || !msg.rxLogData?.length) return html``;
+    const copies = heardCopies(msg.rxLogData, this._routeNodes(), this._ownPosition());
+    return copies.map((copy) => {
+      const parts = [copy.repeaters.join(' → ')];
+      if (copy.hops > 1) parts.push(tn('{n} hop', '{n} hops', copy.hops));
+      if (copy.snr !== undefined) parts.push(`SNR ${copy.snr}`);
+      if (copy.rssi !== undefined) parts.push(`RSSI ${copy.rssi}`);
+      const text = parts.join(' · ');
+      return html`<div class="message-dialog-route heard-copy" @click=${() => this._copyText(text)}>${text}</div>`;
+    });
   }
 
   /** Our position for choosing repeaters as the map does; loads it once, then redraws. */
@@ -986,7 +1016,7 @@ export class MessageBubble extends LitElement {
                   : html``}
               `
             : html``}
-          ${hasRoute
+          ${hasRoute && !msg.isOutgoing
             ? html`
                 <div class="message-dialog-route" @click=${() => this._copyText(routeText)}>
                   ${t('Route: {route}', { route: routeText })}
@@ -1020,12 +1050,13 @@ export class MessageBubble extends LitElement {
                       : t('The recipient has not confirmed the message (no ACK).'))
                       + ((msg.deliveryStatus.attempts ?? 1) > 1
                         ? ` · ${t('Sent {n} times, retried automatically', { n: msg.deliveryStatus.attempts ?? 1 })}` : '')
-                    : (msg.deliveryStatus.repeaterCount ?? 0) > 0
-                      ? tn('{n} repeater responded', '{n} repeaters responded', msg.deliveryStatus.repeaterCount ?? 0)
+                    : this._repeatersHeard(msg) > 0
+                      ? tn('{n} repeater responded', '{n} repeaters responded', this._repeatersHeard(msg))
                       : t('No repeaters responded')}${msg.deliveryStatus.roundTripMs ? ` · ${msg.deliveryStatus.roundTripMs}ms RTT` : ''}
                 </div>
               `
             : html``}
+          ${msg.isOutgoing ? this._renderHeardCopies(msg) : html``}
           ${!msg.isOutgoing && msg.resends
             ? msg.resends.map((copy) => html`
                 <div class="message-dialog-route" @click=${() => this._copyText(resendText(msg, copy))}>

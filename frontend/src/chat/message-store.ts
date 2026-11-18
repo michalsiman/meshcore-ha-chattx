@@ -9,7 +9,7 @@ import type {
   HassEvent,
   StoredMessage,
 } from '../types';
-import { generateId, extractMentions, toClientMessage, deriveFloodScope } from './message-parser';
+import { generateId, extractMentions, toClientMessage, deriveFloodScope, enrichRxLog } from './message-parser';
 import { getMessagesAround, isRepeaterSettingsReply } from '../api';
 import {
   CHANNEL_PREFIX_REGEX,
@@ -735,7 +735,7 @@ export class MessageStore {
           const m = this._messages[i];
           if (m.id.startsWith('optimistic_') && m.sender === sender && m.text === text) {
             m.deliveryStatus = deliveryStatus;
-            if (rxLogData) m.rxLogData = rxLogData;
+            if (rxLogData && rxLogData.length > 0) m.rxLogData = enrichRxLog(rxLogData);
             this._notify();
             break;
           }
@@ -945,14 +945,20 @@ export class MessageStore {
       derivedStatus = 'sent';
     }
 
-    // Find most recent outgoing message
+    // The outgoing message with this text, else the most recent outgoing one.
+    const eventText = eventData.message as string | undefined;
     let msg: ChatMessage | undefined;
+    let newest: ChatMessage | undefined;
     for (let i = this._messages.length - 1; i >= 0; i--) {
-      if (this._messages[i].isOutgoing) {
-        msg = this._messages[i];
+      const m = this._messages[i];
+      if (!m.isOutgoing) continue;
+      newest ??= m;
+      if (!eventText || m.text === eventText) {
+        msg = m;
         break;
       }
     }
+    msg ??= newest;
 
     if (msg) {
       msg.deliveryStatus = {
@@ -963,6 +969,11 @@ export class MessageStore {
       };
       if (repeaterCount !== undefined) {
         msg.repeaterCount = repeaterCount;
+      }
+      // Which repeaters were heard, so the dialog can name them and draw
+      // the route before the stored message replaces this one.
+      if (rxLogData && rxLogData.length > 0) {
+        msg.rxLogData = enrichRxLog(rxLogData);
       }
       this._notify();
     }
