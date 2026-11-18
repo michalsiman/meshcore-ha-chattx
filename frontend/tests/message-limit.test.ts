@@ -10,14 +10,14 @@ describe('remainingMessageBytes', () => {
   });
 
   it('takes the sender and separator off channel messages', () => {
-    expect(remainingMessageBytes('', 'TEST-NODE')).toBe(149);
-    expect(remainingMessageBytes('ahoj', 'TEST-NODE')).toBe(145);
+    expect(remainingMessageBytes('', 'TEST-NODE')).toBe(144);
+    expect(remainingMessageBytes('ahoj', 'TEST-NODE')).toBe(140);
   });
 
   it('counts bytes, so diacritics and emoji cost more', () => {
     expect(remainingMessageBytes('č', null)).toBe(158);
     expect(remainingMessageBytes('😀', null)).toBe(156);
-    expect(remainingMessageBytes('', 'Čáp')).toBe(153);
+    expect(remainingMessageBytes('', 'Čáp')).toBe(148);
   });
 
   it('ignores surrounding whitespace, which is not sent', () => {

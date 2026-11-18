@@ -1172,7 +1172,7 @@ describe('byte counter', () => {
 
   it('counts down from the channel limit without the sender name', async () => {
     const page = await mountChatPage({ selectedId: '0' });
-    const start = 160 - new TextEncoder().encode(`${page.config!.node_name}: `).length;
+    const start = 155 - new TextEncoder().encode(`${page.config!.node_name}: `).length;
 
     expect(counter(page).textContent).toBe(String(start));
     await type(page, 'ahoj');

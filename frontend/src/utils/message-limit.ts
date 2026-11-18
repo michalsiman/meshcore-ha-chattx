@@ -2,6 +2,19 @@
 const MAX_MESSAGE_BYTES = 160;
 
 /**
+ * A channel message longer than this still goes out, but its repeats never
+ * reach Home Assistant: the companion pushes a heard packet only when it fits
+ * a 176-byte frame, and "<sender>: <text>" over 155 bytes is encrypted into
+ * one more 16-byte block (176 instead of 160). It would always show as not
+ * heard, so a longer channel text is split instead.
+ */
+const MAX_CHANNEL_MESSAGE_BYTES = 155;
+
+function limit(channelSender: string | null): number {
+  return channelSender === null ? MAX_MESSAGE_BYTES : MAX_CHANNEL_MESSAGE_BYTES;
+}
+
+/**
  * A long text is sent in at most this many messages, each at most
  * PART_MESSAGE_BYTES long (sender prefix included). Short packets get through
  * the mesh more reliably than full ones, so parts stay well below the limit.
@@ -25,7 +38,7 @@ function prefixBytes(channelSender: string | null): number {
  * direct messages carry only the text. Negative when the text is too long.
  */
 export function remainingMessageBytes(text: string, channelSender: string | null): number {
-  return MAX_MESSAGE_BYTES - prefixBytes(channelSender) - bytes(text.trim());
+  return limit(channelSender) - prefixBytes(channelSender) - bytes(text.trim());
 }
 
 /** Cut a word that alone is longer than `budget` bytes, between characters. */
@@ -80,7 +93,7 @@ function fill(text: string, budget: number): string[] {
 export function splitMessage(text: string, channelSender: string | null): string[] | null {
   const trimmed = text.trim();
   if (remainingMessageBytes(trimmed, channelSender) >= 0) return null;
-  const room = Math.min(MAX_MESSAGE_BYTES, PART_MESSAGE_BYTES) - prefixBytes(channelSender);
+  const room = Math.min(limit(channelSender), PART_MESSAGE_BYTES) - prefixBytes(channelSender);
   const total = bytes(trimmed);
   for (let count = 2; count <= MAX_MESSAGE_PARTS; count++) {
     const budget = room - bytes(` ${count}/${count}`);

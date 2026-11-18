@@ -33,6 +33,12 @@ describe('splitMessage', () => {
     expect(parts[0].startsWith('první řádek\ndruhý řádek')).toBe(true);
   });
 
+  it('keeps a channel message within 155 bytes so its repeats can be seen', () => {
+    expect(remainingMessageBytes('x'.repeat(144), 'OK1SIM-HA')).toBe(0);
+    expect(splitMessage('x '.repeat(73).trim() + ' xxx', 'OK1SIM-HA')).not.toBeNull();
+    expect(remainingMessageBytes('x'.repeat(160), null)).toBe(0);
+  });
+
   it('cuts a very long word', () => {
     const parts = splitMessage('a'.repeat(300), null)!;
     expect(parts.length).toBe(4);
