@@ -4,6 +4,8 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-11-18
+
 ### Added
 
 - The dialog of your own channel message names the repeaters heard repeating it: one line per heard copy with the route by name ("Repeater A → Repeater B · 2 hops · SNR 2"), shortest first. "N repeaters responded" now counts each repeater once (a copy that came back the long way through the same repeater no longer counts again).
