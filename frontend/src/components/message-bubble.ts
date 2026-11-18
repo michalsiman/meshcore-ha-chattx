@@ -31,6 +31,9 @@ function senderColorFromPrefix(prefix: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
+/** Reaction senders named under a bubble before the rest becomes "+N". */
+const REACTION_NAMES_SHOWN = 3;
+
 @customElement('chattx-message-bubble')
 export class MessageBubble extends LitElement {
   @property({ type: Object }) group?: MessageGroup;
@@ -425,6 +428,17 @@ export class MessageBubble extends LitElement {
       opacity: 0.8;
     }
 
+    .reaction-names {
+      margin-left: 3px;
+      font-size: 11px;
+      font-style: italic;
+      opacity: 0.75;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .reaction-picker {
       display: flex;
       justify-content: space-around;
@@ -609,14 +623,24 @@ export class MessageBubble extends LitElement {
     </div>`;
   }
 
-  /** Reaction chips under the bubble: emoji and count, senders on hover. */
+  /**
+   * Reaction chips under the bubble: the emoji and who sent it, in small
+   * italics. Past REACTION_NAMES_SHOWN names the rest is a count ("+2");
+   * the full list is on hover and in the message dialog.
+   */
   private _renderReactions(msg: ChatMessage) {
     const groups = groupReactions(msg.reactions);
     if (groups.length === 0) return html``;
     return html`<div class="reactions">
-      ${groups.map((g) => html`<span class="reaction ${g.own ? 'own' : ''}" title=${g.senders.join(', ')}>
-        ${g.emoji}${g.count > 1 ? html`<span class="reaction-count">${g.count}</span>` : ''}
-      </span>`)}
+      ${groups.map((g) => {
+        const shown = g.senders.slice(0, REACTION_NAMES_SHOWN).join(', ');
+        const more = g.senders.length - REACTION_NAMES_SHOWN;
+        return html`<span class="reaction ${g.own ? 'own' : ''}" title=${g.senders.join(', ')}>
+          ${g.emoji}${g.senders.length
+            ? html`<span class="reaction-names">${shown}${more > 0 ? ` +${more}` : ''}</span>`
+            : g.count > 1 ? html`<span class="reaction-count">${g.count}</span>` : ''}
+        </span>`;
+      })}
     </div>`;
   }
 
