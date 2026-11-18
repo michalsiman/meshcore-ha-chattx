@@ -41,14 +41,15 @@ describe('splitMessage', () => {
 
   it('cuts a very long word', () => {
     const parts = splitMessage('a'.repeat(300), null)!;
-    expect(parts.length).toBe(4);
+    expect(parts.length).toBe(2);
   });
 
-  it('keeps parts short and about the same length', () => {
-    const text = word.repeat(40).trim();
+  it('fills the parts evenly up to the channel limit', () => {
+    const text = word.repeat(60).trim();
     const parts = splitMessage(text, 'OK1SIM-HA')!;
     const sizes = parts.map((p) => new TextEncoder().encode(`OK1SIM-HA: ${p}`).length);
-    expect(Math.max(...sizes)).toBeLessThanOrEqual(100);
+    expect(parts.length).toBe(3);
+    expect(Math.max(...sizes)).toBeLessThanOrEqual(155);
     expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(2 * word.length);
   });
 

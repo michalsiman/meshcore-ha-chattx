@@ -8,7 +8,7 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 - Reactions under a message show who sent them, in small italics next to the emoji ("👍 Krysa, Bob"). Past three names the rest is a count ("+2"); the full list is on hover and in the message dialog.
 
-- Long messages are split into shorter parts of about the same length, at most 100 bytes each including the sender name (before: as full as possible, so the first parts were up to 160 bytes and the last one short). Short packets get through the mesh more reliably. A text can now go out in up to 8 parts.
+- Long messages are split into parts of about the same length (before: as full as possible, so the last part was often short). A text can now go out in up to 8 parts.
 - A channel message is at most 155 bytes including the sender name (before: 160); a longer one is split. From 156 bytes the encrypted message grows by one block and the companion no longer passes its repeats to Home Assistant (frame limit 176 bytes), so such a message always showed "Not heard" although it was sent and repeated. Direct messages keep 160 bytes.
 
 ## [0.25.1] - 2026-11-17
