@@ -1196,7 +1196,7 @@ describe('byte counter', () => {
     const page = await mountChatPage({ selectedId: '0' });
     (page as unknown as { _conversationResolved: boolean })._conversationResolved = true;
     const start = Number(counter(page).textContent);
-    await type(page, `${'slovo '.repeat(Math.ceil((start + 20) / 6))}`.trim());
+    await type(page, `${'slovo '.repeat(Math.ceil((start + 6) / 6))}`.trim());
     expect(counter(page).textContent).toBe('2×');
     expect(send(page).disabled).toBe(false);
     send(page).click();
@@ -1243,7 +1243,7 @@ describe('byte counter', () => {
     const page = await mountChatPage({ selectedId: '0' });
     const start = Number(counter(page).textContent);
 
-    await type(page, 'x '.repeat(start * 4));
+    await type(page, 'x '.repeat(start * 6));
 
     expect(Number(counter(page).textContent)).toBeLessThan(0);
     expect(send(page).disabled).toBe(true);

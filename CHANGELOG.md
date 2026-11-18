@@ -4,6 +4,10 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+### Changed
+
+- Long messages are split into shorter parts of about the same length, at most 100 bytes each including the sender name (before: as full as possible, so the first parts were up to 160 bytes and the last one short). Short packets get through the mesh more reliably. A text can now go out in up to 8 parts.
+
 ## [0.25.1] - 2026-11-17
 
 ### Fixed

@@ -1,8 +1,13 @@
 /** Firmware MAX_TEXT_LEN: the limit is in UTF-8 bytes, not characters. */
 const MAX_MESSAGE_BYTES = 160;
 
-/** A long text is sent in at most this many messages. */
-export const MAX_MESSAGE_PARTS = 5;
+/**
+ * A long text is sent in at most this many messages, each at most
+ * PART_MESSAGE_BYTES long (sender prefix included). Short packets get through
+ * the mesh more reliably than full ones, so parts stay well below the limit.
+ */
+export const MAX_MESSAGE_PARTS = 8;
+const PART_MESSAGE_BYTES = 100;
 
 const encoder = new TextEncoder();
 
@@ -68,20 +73,25 @@ function fill(text: string, budget: number): string[] {
 }
 
 /**
- * A text too long for one message, split into numbered messages that each
- * fit: "… 1/3", "… 2/3", "… 3/3". Null when it fits in one message or would
- * need more than MAX_MESSAGE_PARTS.
+ * A text too long for one message, split into numbered messages of about the
+ * same length, each at most PART_MESSAGE_BYTES: "… 1/3", "… 2/3", "… 3/3".
+ * Null when it fits in one message or would need more than MAX_MESSAGE_PARTS.
  */
 export function splitMessage(text: string, channelSender: string | null): string[] | null {
   const trimmed = text.trim();
   if (remainingMessageBytes(trimmed, channelSender) >= 0) return null;
-  const room = MAX_MESSAGE_BYTES - prefixBytes(channelSender);
+  const room = Math.min(MAX_MESSAGE_BYTES, PART_MESSAGE_BYTES) - prefixBytes(channelSender);
+  const total = bytes(trimmed);
   for (let count = 2; count <= MAX_MESSAGE_PARTS; count++) {
     const budget = room - bytes(` ${count}/${count}`);
     if (budget < 8) return null;
-    const parts = fill(trimmed, budget);
-    if (parts.length <= count) {
-      return parts.map((part, i) => `${part} ${i + 1}/${parts.length}`);
+    if (fill(trimmed, budget).length > count) continue;
+    // Even out the parts: the smallest budget that still needs only `count`.
+    for (let even = Math.min(budget, Math.ceil(total / count)); even <= budget; even++) {
+      const parts = fill(trimmed, even);
+      if (parts.length <= count) {
+        return parts.map((part, i) => `${part} ${i + 1}/${parts.length}`);
+      }
     }
   }
   return null;

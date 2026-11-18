@@ -85,7 +85,7 @@ These features were built by [Michal Šiman](https://github.com/michalsiman) ([O
 - Name suggestions after "@": the radio's contacts and everyone who wrote in the open conversation; Enter or Tab inserts "@[Name] "
 - Send a location with 📍: the radio's position, Home Assistant's home or a place picked on the map; received locations open on the map
 - Bytes-left counter that counts in UTF-8 bytes, as the radio does
-- A message too long for one is sent in numbered parts ("… 1/3", "… 2/3", "… 3/3"), at most 5, a few seconds apart; the counter shows how many, for example "3×"
+- A message too long for one is sent in numbered parts ("… 1/3", "… 2/3", "… 3/3") of about the same length, at most 100 bytes each and at most 8 parts, a few seconds apart; the counter shows how many, for example "3×"
 - Emoji reactions on messages (👍 ❤️ 😂 😮 😢 🙏 in the message dialog), in the MeshCore One format, so they work with MeshCore One, MeshCore Open and KiekR
 - Long web addresses can be shortened with is.gd before sending; addresses in messages are clickable
 - Switch that sends text without diacritics, which leaves more room in a message
