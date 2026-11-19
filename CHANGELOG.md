@@ -8,7 +8,7 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ### Development paused
 
-I'm pausing the development of MeshCore Chattx. Many users of the MeshCore network don't like that a Home Assistant panel makes the mesh reachable over the internet, which goes against the basic idea of MeshCore: communication that works without the internet. I respect that.
+I'm pausing the development of MeshCore Chattx. Many users of the MeshCore network don't like that a Home Assistant panel makes the mesh reachable over the internet, which goes against the basic idea of MeshCore: communication that works without the internet. This happened even though Chattx was designed from the start to work offline, including its maps, and was meant above all for emergency communication. I respect that.
 
 The code stays as it is, but there will be no new releases or fixes for now. The repository is archived (read-only).
 
