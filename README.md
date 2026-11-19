@@ -272,7 +272,7 @@ The Chat images use demo data. The others come from the original MeshCore Chat, 
 <td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/devices-tab.jpg"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/devices-tab.jpg" alt="Devices tab"></a></td>
 </tr>
 <tr>
-<td><b>Chat</b> — channels and DMs in the left rail with All / Unread / DMs / Channels filters; messages rendered with sender, age, hop count, path size and delivery status (Repeated / Sent / Waiting).</td>
+<td><b>Chat</b> — channels and DMs in the left rail with All / Unread / Favourites filters (star chats in Manage); messages rendered with sender, age, hop count, path size and delivery status (Repeated / Sent / Waiting).</td>
 <td><b>Devices</b> — per-device sensor tiles (SNR, RSSI, airtime, battery, message counts) with a neighbor table and quick-action buttons (Flood Advert, Sync Clock, Req Telemetry, Req Status).</td>
 </tr>
 <tr>
