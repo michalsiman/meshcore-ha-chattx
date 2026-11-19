@@ -7,7 +7,7 @@
 > [!TIP]
 > **Maps that work without internet.** The route of every message and all nodes with a position are drawn on a map that Home Assistant keeps locally: world borders and capitals, plus borders, regions, towns and peaks of the countries you choose (247 to pick from). Download it once in Settings → Map and the maps keep working when the internet is down, which is exactly when a mesh network matters.
 >
-> **Also new:** emoji reactions compatible with MeshCore One, long messages sent in numbered parts, images and links in the chat, and repeater management with login, settings, telemetry, neighbours, regions and a terminal.
+> **Also new:** favourite chats, emoji reactions compatible with MeshCore One, long messages sent in numbered parts, images and links in the chat, and repeater management with login, settings, telemetry, neighbours, regions and a terminal.
 
 ## How it differs from the original
 
@@ -142,6 +142,22 @@ These use demo data, and the names and values are made up.
 
 <table>
 <tr>
+<td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-favorites.png"><picture><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-favorites-light.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-favorites.png" alt="Favourite chats on top of the chat list, marked with a star"></picture></a></td>
+<td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-manage-favorites.png"><picture><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-manage-favorites-light.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-manage-favorites.png" alt="Stars next to channels in Manage, and the option to keep favourites on top"></picture></a></td>
+</tr>
+<tr>
+<td><b>Favourites</b> — the chat list filters are All, Unread and Favourites; a gold ★ marks a favourite, and with "Favourites always on top" they come first, alphabetically.</td>
+<td><b>Starring chats</b> — in Manage (⚙) a star next to every contact and channel adds it to the favourites; the same favourites on every device.</td>
+</tr>
+<tr>
+<td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-heard-repeaters.png"><picture><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-heard-repeaters-light.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-heard-repeaters.png" alt="The repeaters that repeated an own message, by name, with the route and signal of each heard copy"></picture></a></td>
+<td width="50%"></td>
+</tr>
+<tr>
+<td><b>Who repeated it</b> — the dialog of your own channel message names the repeaters heard repeating it, one line per heard copy with the route, hops and signal.</td>
+<td></td>
+</tr>
+<tr>
 <td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat-light.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-chat.png" alt="Chat with an image preview, distances and a repeat count"></picture></a></td>
 <td width="50%"><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-long-message.png"><picture><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-long-message-light.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-long-message.png" alt="A long message sent in numbered parts"></picture></a></td>
 </tr>
@@ -154,7 +170,7 @@ These use demo data, and the names and values are made up.
 <td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mentions.png"><picture><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mentions-light.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-mentions.png" alt="Name suggestions after @"></picture></a></td>
 </tr>
 <tr>
-<td><b>Reactions</b> — pick an emoji in the message dialog; reactions show as chips under the message and the dialog lists who reacted. Compatible with MeshCore One, MeshCore Open and KiekR.</td>
+<td><b>Reactions</b> — pick an emoji in the message dialog; reactions show under the message with the names of who sent them (in small italics), and the dialog lists them all. Compatible with MeshCore One, MeshCore Open and KiekR.</td>
 <td><b>"@" suggestions</b> — typing "@a" offers contacts and the people of the conversation; Enter, Tab or a tap inserts "@[Name] ".</td>
 </tr>
 <tr>
