@@ -2,7 +2,7 @@ import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, Channel } from '../types';
-import { FAVORITES_CHANGED, loadFavorites, favoriteKey } from '../utils/favorites';
+import { FAVORITES_CHANGED, favoriteKey, favoritesFirst, loadFavorites, loadFavoritesOnTop } from '../utils/favorites';
 import { SETTINGS_CHANGED } from '../utils/user-settings';
 import type { UnreadController } from '../chat/unread-controller';
 import { formatLastActivity, lastActivityOf, lastPreviewOf } from '../utils/conversation-activity';
@@ -41,7 +41,11 @@ export class ConversationList extends LitElement {
 
   @state() private _activeFilter: ChatFilter = 'all';
   @state() private _favorites: Set<string> = loadFavorites();
-  private _onFavorites = () => { this._favorites = loadFavorites(); };
+  @state() private _favoritesOnTop = loadFavoritesOnTop();
+  private _onFavorites = () => {
+    this._favorites = loadFavorites();
+    this._favoritesOnTop = loadFavoritesOnTop();
+  };
   @state() private _filteredConversations: Array<Contact | Channel> = [];
 
   static styles = css`
@@ -296,7 +300,8 @@ export class ConversationList extends LitElement {
     if (
       changedProperties.has('conversations') ||
       changedProperties.has('_activeFilter') ||
-      changedProperties.has('_favorites')
+      changedProperties.has('_favorites') ||
+      changedProperties.has('_favoritesOnTop')
     ) {
       this._updateFiltered();
     }
@@ -494,6 +499,9 @@ export class ConversationList extends LitElement {
       case 'favorites':
         this._filteredConversations = this.conversations.filter((conv) => this._favorites.has(favoriteKey(conv)));
         break;
+    }
+    if (this._favoritesOnTop) {
+      this._filteredConversations = favoritesFirst(this._filteredConversations, this._favorites);
     }
   }
 }

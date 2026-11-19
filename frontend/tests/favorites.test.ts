@@ -52,3 +52,25 @@ describe('favourites', () => {
     expect([...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent)).toEqual(['Alice', '#Test']);
   });
 });
+
+describe('favourites on top', () => {
+  it('puts favourites first, alphabetically, the rest in the given order', async () => {
+    const { favoritesFirst, saveFavoritesOnTop } = await import('../src/utils/favorites');
+    const zed = { pubkey_prefix: '999999999999', adv_name: 'zed' } as unknown as Contact;
+    const bob = { pubkey_prefix: '888888888888', adv_name: 'Bob' } as unknown as Contact;
+    toggleFavorite(zed);
+    toggleFavorite(channel);
+    const list = [other, zed, contact, channel, bob];
+    expect(favoritesFirst(list, loadFavorites()).map((c) => ('adv_name' in c ? c.adv_name : c.name)))
+      .toEqual(['#Test', 'zed', 'Public', 'Alice', 'Bob']);
+
+    saveFavoritesOnTop(true);
+    const el = document.createElement('chattx-conversation-list') as ConversationList;
+    el.conversations = list;
+    document.body.appendChild(el);
+    await el.updateComplete;
+    await el.updateComplete;
+    expect([...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent))
+      .toEqual(['#Test', 'zed', 'Public', 'Alice', 'Bob']);
+  });
+});

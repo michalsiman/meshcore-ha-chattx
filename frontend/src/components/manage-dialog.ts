@@ -1,7 +1,7 @@
 import { modalFrameStyles } from '../styles';
 import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
-import { favoriteKey, loadFavorites, toggleFavorite } from '../utils/favorites';
+import { favoriteKey, loadFavorites, loadFavoritesOnTop, saveFavoritesOnTop, toggleFavorite } from '../utils/favorites';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, Contact, Channel } from '../types';
 import { getContacts, getChannels, getDeviceConfig, addContact, removeContact, removeChannel } from '../api';
@@ -64,6 +64,7 @@ export class ManageDialog extends LitElement {
   @state() private _channels: Channel[] = [];
   @state() private _searchQuery = '';
   @state() private _favorites: Set<string> = loadFavorites();
+  @state() private _favoritesOnTop = loadFavoritesOnTop();
   @state() private _categoryFilter: 'all' | 'added' | 'discovered' = 'all';
   @state() private _typeFilter: 'all' | 'clients' | 'repeaters' = 'all';
   @state() private _loading = false;
@@ -650,6 +651,17 @@ export class ManageDialog extends LitElement {
               }),
             )} />
           ${t('Show the newest message (sender and text) in the chat list')}
+        </label>
+
+        <label class="list-option">
+          <input
+            type="checkbox"
+            .checked=${this._favoritesOnTop}
+            @change=${(e: Event) => {
+              this._favoritesOnTop = (e.target as HTMLInputElement).checked;
+              saveFavoritesOnTop(this._favoritesOnTop);
+            }} />
+          ${t('Favourites always on top (alphabetically)')}
         </label>
 
         <div class="tab-bar">

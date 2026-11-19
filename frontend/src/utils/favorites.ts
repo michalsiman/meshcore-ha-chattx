@@ -49,3 +49,35 @@ export function toggleFavorite(conv: Contact | Channel): boolean {
 
 /** Fired on this page when a star changes (other devices: SETTINGS_CHANGED). */
 export const FAVORITES_CHANGED = 'chattx-favorites-changed';
+
+const ON_TOP_KEY = 'chattx-favorites-on-top';
+
+/** Whether the chat list puts favourites first, in alphabetical order. Off unless switched on. */
+export function loadFavoritesOnTop(): boolean {
+  try {
+    return settings.getItem(ON_TOP_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function saveFavoritesOnTop(enabled: boolean): void {
+  try {
+    settings.setItem(ON_TOP_KEY, String(enabled));
+  } catch {
+    // Storage unavailable: lasts until the page reloads.
+  }
+  window.dispatchEvent(new CustomEvent(FAVORITES_CHANGED));
+}
+
+function chatName(conv: Contact | Channel): string {
+  return 'pubkey_prefix' in conv ? (conv as Contact).adv_name ?? '' : (conv as Channel).name ?? '';
+}
+
+/** Favourites first, alphabetically, then the rest in the order given. */
+export function favoritesFirst<T extends Contact | Channel>(list: T[], favorites: Set<string>): T[] {
+  const top = list.filter((c) => favorites.has(favoriteKey(c)));
+  const rest = list.filter((c) => !favorites.has(favoriteKey(c)));
+  top.sort((a, b) => chatName(a).replace(/^#/, '').localeCompare(chatName(b).replace(/^#/, ''), undefined, { sensitivity: 'base' }));
+  return [...top, ...rest];
+}
