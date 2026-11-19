@@ -4,6 +4,10 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+### Changed
+
+- Blocking a sender now also hides replies to them: a message from someone else that mentions a blocked name ("@[Name] …") is not stored or shown, unless it mentions you too. Replies stored before are hidden as well. The text in Settings → Blocked contacts says so: you see neither the blocked sender's messages nor reactions to them (replies and emoji reactions).
+
 ## [0.28.0] - 2026-11-19
 
 ### Added

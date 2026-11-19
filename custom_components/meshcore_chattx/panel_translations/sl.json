@@ -630,7 +630,6 @@
   "Kilometres": "Kilometri",
   "Miles": "Milje",
   "Blocked contacts": "Blokirani stiki",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Sporočila teh pošiljateljev se ne prikazujejo in ne shranjujejo, v kanalih in neposrednih sporočilih. Pošiljatelj se izbere z javnim ključem, ne glede na ime; v kanalih, kjer sporočilo nosi le ime, se primerjajo vsa imena, pod katerimi se je ključ pojavil.",
   "Nobody is blocked.": "Nihče ni blokiran.",
   "Unknown name": "Neznano ime",
   "Contact name or public key": "Ime stika ali javni ključ",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Še ni priljubljenih: označi klepete z zvezdico v Upravljanju (⚙).",
   "Add to favourites": "Dodaj med priljubljene",
   "Remove from favourites": "Odstrani iz priljubljenih",
-  "Favourites always on top (alphabetically)": "Priljubljeni vedno na vrhu (po abecedi)"
+  "Favourites always on top (alphabetically)": "Priljubljeni vedno na vrhu (po abecedi)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Ne boš videl sporočil teh pošiljateljev niti odzivov na njihova sporočila: odgovorov drugih, ki se začnejo z @[njihovo ime] (razen če omenjajo tudi tebe), in emoji odzivov. Velja za kanale in neposredna sporočila, in nič od tega se ne shrani. Pošiljatelj se izbere po javnem ključu, ne glede na ime; v kanalih, kjer sporočilo nosi samo ime, se primerjajo vsa imena ključa."
 }

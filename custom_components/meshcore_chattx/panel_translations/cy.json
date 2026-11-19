@@ -630,7 +630,6 @@
   "Kilometres": "Cilometrau",
   "Miles": "Milltiroedd",
   "Blocked contacts": "Cysylltiadau wedi'u rhwystro",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Nid yw negeseuon gan yr anfonwyr hyn yn cael eu dangos na'u cadw, mewn sianeli nac mewn negeseuon preifat. Dewisir anfonwr yn ôl ei allwedd gyhoeddus, beth bynnag yw ei enw; mewn sianeli, lle mae negeseuon yn cario enw'r anfonwr yn unig, mae pob enw a ddefnyddiwyd gan yr allwedd yn cael ei gymharu.",
   "Nobody is blocked.": "Does neb wedi'i rwystro.",
   "Unknown name": "Enw anhysbys",
   "Contact name or public key": "Enw'r cyswllt neu'r allwedd gyhoeddus",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Dim ffefrynnau eto: marciwch sgyrsiau gyda’r seren yn Rheoli (⚙).",
   "Add to favourites": "Ychwanegu at ffefrynnau",
   "Remove from favourites": "Tynnu o ffefrynnau",
-  "Favourites always on top (alphabetically)": "Ffefrynnau bob amser ar y brig (yn nhrefn yr wyddor)"
+  "Favourites always on top (alphabetically)": "Ffefrynnau bob amser ar y brig (yn nhrefn yr wyddor)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Ni fyddwch yn gweld negeseuon gan yr anfonwyr hyn, na’r ymatebion i’w negeseuon: atebion gan eraill sy’n dechrau gydag @[eu henw] (oni bai eu bod yn eich crybwyll chi hefyd) ac ymatebion emoji. Mae hyn yn berthnasol i sianeli a negeseuon uniongyrchol, ac nid oes dim ohono’n cael ei gadw. Dewisir anfonwr yn ôl allwedd gyhoeddus, beth bynnag ei enw; mewn sianeli, lle mae negeseuon yn cario’r enw yn unig, cymherir pob enw sydd gan yr allwedd."
 }

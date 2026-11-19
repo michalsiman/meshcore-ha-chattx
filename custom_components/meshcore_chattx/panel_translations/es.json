@@ -630,7 +630,6 @@
   "Kilometres": "Kilómetros",
   "Miles": "Millas",
   "Blocked contacts": "Contactos bloqueados",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Los mensajes de estos remitentes no se muestran ni se guardan, ni en canales ni en mensajes privados. El remitente se elige por su clave pública, sea cual sea su nombre; en los canales, donde los mensajes solo llevan el nombre del remitente, se comparan todos los nombres con los que ha aparecido la clave.",
   "Nobody is blocked.": "No hay nadie bloqueado.",
   "Unknown name": "Nombre desconocido",
   "Contact name or public key": "Nombre del contacto o clave pública",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Aún no hay favoritos: marca chats con la estrella en Gestionar (⚙).",
   "Add to favourites": "Añadir a favoritos",
   "Remove from favourites": "Quitar de favoritos",
-  "Favourites always on top (alphabetically)": "Favoritos siempre arriba (por orden alfabético)"
+  "Favourites always on top (alphabetically)": "Favoritos siempre arriba (por orden alfabético)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "No verás los mensajes de estos remitentes ni las reacciones a sus mensajes: respuestas de otros que empiezan por @[su nombre] (salvo que también te mencionen) y reacciones emoji. Se aplica a canales y mensajes directos, y nada de ello se guarda. Un remitente se elige por su clave pública, se llame como se llame; en los canales, donde los mensajes solo llevan el nombre, se comparan todos los nombres de la clave."
 }

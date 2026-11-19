@@ -630,7 +630,6 @@
   "Kilometres": "Kilometre",
   "Miles": "Míle",
   "Blocked contacts": "Blokované kontakty",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Správy od týchto odosielateľov sa nezobrazujú ani neukladajú, v kanáloch ani v priamych správach. Odosielateľ sa určuje verejným kľúčom bez ohľadu na meno; v kanáloch, kde správa nesie len meno odosielateľa, sa porovnávajú všetky mená, pod ktorými sa kľúč objavil.",
   "Nobody is blocked.": "Nikto nie je blokovaný.",
   "Unknown name": "Neznáme meno",
   "Contact name or public key": "Meno kontaktu alebo verejný kľúč",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Zatiaľ žiadne obľúbené: označ chaty hviezdičkou v Správe (⚙).",
   "Add to favourites": "Pridať do obľúbených",
   "Remove from favourites": "Odobrať z obľúbených",
-  "Favourites always on top (alphabetically)": "Obľúbené vždy hore (abecedne)"
+  "Favourites always on top (alphabetically)": "Obľúbené vždy hore (abecedne)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Správy od týchto odosielateľov neuvidíš, ani reakcie na ich správy: odpovede ostatných začínajúce @[ich meno] (ak v nich nie si spomenutý aj ty) a emoji reakcie. Platí to v kanáloch aj priamych správach a nič z toho sa neukladá. Odosielateľ sa vyberá podľa verejného kľúča, nech sa volá akokoľvek; v kanáloch, kde správa nesie len meno odosielateľa, sa porovnávajú všetky mená, pod ktorými sa kľúč objavil."
 }

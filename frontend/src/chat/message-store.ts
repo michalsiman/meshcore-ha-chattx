@@ -83,8 +83,10 @@ export class MessageStore {
   }
 
   get messages(): ChatMessage[] {
-    // Messages of blocked senders, stored before blocking or arriving live, stay hidden.
-    return this._messages.some(isBlockedMessage) ? this._messages.filter((m) => !isBlockedMessage(m)) : this._messages;
+    // Messages of blocked senders and replies to them, stored before blocking or arriving live, stay hidden.
+    const own = this._config?.node_name;
+    const hidden = (m: ChatMessage) => isBlockedMessage(m, own);
+    return this._messages.some(hidden) ? this._messages.filter((m) => !hidden(m)) : this._messages;
   }
 
   get loading(): boolean {

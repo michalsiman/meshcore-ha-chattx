@@ -630,7 +630,6 @@
   "Kilometres": "Chilometri",
   "Miles": "Miglia",
   "Blocked contacts": "Contatti bloccati",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "I messaggi di questi mittenti non vengono mostrati né salvati, né nei canali né nei messaggi privati. Il mittente si sceglie con la chiave pubblica, qualunque sia il nome; nei canali, dove i messaggi portano solo il nome del mittente, si confrontano tutti i nomi con cui la chiave è comparsa.",
   "Nobody is blocked.": "Nessuno è bloccato.",
   "Unknown name": "Nome sconosciuto",
   "Contact name or public key": "Nome del contatto o chiave pubblica",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Nessun preferito: segna le chat con la stella in Gestisci (⚙).",
   "Add to favourites": "Aggiungi ai preferiti",
   "Remove from favourites": "Rimuovi dai preferiti",
-  "Favourites always on top (alphabetically)": "Preferiti sempre in alto (in ordine alfabetico)"
+  "Favourites always on top (alphabetically)": "Preferiti sempre in alto (in ordine alfabetico)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Non vedrai i messaggi di questi mittenti né le reazioni ai loro messaggi: risposte di altri che iniziano con @[il loro nome] (a meno che menzionino anche te) e reazioni emoji. Vale per canali e messaggi diretti, e nulla viene salvato. Un mittente si sceglie per chiave pubblica, qualunque sia il nome; nei canali, dove i messaggi portano solo il nome, si confrontano tutti i nomi della chiave."
 }

@@ -637,6 +637,9 @@ def _make_message_handler(hass: HomeAssistant, entry_id: str):
         if blocklist is not None and blocklist.is_blocked(record):
             _LOGGER.debug("Message from a blocked sender in %s not stored", entity_id)
             return
+        if blocklist is not None and blocklist.is_reply_to_blocked(record, _own_names(hass)):
+            _LOGGER.debug("Reply to a blocked sender in %s not stored", entity_id)
+            return
 
         await _record_sender_timestamp(hass, data, record)
 
@@ -701,6 +704,16 @@ def _make_message_handler(hass: HomeAssistant, entry_id: str):
                 )
 
     return _handle
+
+
+def _own_names(hass: HomeAssistant) -> list[str]:
+    """Our node's advertised names, from the core integration's radios."""
+    names: list[str] = []
+    for coordinator in (hass.data.get(MESHCORE_DOMAIN) or {}).values():
+        info = getattr(getattr(coordinator, "api", None), "self_info", None)
+        if isinstance(info, dict) and isinstance(info.get("name"), str) and info["name"]:
+            names.append(info["name"])
+    return names
 
 
 def _make_delivery_update_handler(hass: HomeAssistant, entry_id: str):

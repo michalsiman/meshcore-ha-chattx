@@ -202,7 +202,7 @@ These use demo data, and the names and values are made up.
 <td><a href="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-settings-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-settings-map-light.png"><img src="https://raw.githubusercontent.com/michalsiman/meshcore-ha-chattx/main/assets/screenshots/chattx-settings-map.png" alt="Offline map download in Settings"></picture></a></td>
 </tr>
 <tr>
-<td><b>Blocked contacts</b> — chosen by public key; their messages are neither shown nor stored.</td>
+<td><b>Blocked contacts</b> — chosen by public key; neither their messages nor replies and reactions to them are shown or stored.</td>
 <td><b>Map settings</b> — countries for the offline map (247, Home Assistant's country and its neighbours suggested), distance unit, and the switch for the offline map only.</td>
 </tr>
 <tr>

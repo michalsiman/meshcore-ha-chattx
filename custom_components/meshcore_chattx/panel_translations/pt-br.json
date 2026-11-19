@@ -630,7 +630,6 @@
   "Kilometres": "Quilômetros",
   "Miles": "Milhas",
   "Blocked contacts": "Contatos bloqueados",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "As mensagens destes remetentes não são mostradas nem salvas, nem nos canais nem nas mensagens privadas. O remetente é escolhido pela chave pública, seja qual for o nome; nos canais, onde as mensagens só levam o nome do remetente, são comparados todos os nomes com que a chave apareceu.",
   "Nobody is blocked.": "Ninguém está bloqueado.",
   "Unknown name": "Nome desconhecido",
   "Contact name or public key": "Nome do contato ou chave pública",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Nenhum favorito ainda: marque conversas com a estrela em Gerenciar (⚙).",
   "Add to favourites": "Adicionar aos favoritos",
   "Remove from favourites": "Remover dos favoritos",
-  "Favourites always on top (alphabetically)": "Favoritos sempre no topo (em ordem alfabética)"
+  "Favourites always on top (alphabetically)": "Favoritos sempre no topo (em ordem alfabética)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Você não verá as mensagens desses remetentes nem as reações às mensagens deles: respostas de outros que começam com @[o nome deles] (a menos que também mencionem você) e reações emoji. Vale para canais e mensagens diretas, e nada disso é salvo. Um remetente é escolhido pela chave pública, seja qual for o nome; nos canais, onde as mensagens só trazem o nome, todos os nomes da chave são comparados."
 }

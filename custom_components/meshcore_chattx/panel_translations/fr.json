@@ -630,7 +630,6 @@
   "Kilometres": "Kilomètres",
   "Miles": "Miles",
   "Blocked contacts": "Contacts bloqués",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Les messages de ces expéditeurs ne sont ni affichés ni enregistrés, dans les canaux comme en messages directs. Un expéditeur est choisi par sa clé publique, quel que soit son nom ; dans les canaux, où les messages ne portent que le nom, tous les noms sous lesquels la clé est apparue sont comparés.",
   "Nobody is blocked.": "Personne n’est bloqué.",
   "Unknown name": "Nom inconnu",
   "Contact name or public key": "Nom du contact ou clé publique",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Aucun favori : marquez des discussions avec l’étoile dans Gérer (⚙).",
   "Add to favourites": "Ajouter aux favoris",
   "Remove from favourites": "Retirer des favoris",
-  "Favourites always on top (alphabetically)": "Favoris toujours en haut (par ordre alphabétique)"
+  "Favourites always on top (alphabetically)": "Favoris toujours en haut (par ordre alphabétique)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Vous ne verrez ni les messages de ces expéditeurs, ni les réactions à leurs messages : les réponses des autres commençant par @[leur nom] (sauf si elles vous mentionnent aussi) et les réactions emoji. Cela vaut pour les canaux et les messages directs, et rien n’en est enregistré. Un expéditeur est choisi par sa clé publique, quel que soit son nom ; dans les canaux, où les messages ne portent que le nom, tous les noms de la clé sont comparés."
 }

@@ -630,7 +630,6 @@
   "Kilometres": "Kilometrit",
   "Miles": "Mailit",
   "Blocked contacts": "Estetyt yhteystiedot",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Näiden lähettäjien viestejä ei näytetä eikä tallenneta, ei kanavilla eikä suorissa viesteissä. Lähettäjä valitaan julkisella avaimella nimestä riippumatta; kanavilla, joissa viesti sisältää vain nimen, verrataan kaikkia nimiä, joilla avain on nähty.",
   "Nobody is blocked.": "Ketään ei ole estetty.",
   "Unknown name": "Tuntematon nimi",
   "Contact name or public key": "Yhteystiedon nimi tai julkinen avain",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Ei vielä suosikkeja: merkitse keskustelut tähdellä Hallinnassa (⚙).",
   "Add to favourites": "Lisää suosikkeihin",
   "Remove from favourites": "Poista suosikeista",
-  "Favourites always on top (alphabetically)": "Suosikit aina ylimpänä (aakkosjärjestyksessä)"
+  "Favourites always on top (alphabetically)": "Suosikit aina ylimpänä (aakkosjärjestyksessä)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Et näe näiden lähettäjien viestejä etkä reaktioita heidän viesteihinsä: muiden vastauksia, jotka alkavat @[heidän nimensä] (ellei niissä mainita myös sinua), ja emoji-reaktioita. Tämä koskee kanavia ja suoria viestejä, eikä mitään niistä tallenneta. Lähettäjä valitaan julkisen avaimen mukaan nimestä riippumatta; kanavilla, joissa viesti sisältää vain nimen, verrataan kaikkia avaimen nimiä."
 }

@@ -630,7 +630,6 @@
   "Kilometres": "Quilómetros",
   "Miles": "Milhas",
   "Blocked contacts": "Contactos bloqueados",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "As mensagens destes remetentes não são mostradas nem guardadas, nem nos canais nem nas mensagens privadas. O remetente é escolhido pela chave pública, seja qual for o nome; nos canais, onde as mensagens só levam o nome do remetente, são comparados todos os nomes com que a chave apareceu.",
   "Nobody is blocked.": "Ninguém está bloqueado.",
   "Unknown name": "Nome desconhecido",
   "Contact name or public key": "Nome do contacto ou chave pública",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Ainda sem favoritos: marque conversas com a estrela em Gerir (⚙).",
   "Add to favourites": "Adicionar aos favoritos",
   "Remove from favourites": "Remover dos favoritos",
-  "Favourites always on top (alphabetically)": "Favoritos sempre no topo (por ordem alfabética)"
+  "Favourites always on top (alphabetically)": "Favoritos sempre no topo (por ordem alfabética)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Não verá as mensagens destes remetentes nem as reações às mensagens deles: respostas de outros que começam por @[o nome deles] (a não ser que também o mencionem) e reações emoji. Aplica-se a canais e mensagens diretas, e nada disto é guardado. Um remetente é escolhido pela chave pública, seja qual for o nome; nos canais, onde as mensagens só levam o nome, comparam-se todos os nomes da chave."
 }

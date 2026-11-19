@@ -630,7 +630,6 @@
   "Kilometres": "Kilometry",
   "Miles": "Mile",
   "Blocked contacts": "Zablokowane kontakty",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Wiadomości od tych nadawców nie są pokazywane ani zapisywane, w kanałach i wiadomościach bezpośrednich. Nadawcę wybiera się po kluczu publicznym, niezależnie od nazwy; w kanałach, gdzie wiadomość niesie tylko nazwę, porównywane są wszystkie nazwy, pod którymi pojawił się klucz.",
   "Nobody is blocked.": "Nikt nie jest zablokowany.",
   "Unknown name": "Nieznana nazwa",
   "Contact name or public key": "Nazwa kontaktu lub klucz publiczny",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Brak ulubionych: oznacz czaty gwiazdką w Zarządzaj (⚙).",
   "Add to favourites": "Dodaj do ulubionych",
   "Remove from favourites": "Usuń z ulubionych",
-  "Favourites always on top (alphabetically)": "Ulubione zawsze na górze (alfabetycznie)"
+  "Favourites always on top (alphabetically)": "Ulubione zawsze na górze (alfabetycznie)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Nie zobaczysz wiadomości od tych nadawców ani reakcji na ich wiadomości: odpowiedzi innych zaczynających się od @[ich nazwa] (chyba że wspominają też ciebie) i reakcji emoji. Dotyczy to kanałów i wiadomości bezpośrednich, a nic z tego nie jest zapisywane. Nadawca jest wybierany po kluczu publicznym, niezależnie od nazwy; w kanałach, gdzie wiadomość niesie tylko nazwę nadawcy, porównywane są wszystkie nazwy tego klucza."
 }

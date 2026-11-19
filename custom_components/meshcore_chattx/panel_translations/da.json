@@ -630,7 +630,6 @@
   "Kilometres": "Kilometer",
   "Miles": "Miles",
   "Blocked contacts": "Blokerede kontakter",
-  "Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Beskeder fra disse afsendere vises og gemmes ikke, i kanaler og direkte beskeder. En afsender vælges ud fra den offentlige nøgle, uanset navn; i kanaler, hvor beskeder kun bærer navnet, sammenlignes alle navne, nøglen er set under.",
   "Nobody is blocked.": "Ingen er blokeret.",
   "Unknown name": "Ukendt navn",
   "Contact name or public key": "Kontaktnavn eller offentlig nøgle",
@@ -754,5 +753,6 @@
   "No favourites yet: mark chats with the star in Manage (⚙).": "Ingen favoritter endnu: markér chats med stjernen under Administrer (⚙).",
   "Add to favourites": "Føj til favoritter",
   "Remove from favourites": "Fjern fra favoritter",
-  "Favourites always on top (alphabetically)": "Favoritter altid øverst (alfabetisk)"
+  "Favourites always on top (alphabetically)": "Favoritter altid øverst (alfabetisk)",
+  "You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender's name, every name the key goes by is matched.": "Du ser hverken beskeder fra disse afsendere eller reaktioner på deres beskeder: svar fra andre, der starter med @[deres navn] (medmindre de også nævner dig), og emoji-reaktioner. Det gælder kanaler og direkte beskeder, og intet af det gemmes. En afsender vælges efter offentlig nøgle, uanset navn; i kanaler, hvor beskeder kun bærer navnet, sammenlignes alle nøglens navne."
 }

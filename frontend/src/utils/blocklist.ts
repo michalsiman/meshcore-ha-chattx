@@ -1,7 +1,7 @@
 /**
  * Blocked senders (Settings → Blocked contacts), kept in Home Assistant.
- * The backend no longer stores their messages; here messages stored
- * before blocking and live ones are hidden. Channel messages carry only
+ * The backend no longer stores their messages, nor replies to them; here
+ * messages stored before blocking and live ones are hidden. Channel messages carry only
  * the sender's name, so the names each blocked key went by are matched.
  */
 import type { ChatMessage, HomeAssistant } from '../types';
@@ -37,8 +37,23 @@ export function isBlockedSender(name: string | undefined, pubkeyPrefix?: string 
   return !!name && names.has(name);
 }
 
-export function isBlockedMessage(msg: ChatMessage): boolean {
-  return names.size > 0 && !msg.isOutgoing && !msg.isSystem && names.has(msg.sender);
+/** Names mentioned as "@[Name]", the MeshCore form. */
+function mentionedNames(text: string): string[] {
+  return [...(text ?? '').matchAll(/@\[([^\]]+)\]/g)].map((m) => m[1]);
+}
+
+/**
+ * A received message to hide: from a blocked sender, or a reply to one
+ * ("@[Name] …") that does not mention us (`ownName`) too.
+ */
+export function isBlockedMessage(msg: ChatMessage, ownName?: string): boolean {
+  if (names.size === 0 || msg.isOutgoing || msg.isSystem) return false;
+  if (names.has(msg.sender)) return true;
+  const mentioned = mentionedNames(msg.text);
+  if (mentioned.length === 0) return false;
+  const own = (ownName ?? '').toLocaleLowerCase();
+  if (own && mentioned.some((m) => m.toLocaleLowerCase() === own)) return false;
+  return mentioned.some((m) => names.has(m));
 }
 
 export async function syncBlocklist(hass: HomeAssistant): Promise<void> {

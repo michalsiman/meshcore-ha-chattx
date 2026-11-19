@@ -1,4 +1,5 @@
-"""Blocked senders: messages from them are not stored or shown.
+"""Blocked senders: messages from them are not stored or shown, nor
+replies to them ("@[Name] …" from someone else), unless they mention us too.
 
 An entry is a public key (or its first bytes, at least 6 hex digits).
 Direct messages carry the sender's key prefix, so they are matched by key.
@@ -101,6 +102,25 @@ class BlocklistStore:
         if self._refresh_names():
             self._hass.async_create_task(self._save())
         return any(sender in e["names"] for e in self._entries)
+
+    def is_reply_to_blocked(self, record: dict, own_names: list[str]) -> bool:
+        """True for a received message that mentions a blocked sender
+        ("@[Name] …") and not us: a reply to someone we blocked."""
+        if not self._entries or record.get("outgoing"):
+            return False
+        mentioned = mentioned_names(record.get("text") or "")
+        if not mentioned:
+            return False
+        own = {n.casefold() for n in own_names if n}
+        if any(m.casefold() in own for m in mentioned):
+            return False
+        blocked = {n for e in self._entries for n in e["names"]}
+        return any(m in blocked for m in mentioned)
+
+
+def mentioned_names(text: str) -> list[str]:
+    """Names mentioned as "@[Name]", the MeshCore form."""
+    return re.findall(r"@\[([^\]]+)\]", text or "")
 
 
 def get_blocklist(hass: HomeAssistant) -> BlocklistStore | None:

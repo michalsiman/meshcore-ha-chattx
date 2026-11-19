@@ -119,7 +119,7 @@ export class BlocklistSettings extends LitElement {
     const admin = !!this.hass?.user?.is_admin;
     const contacts = this.hass ? knownContacts(this.hass.states) : [];
     return html`
-      <div class="form-description">${t('Messages from these senders are not shown or stored, in channels and direct messages. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender\'s name, every name the key goes by is matched.')}</div>
+      <div class="form-description">${t('You will not see messages from these senders, nor reactions to their messages: replies from others that start with @[their name] (unless they mention you too) and emoji reactions. This applies to channels and direct messages, and none of it is stored. A sender is chosen by public key, whatever its name; in channels, where messages carry only the sender\'s name, every name the key goes by is matched.')}</div>
       ${this._entries.length === 0
         ? html`<div class="empty">${t('Nobody is blocked.')}</div>`
         : html`<ul>
