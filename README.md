@@ -2,6 +2,15 @@
 
 # MeshCore Chattx for Home Assistant
 
+> [!WARNING]
+> **Development paused (November 2026)**
+>
+> I'm pausing the development of MeshCore Chattx. Many users of the MeshCore network don't like that a Home Assistant panel makes the mesh reachable over the internet, which goes against the basic idea of MeshCore: communication that works without the internet. I respect that.
+>
+> The code stays here as it is, but there will be no new releases or fixes for now.
+>
+> Thank you all for your support, ideas, testing, translations and pull requests so far. 73, Michal OK1SIM
+
 **MeshCore Chattx** is a fork of [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat) by Matt Wolter. It keeps the sidebar chat panel for the [MeshCore](https://meshcore.io) mesh radio network and adds repeater management, better message writing and proper phone support.
 
 > [!TIP]

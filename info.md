@@ -1,3 +1,6 @@
+> [!WARNING]
+> **Development paused (November 2026).** Many users of the MeshCore network don't like that a Home Assistant panel makes the mesh reachable over the internet, which goes against the basic idea of MeshCore: communication that works without the internet. The code stays as it is, but there will be no new releases or fixes for now. Thank you all for your support so far. 73, Michal OK1SIM
+
 # MeshCore Chattx
 
 Sidebar chat panel and persistent message store for the MeshCore mesh radio network.

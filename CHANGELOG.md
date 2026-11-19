@@ -4,6 +4,16 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+## [0.28.3] - 2026-11-19
+
+### Development paused
+
+I'm pausing the development of MeshCore Chattx. Many users of the MeshCore network don't like that a Home Assistant panel makes the mesh reachable over the internet, which goes against the basic idea of MeshCore: communication that works without the internet. I respect that.
+
+The code stays as it is, but there will be no new releases or fixes for now. The repository is archived (read-only).
+
+Thank you all for your support, ideas, testing, translations and pull requests so far. 73, Michal OK1SIM
+
 ## [0.28.2] - 2026-11-19
 
 ### Changed
