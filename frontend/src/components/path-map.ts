@@ -506,7 +506,11 @@ export class PathMap extends LitElement {
       const blob = await this._mapImage();
       this._copyState = 'idle';
       this.dispatchEvent(new CustomEvent('chattx-send-image', {
-        detail: { file: new File([blob], 'chattx-route.png', { type: 'image/png' }) },
+        // A received message's sender is mentioned in the reply, as Reply does.
+        detail: {
+          file: new File([blob], 'chattx-route.png', { type: 'image/png' }),
+          replyTo: this.message && !this.message.isOutgoing && !this.message.isSystem ? this.message.sender : null,
+        },
         bubbles: true,
         composed: true,
       }));

@@ -1323,3 +1323,25 @@ describe('region scope', () => {
     expect(page.shadowRoot!.querySelector('.scope-chip')).toBeNull();
   });
 });
+
+describe('route map sent as an image', () => {
+  async function sendMap(page: ChatPage, replyTo: string | null) {
+    page.dispatchEvent(new CustomEvent('chattx-send-image', {
+      detail: { file: new Blob(['x'], { type: 'image/png' }), replyTo },
+    }));
+    await vi.waitFor(() => expect((page as unknown as { _imageFile: Blob | null })._imageFile).not.toBeNull());
+    await (page as unknown as { _onImageUploaded(e: CustomEvent<{ url: string }>): Promise<void> })
+      ._onImageUploaded(new CustomEvent('image-uploaded', { detail: { url: 'https://example.org/map.png' } }));
+    return (page as unknown as { _inputText: string })._inputText;
+  }
+
+  it('mentions the sender of the message the map belongs to', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    expect(await sendMap(page, 'Alice')).toBe('@[Alice] https://example.org/map.png ');
+  });
+
+  it('adds just the link for an own message', async () => {
+    const page = await mountChatPage({ selectedId: '0' });
+    expect(await sendMap(page, null)).toBe('https://example.org/map.png ');
+  });
+});

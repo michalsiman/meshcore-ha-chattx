@@ -83,6 +83,8 @@ export class ChatPage extends LitElement {
   @state() private _shortening = false;
   /** Image chosen or pasted for upload; the upload dialog is open while set. */
   @state() private _imageFile: Blob | null = null;
+  /** Whose message the image being uploaded answers (a route map): mentioned with the link. */
+  private _imageReplyTo: string | null = null;
   @state() private _locationOpen = false;
   /** The + strip of the composer is open. */
   @state() private _toolsOpen = false;
@@ -1196,7 +1198,7 @@ export class ChatPage extends LitElement {
       <chattx-image-upload-dialog
         .hass=${this.hass}
         .file=${this._imageFile}
-        @close=${() => { this._imageFile = null; }}
+        @close=${() => { this._imageFile = null; this._imageReplyTo = null; }}
         @image-uploaded=${this._onImageUploaded}></chattx-image-upload-dialog>
       <chattx-location-dialog
         .hass=${this.hass}
@@ -1573,8 +1575,10 @@ export class ChatPage extends LitElement {
 
   /** A route map image from a message's details: offer it for the message being written. */
   private _onSendImage = async (e: Event) => {
-    const file = (e as CustomEvent<{ file: Blob }>).detail?.file;
+    const detail = (e as CustomEvent<{ file: Blob; replyTo?: string | null }>).detail;
+    const file = detail?.file;
     if (!file || !this.selectedId) return;
+    this._imageReplyTo = detail.replyTo || null;
     // The message dialog and its map just closed; on a phone their history
     // entries are being left. Opening the upload dialog before that ends
     // would let the going back close it again at once.
@@ -1588,12 +1592,24 @@ export class ChatPage extends LitElement {
     const file = item?.getAsFile();
     if (!file || !this.selectedId) return;
     e.preventDefault();
+    this._imageReplyTo = null;
     this._imageFile = file;
   }
 
   /** Put the uploaded image's address into the message at the cursor. */
   private async _onImageUploaded(e: CustomEvent<{ url: string }>) {
     this._imageFile = null;
+    // A route map answers its message: mention the sender first, as Reply does.
+    const replyTo = this._imageReplyTo;
+    this._imageReplyTo = null;
+    const mention = replyTo ? `@[${replyTo}] ` : '';
+    if (mention && !this._inputText.includes(mention.trim())) {
+      this._inputText = mention + this._inputText.replace(/^\s+/, '');
+      this.requestUpdate();
+      await this.updateComplete;
+      const ta = this.shadowRoot?.querySelector<HTMLTextAreaElement>('.input-area textarea');
+      ta?.setSelectionRange(this._inputText.length, this._inputText.length);
+    }
     await this._onEmojiSelected(new CustomEvent('emoji-selected', {
       detail: { emoji: this._inputText && !/\s$/.test(this._inputText) ? ` ${e.detail.url} ` : `${e.detail.url} ` },
     }));

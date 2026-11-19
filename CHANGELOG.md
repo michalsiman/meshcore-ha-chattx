@@ -4,6 +4,10 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+### Changed
+
+- Sending the route map of a received message (Send map in a message) now puts "@[sender] " before the image link, as Reply does, so the answer goes to the person who wrote the message. An own message's map gets just the link.
+
 ## [0.28.1] - 2026-11-19
 
 ### Changed
