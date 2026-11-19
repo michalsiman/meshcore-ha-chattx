@@ -1,5 +1,7 @@
 > [!WARNING]
-> **Development paused (November 2026).** Many users of the MeshCore network don't like that a Home Assistant panel makes the mesh reachable over the internet, which goes against the basic idea of MeshCore: communication that works without the internet. This happened even though Chattx was designed from the start to work offline, including its maps, and was meant above all for emergency communication. The code stays as it is, but there will be no new releases or fixes for now. Thank you all for your support so far. 73, Michal OK1SIM
+> **Development paused (November 2026).** Many users of the MeshCore network don't like that a Home Assistant panel makes the mesh reachable over the internet, which goes against the basic idea of MeshCore: communication that works without the internet. This happened even though Chattx was designed from the start to work offline, including its maps, and was meant above all for emergency communication. The code stays as it is, but there will be no new releases or fixes for now.
+>
+> **Known security issues, not fixed.** Two problems reported privately remain open: image previews are on by default, so an image link posted on the mesh makes Home Assistant fetch it and reveals the instance's public IP address to that link's server; and the panel's local command channel lets an administrator session run radio commands that meshcore-ha refuses, such as a factory reset. Please uninstall Chattx or switch to [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat). If you keep it for now, turn off image previews in Settings → Images. Thank you all for your support so far. 73, Michal OK1SIM
 
 # MeshCore Chattx
 

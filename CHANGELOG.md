@@ -12,6 +12,8 @@ I'm pausing the development of MeshCore Chattx. Many users of the MeshCore netwo
 
 The code stays as it is, but there will be no new releases or fixes for now. The repository is archived (read-only).
 
+**Known security issues, not fixed.** Two problems reported privately remain open: image previews are on by default, so an image link posted on the mesh makes Home Assistant fetch it and reveals the instance's public IP address to that link's server; and the panel's local command channel lets an administrator session run radio commands that meshcore-ha refuses, such as a factory reset. Please uninstall Chattx or switch to [MeshCore Chat](https://github.com/mwolter805/meshcore-ha-chat). If you keep it for now, turn off image previews in Settings → Images.
+
 Thank you all for your support, ideas, testing, translations and pull requests so far. 73, Michal OK1SIM
 
 ## [0.28.2] - 2026-11-19
