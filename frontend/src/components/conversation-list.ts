@@ -2,12 +2,14 @@ import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Contact, Channel } from '../types';
+import { FAVORITES_CHANGED, loadFavorites, favoriteKey } from '../utils/favorites';
+import { SETTINGS_CHANGED } from '../utils/user-settings';
 import type { UnreadController } from '../chat/unread-controller';
 import { formatLastActivity, lastActivityOf, lastPreviewOf } from '../utils/conversation-activity';
 import { avatarLabel } from '../utils/avatar-label';
 // manage-dialog is loaded by chat-page
 
-type ChatFilter = 'all' | 'unread' | 'dms' | 'channels';
+type ChatFilter = 'all' | 'unread' | 'favorites';
 
 @customElement('chattx-conversation-list')
 export class ConversationList extends LitElement {
@@ -38,6 +40,8 @@ export class ConversationList extends LitElement {
   private _ageTimer: ReturnType<typeof setInterval> | null = null;
 
   @state() private _activeFilter: ChatFilter = 'all';
+  @state() private _favorites: Set<string> = loadFavorites();
+  private _onFavorites = () => { this._favorites = loadFavorites(); };
   @state() private _filteredConversations: Array<Contact | Channel> = [];
 
   static styles = css`
@@ -275,18 +279,24 @@ export class ConversationList extends LitElement {
     super.connectedCallback();
     // The shown ages grow on their own, without any new message.
     this._ageTimer = setInterval(() => this.requestUpdate(), 60_000);
+    window.addEventListener(FAVORITES_CHANGED, this._onFavorites);
+    window.addEventListener(SETTINGS_CHANGED, this._onFavorites);
+    this._onFavorites();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this._ageTimer) clearInterval(this._ageTimer);
     this._ageTimer = null;
+    window.removeEventListener(FAVORITES_CHANGED, this._onFavorites);
+    window.removeEventListener(SETTINGS_CHANGED, this._onFavorites);
   }
 
   updated(changedProperties: Map<string, unknown>) {
     if (
       changedProperties.has('conversations') ||
-      changedProperties.has('_activeFilter')
+      changedProperties.has('_activeFilter') ||
+      changedProperties.has('_favorites')
     ) {
       this._updateFiltered();
     }
@@ -309,8 +319,7 @@ export class ConversationList extends LitElement {
       <div class="filter-bar" role="tablist" aria-label=${t('Conversation filter')}>
         ${this._renderFilterBtn('all', t('All'))}
         ${this._renderFilterBtn('unread', t('Unread'))}
-        ${this._renderFilterBtn('dms', t('DMs'))}
-        ${this._renderFilterBtn('channels', t('Channels'))}
+        ${this._renderFilterBtn('favorites', t('Favourites'))}
       </div>
       <div
         class="conversation-list"
@@ -396,8 +405,7 @@ export class ConversationList extends LitElement {
   private _emptyMessage(): string {
     switch (this._activeFilter) {
       case 'unread': return t('No unread conversations');
-      case 'dms': return t('No direct messages');
-      case 'channels': return t('No channels');
+      case 'favorites': return t('No favourites yet: mark chats with the star in Manage (⚙).');
       default: return t('No conversations yet');
     }
   }
@@ -483,15 +491,8 @@ export class ConversationList extends LitElement {
           return this._getUnreadCount(id) > 0;
         });
         break;
-      case 'dms':
-        this._filteredConversations = this.conversations.filter(
-          (conv) => 'pubkey_prefix' in conv,
-        );
-        break;
-      case 'channels':
-        this._filteredConversations = this.conversations.filter(
-          (conv) => !('pubkey_prefix' in conv),
-        );
+      case 'favorites':
+        this._filteredConversations = this.conversations.filter((conv) => this._favorites.has(favoriteKey(conv)));
         break;
     }
   }

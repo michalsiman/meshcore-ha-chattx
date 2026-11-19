@@ -4,6 +4,14 @@ All notable changes to **MeshCore Chattx for Home Assistant**, a fork of MeshCor
 
 ## [Unreleased]
 
+### Added
+
+- Favourite chats: a star next to every contact and channel in Manage (⚙) puts it among the favourites, and the chat list's Favourites filter shows just those. Favourites are kept with the shared panel settings, so every device sees the same ones; a channel is kept by its name, so moving it to another index keeps it starred.
+
+### Changed
+
+- The chat list filters are All, Unread and Favourites; DMs and Channels are gone (each row still shows whether it is a contact or a channel).
+
 ## [0.27.0] - 2026-11-18
 
 ### Added

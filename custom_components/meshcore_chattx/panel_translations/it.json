@@ -749,5 +749,9 @@
   "More: quick messages, emoji, image, location, without diacritics": "Altro: messaggi rapidi, emoji, immagine, posizione, senza accenti",
   "Also networks on other frequencies": "Anche reti su altre frequenze",
   "Keeps repeaters with the same bandwidth, SF and CR as your radio on any frequency. Networks on other frequencies joined by bridges (such as the Czech and Slovak ones) then show their repeaters in paths too.": "Mantiene i ripetitori con la stessa larghezza di banda, SF e CR della tua radio su qualsiasi frequenza. Le reti su altre frequenze collegate da ponti (come quella ceca e quella slovacca) mostrano così anche i loro ripetitori nei percorsi.",
-  "you were mentioned": "sei stato menzionato"
+  "you were mentioned": "sei stato menzionato",
+  "Favourites": "Preferiti",
+  "No favourites yet: mark chats with the star in Manage (⚙).": "Nessun preferito: segna le chat con la stella in Gestisci (⚙).",
+  "Add to favourites": "Aggiungi ai preferiti",
+  "Remove from favourites": "Rimuovi dai preferiti"
 }

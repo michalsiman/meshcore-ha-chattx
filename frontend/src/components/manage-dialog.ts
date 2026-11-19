@@ -1,6 +1,7 @@
 import { modalFrameStyles } from '../styles';
 import { t } from '../i18n';
 import { LitElement, html, css } from 'lit';
+import { favoriteKey, loadFavorites, toggleFavorite } from '../utils/favorites';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, Contact, Channel } from '../types';
 import { getContacts, getChannels, getDeviceConfig, addContact, removeContact, removeChannel } from '../api';
@@ -62,6 +63,7 @@ export class ManageDialog extends LitElement {
   @state() private _contacts: Contact[] = [];
   @state() private _channels: Channel[] = [];
   @state() private _searchQuery = '';
+  @state() private _favorites: Set<string> = loadFavorites();
   @state() private _categoryFilter: 'all' | 'added' | 'discovered' = 'all';
   @state() private _typeFilter: 'all' | 'clients' | 'repeaters' = 'all';
   @state() private _loading = false;
@@ -368,6 +370,29 @@ export class ManageDialog extends LitElement {
     }
 
     /* Action buttons */
+    .star-btn {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      margin-right: -4px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: none;
+      color: var(--secondary-text-color);
+      font-size: 20px;
+      line-height: 32px;
+      cursor: pointer;
+    }
+
+    .star-btn:hover {
+      background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
+    }
+
+    .star-btn.on {
+      color: #f5b301;
+    }
+
     .action-btn {
       padding: 6px 12px;
       border: 1px solid var(--divider-color, #e0e0e0);
@@ -724,6 +749,14 @@ export class ManageDialog extends LitElement {
     `;
   }
 
+  /** Star that puts a contact or channel among the chat list's favourites. */
+  private _renderStar(conv: Contact | Channel) {
+    const on = this._favorites.has(favoriteKey(conv));
+    const label = on ? t('Remove from favourites') : t('Add to favourites');
+    return html`<button class="star-btn ${on ? 'on' : ''}" title=${label} aria-label=${label} aria-pressed=${on ? 'true' : 'false'}
+      @click=${() => { toggleFavorite(conv); this._favorites = loadFavorites(); }}>${on ? '★' : '☆'}</button>`;
+  }
+
   private _renderContacts() {
     const filtered = this._filterContacts();
 
@@ -761,6 +794,7 @@ export class ManageDialog extends LitElement {
 
     return html`
       <div class="contact-item">
+        ${this._renderStar(contact)}
         <div class="contact-avatar">${avatar}</div>
         <div class="contact-info">
           <div class="contact-name">${contact.adv_name || 'Unknown'}</div>
@@ -827,6 +861,7 @@ export class ManageDialog extends LitElement {
 
         return html`
           <div class="channel-item">
+            ${this._renderStar(channel)}
             <div class="channel-icon">#</div>
             <div class="channel-info">
               <div class="channel-name">${channel.name}</div>
