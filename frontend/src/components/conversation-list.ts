@@ -203,6 +203,12 @@ export class ConversationList extends LitElement {
       white-space: nowrap;
     }
 
+    .fav-star {
+      margin-right: 4px;
+      color: #f5b301;
+      font-size: 13px;
+    }
+
     .conversation-preview {
       font-size: 12px;
       color: var(--secondary-text-color, #727272);
@@ -433,10 +439,11 @@ export class ConversationList extends LitElement {
     );
 
     const isActive = this.activeId === id;
+    const favorite = this._favorites.has(favoriteKey(conv));
 
     const unread = this._getUnreadCount(id);
     const mentioned = unread > 0 && this.unread ? this.unread.mentionCount(id, this.nodePrefix) > 0 : false;
-    const ariaLabel = [name, detail, unread > 0 ? `${unread} unread` : '', mentioned ? t('you were mentioned') : ''].filter(Boolean).join(', ');
+    const ariaLabel = [name, favorite ? t('Favourites') : '', detail, unread > 0 ? `${unread} unread` : '', mentioned ? t('you were mentioned') : ''].filter(Boolean).join(', ');
 
     // Roving tabindex: exactly one item in the list is the Tab stop.
     // Prefer the active item; if nothing is active, the first row.
@@ -460,7 +467,7 @@ export class ConversationList extends LitElement {
         )}>
         <div class="conversation-avatar ${isContact ? '' : 'channel'}">${avatar}</div>
         <div class="conversation-info">
-          <div class="conversation-name">${name}</div>
+          <div class="conversation-name">${favorite ? html`<span class="fav-star" title=${t('Favourites')} aria-hidden="true">★</span>` : ''}${name}</div>
           ${detail ? html`<div class="conversation-detail">${detail}</div>` : ''}
           ${preview ? html`<div class="conversation-preview">${preview}</div>` : ''}
         </div>

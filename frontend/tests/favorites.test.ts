@@ -44,12 +44,12 @@ describe('favourites', () => {
     buttons[2].click();
     await el.updateComplete;
     await el.updateComplete;
-    const names = [...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent);
+    const names = [...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent!.replace('★', ''));
     expect(names).toEqual(['Alice']);
     toggleFavorite(channel);
     await el.updateComplete;
     await el.updateComplete;
-    expect([...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent)).toEqual(['Alice', '#Test']);
+    expect([...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent!.replace('★', ''))).toEqual(['Alice', '#Test']);
   });
 });
 
@@ -70,7 +70,21 @@ describe('favourites on top', () => {
     document.body.appendChild(el);
     await el.updateComplete;
     await el.updateComplete;
-    expect([...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent))
+    expect([...el.shadowRoot!.querySelectorAll('.conversation-name')].map((n) => n.textContent!.replace('★', '')))
       .toEqual(['#Test', 'zed', 'Public', 'Alice', 'Bob']);
+  });
+});
+
+describe('favourite mark in the chat list', () => {
+  it('shows a star before the name of a favourite only', async () => {
+    toggleFavorite(contact);
+    const el = document.createElement('chattx-conversation-list') as ConversationList;
+    el.conversations = [contact, other];
+    document.body.appendChild(el);
+    await el.updateComplete;
+    await el.updateComplete;
+    const names = [...el.shadowRoot!.querySelectorAll('.conversation-name')];
+    expect(names[0].querySelector('.fav-star')?.textContent).toBe('★');
+    expect(names[1].querySelector('.fav-star')).toBeNull();
   });
 });
